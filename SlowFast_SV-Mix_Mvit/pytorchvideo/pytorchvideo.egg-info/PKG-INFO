@@ -1,0 +1,12 @@
+Metadata-Version: 2.1
+Name: pytorchvideo
+Version: 0.1.5
+Summary: A video understanding deep learning library.
+Home-page: https://github.com/facebookresearch/pytorchvideo
+Author: Facebook AI
+License: Apache 2.0
+Requires-Python: >=3.7
+Provides-Extra: test
+Provides-Extra: dev
+Provides-Extra: opencv-python
+License-File: LICENSE
