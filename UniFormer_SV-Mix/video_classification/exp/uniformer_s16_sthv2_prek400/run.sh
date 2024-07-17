@@ -1,0 +1,23 @@
+work_path=$(dirname $0)
+PYTHONPATH=$PYTHONPATH:./slowfast \
+CUDA_VISIBLE_DEVICES=0,4,5,6,7 python tools/run_net.py \
+  --cfg $work_path/config.yaml \
+  DATA.PATH_TO_DATA_DIR ./data_list/sthv2 \
+  DATA.PATH_PREFIX /data/tanyi/ \
+  DATA.LABEL_PATH_TEMPLATE "/data/tanyi/some_some_v2/trainValTest_nozero/{}.txt" \
+  DATA.IMAGE_TEMPLATE "{:06d}.jpg" \
+  DATA.PATH_LABEL_SEPARATOR "," \
+  TRAIN.EVAL_PERIOD 5 \
+  TRAIN.CHECKPOINT_PERIOD 1 \
+  TRAIN.BATCH_SIZE 40 \
+  TEST.BATCH_SIZE 40 \
+  NUM_GPUS 5 \
+  UNIFORMER.DROP_DEPTH_RATE 0.3 \
+  AUG.NUM_SAMPLE 1\
+  SOLVER.MAX_EPOCH 50 \
+  SOLVER.BASE_LR 25e-5 \
+  SOLVER.WARMUP_EPOCHS 5.0 \
+  DATA.TEST_CROP_SIZE 224 \
+  TEST.NUM_ENSEMBLE_VIEWS 1 \
+  TEST.NUM_SPATIAL_CROPS 3 \
+  OUTPUT_DIR $work_path
