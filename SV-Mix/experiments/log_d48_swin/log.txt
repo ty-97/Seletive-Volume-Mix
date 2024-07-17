@@ -1,0 +1,1922 @@
+[07/04 10:52:47] pytorchvideo INFO: Rank of current process: 0. World size: 4
+[07/04 10:52:48] pytorchvideo INFO: Environment info:
+----------------------  ---------------------------------------------------------------------------------------
+sys.platform            linux
+Python                  3.9.0 (default, Nov 15 2020, 14:28:56) [GCC 7.3.0]
+numpy                   1.24.2
+PyTorch                 2.0.0+cu117 @/data/tanyi/anaconda3/envs/torch2/lib/python3.9/site-packages/torch
+PyTorch debug build     False
+GPU available           True
+GPU 0,1,2,3             NVIDIA GeForce RTX 3090 (arch=8.6)
+CUDA_HOME               /usr
+Pillow                  10.0.1
+torchvision             0.15.1+cu117 @/data/tanyi/anaconda3/envs/torch2/lib/python3.9/site-packages/torchvision
+torchvision arch flags  3.5, 5.0, 6.0, 7.0, 7.5, 8.0, 8.6
+fvcore                  0.1.5.post20221221
+iopath                  0.1.10
+----------------------  ---------------------------------------------------------------------------------------
+PyTorch built with:
+  - GCC 9.3
+  - C++ Version: 201703
+  - Intel(R) oneAPI Math Kernel Library Version 2022.2-Product Build 20220804 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.7.3 (Git Hash 6dbeffbae1f23cbbeae17adb7b5b13f1f37c080e)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.7
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.5
+  - Magma 2.6.1
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.7, CUDNN_VERSION=8.5.0, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -D_GLIBCXX_USE_CXX11_ABI=0 -fabi-version=11 -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOROCTRACER -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wunused-local-typedefs -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Werror=cast-function-type -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_DISABLE_GPU_ASSERTS=ON, TORCH_VERSION=2.0.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=1, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+[07/04 10:52:48] pytorchvideo INFO: Command line arguments: Namespace(config_file='experiments/d48_swin_s2s+t2t_8gpu_mixlr002.yaml', resume=False, eval_only=False, num_gpus=4, repeat_time=1, num_machines=1, machine_rank=0, dist_url='auto', opts=[])
+[07/04 10:52:48] pytorchvideo INFO: Contents of args.config_file=experiments/d48_swin_s2s+t2t_8gpu_mixlr002.yaml:
+DATASET:
+  NAME: 'VideoClsDataset'
+
+DATALOADER:
+  TRAIN_BATCH_SIZE: 8
+  TEST_BATCH_SIZE: 8
+  TOTAL_BATCH_SIZE: 32
+  NUM_WORKERS: 4
+  ROOT_PATH: '/data/tanyi/diving48'
+  TRAIN_LIST_FILE: 'trainValTest/train.txt'
+  TEST_LIST_FILE: 'trainValTest/val.txt'
+  FORMAT: 'DECORD_.mp4'
+  NUM_CLIPS: 1
+  NUM_CROPS: 1
+  NUM_SEGMENTS: 16
+  CLIP_LENGTH: 1
+  NUM_STEPS: 1
+
+ENGINE:
+  NAME: 'DefaultTrainer'
+  BEST_METRICS: ['ACC-1crop@1']
+  FP16: True
+
+TRANSFORM:
+  NAME: 'SIFARTransform'
+  CROP_SIZE: 224
+  TEST_CROP_SIZE: 224
+  NO_HORIZONTAL_FLIP: False
+  TIME_DIM: 'T'
+  MIXUP_PROB: 1.
+  SWITCH_PROB: .5
+  MASK_MOTION_CUT: 1.
+  MIXUP_LABELSMOOTHING: .1
+
+
+MODEL:
+  NAME: 'VIDEO_SWIN'
+  ARCH: 'video_swin_vit_s_p4_w7'
+  NUM_CLASSES: 48
+  DROP_PATH_RATIO: 0.2
+  WEIGHTS: '/data/tanyi/swin_small_patch244_window877_kinetics400_1k.pth'
+  REMOVE_FC: True
+  FROZEN_BN: False
+  TRANSFER_WEIGHTS: True
+
+SOLVER:
+  NAME: 'AdamW'
+  NAME_MIXBLOCK: 'SGD'
+  PARAMS: 'default'
+  EPOCH: 50
+  CHECKPOINT_PERIOD: 1
+  EVAL_PERIOD: 5
+  DENSE_EVAL_EPOCH: 40
+  BASE_LR: 2e-4
+  BASE_LR_MIXBLOCK: 0.02
+  WEIGHT_DECAY: 0.05
+  WEIGHT_DECAY_MIXBLOCK: 0.0001
+  MOMENTUM: 0.9
+  ALPHA: 0.99
+  BETAS: [0.9, 0.999]
+  WRITE_PERIOD: 50
+  AUTO_LR: False
+  GRAD_CLIP: 1.
+  GRAD_CLIP_MIXBLOCK: 20.
+
+LR_SCHEDULER:
+  NAME: 'WarmupCosineLR'
+  WARMUP_EPOCH: 5
+
+LOSSES:
+  # NAMES: ['LabelSmoothing']
+  # LABELSMOOTHING: 0.1
+  NAMES: ['SoftTargetCrossEntropy']
+
+
+INFERENCE:
+  NAME: 'ClsEvaluator'
+[07/04 10:52:48] pytorchvideo INFO: Running with full config:
+CUDNN_BENCHMARK: True
+DATALOADER:
+  CLIP_LENGTH: 1
+  FORMAT: DECORD_.mp4
+  NUM_CLIPS: 1
+  NUM_CROPS: 1
+  NUM_SEGMENTS: 16
+  NUM_STEPS: 1
+  NUM_WORKERS: 4
+  ROOT_PATH: /data/tanyi/diving48
+  SHUFFLE: True
+  TEST_BATCH_SIZE: 8
+  TEST_LIST_FILE: trainValTest/val.txt
+  TOTAL_BATCH_SIZE: 32
+  TRAIN_BATCH_SIZE: 8
+  TRAIN_LIST_FILE: trainValTest/train.txt
+DATASET:
+  NAME: VideoClsDataset
+ENGINE:
+  BEST_METRICS: ['ACC-1crop@1']
+  FP16: True
+  NAME: DefaultTrainer
+INFERENCE:
+  NAME: ClsEvaluator
+LOSSES:
+  LABELSMOOTHING: 0.2
+  NAMES: ['SoftTargetCrossEntropy']
+  WEIGHTS: [1.0]
+LR_SCHEDULER:
+  GAMMA: 0.1
+  MILESTONES: (3,)
+  NAME: WarmupCosineLR
+  STEP_SIZE: 3
+  WARMUP_EPOCH: 5
+MODEL:
+  ARCH: video_swin_vit_s_p4_w7
+  ARCH_CFGS: []
+  DEVICE: cuda
+  DROPOUT_RATIO: 0.0
+  DROP_PATH_RATIO: 0.2
+  EARLY_STRIDE: 1
+  FROZEN_BN: False
+  NAME: VIDEO_SWIN
+  NUM_CLASSES: 48
+  REMOVE_FC: True
+  TRANSFER_WEIGHTS: True
+  WEIGHTS: /data/tanyi/swin_small_patch244_window877_kinetics400_1k.pth
+OUTPUT_DIR: experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002
+SEED: -1
+SOLVER:
+  ALPHA: 0.99
+  AUTO_LR: False
+  BASE_LR: 0.0002
+  BASE_LR_MIXBLOCK: 0.02
+  BETAS: [0.9, 0.999]
+  BIAS_LR_FACTOR: 1.0
+  CHECKPOINT_PERIOD: 1
+  DENSE_EVAL_EPOCH: 40
+  EPOCH: 50
+  EPS: 1e-08
+  EVAL_PERIOD: 5
+  FC_LR5: False
+  GRAD_CLIP: 1.0
+  GRAD_CLIP_MIXBLOCK: 20.0
+  GRAD_CLIP_TYPE: norm
+  MOMENTUM: 0.9
+  NAME: AdamW
+  NAME_MIXBLOCK: SGD
+  NESTEROV: False
+  NORM_TYPE: 2.0
+  PARAMS: default
+  REGULARIZE: 1.0
+  SNAPSHOT: 
+  WEIGHT_DECAY: 0.05
+  WEIGHT_DECAY_BIAS: 0.0
+  WEIGHT_DECAY_MIXBLOCK: 0.0001
+  WEIGHT_DECAY_NORM: 0.0
+  WRITE_PERIOD: 50
+TRANSFORM:
+  AUTO_AUG: rand-m7-n4-mstd0.5-inc1
+  CROP_SIZE: 224
+  MASK_MIX: 0.0
+  MASK_MOTION_CUT: 1.0
+  MASK_MOTION_CUT_STATIC: 0.0
+  MIXUP_LABELSMOOTHING: 0.1
+  MIXUP_PROB: 1.0
+  MOTION_CUT: 0.0
+  MOTION_CUT_STATIC: 0.0
+  NAME: SIFARTransform
+  NO_HORIZONTAL_FLIP: False
+  SALIENCY_CUT: 0.0
+  SWITCH_PROB: 0.5
+  TEST_CROP_SIZE: 224
+  TIME_DIM: T
+  USE_FLOW: False
+VERSION: 1
+[07/04 10:52:48] pytorchvideo INFO: Full config saved to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/config.yaml
+[07/04 10:52:48] pts.utils.env INFO: Using a generated random seed 50906638
+[07/04 10:57:17] pytorchvideo INFO: Rank of current process: 0. World size: 4
+[07/04 10:57:18] pytorchvideo INFO: Environment info:
+----------------------  ---------------------------------------------------------------------------------------
+sys.platform            linux
+Python                  3.9.0 (default, Nov 15 2020, 14:28:56) [GCC 7.3.0]
+numpy                   1.24.2
+PyTorch                 2.0.0+cu117 @/data/tanyi/anaconda3/envs/torch2/lib/python3.9/site-packages/torch
+PyTorch debug build     False
+GPU available           True
+GPU 0,1,2,3             NVIDIA GeForce RTX 3090 (arch=8.6)
+CUDA_HOME               /usr
+Pillow                  10.0.1
+torchvision             0.15.1+cu117 @/data/tanyi/anaconda3/envs/torch2/lib/python3.9/site-packages/torchvision
+torchvision arch flags  3.5, 5.0, 6.0, 7.0, 7.5, 8.0, 8.6
+fvcore                  0.1.5.post20221221
+iopath                  0.1.10
+----------------------  ---------------------------------------------------------------------------------------
+PyTorch built with:
+  - GCC 9.3
+  - C++ Version: 201703
+  - Intel(R) oneAPI Math Kernel Library Version 2022.2-Product Build 20220804 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.7.3 (Git Hash 6dbeffbae1f23cbbeae17adb7b5b13f1f37c080e)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.7
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.5
+  - Magma 2.6.1
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.7, CUDNN_VERSION=8.5.0, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -D_GLIBCXX_USE_CXX11_ABI=0 -fabi-version=11 -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOROCTRACER -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wunused-local-typedefs -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Werror=cast-function-type -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_DISABLE_GPU_ASSERTS=ON, TORCH_VERSION=2.0.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=1, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+[07/04 10:57:18] pytorchvideo INFO: Command line arguments: Namespace(config_file='experiments/d48_swin_s2s+t2t_8gpu_mixlr002.yaml', resume=False, eval_only=False, num_gpus=4, repeat_time=1, num_machines=1, machine_rank=0, dist_url='auto', opts=[])
+[07/04 10:57:18] pytorchvideo INFO: Contents of args.config_file=experiments/d48_swin_s2s+t2t_8gpu_mixlr002.yaml:
+DATASET:
+  NAME: 'VideoClsDataset'
+
+DATALOADER:
+  TRAIN_BATCH_SIZE: 8
+  TEST_BATCH_SIZE: 8
+  TOTAL_BATCH_SIZE: 32
+  NUM_WORKERS: 4
+  ROOT_PATH: '/data/tanyi/diving48'
+  TRAIN_LIST_FILE: 'trainValTest/train.txt'
+  TEST_LIST_FILE: 'trainValTest/val.txt'
+  FORMAT: 'DECORD_.mp4'
+  NUM_CLIPS: 1
+  NUM_CROPS: 1
+  NUM_SEGMENTS: 16
+  CLIP_LENGTH: 1
+  NUM_STEPS: 1
+
+ENGINE:
+  NAME: 'DefaultTrainer'
+  BEST_METRICS: ['ACC-1crop@1']
+  FP16: True
+
+TRANSFORM:
+  NAME: 'SIFARTransform'
+  CROP_SIZE: 224
+  TEST_CROP_SIZE: 224
+  NO_HORIZONTAL_FLIP: False
+  TIME_DIM: 'T'
+  MIXUP_PROB: 1.
+  SWITCH_PROB: .5
+  MASK_MOTION_CUT: 1.
+  MIXUP_LABELSMOOTHING: .1
+
+
+MODEL:
+  NAME: 'VIDEO_SWIN'
+  ARCH: 'video_swin_vit_s_p4_w7'
+  NUM_CLASSES: 48
+  DROP_PATH_RATIO: 0.2
+  WEIGHTS: '/data/tanyi/swin_small_patch244_window877_kinetics400_1k.pth'
+  REMOVE_FC: True
+  FROZEN_BN: False
+  TRANSFER_WEIGHTS: True
+
+SOLVER:
+  NAME: 'AdamW'
+  NAME_MIXBLOCK: 'SGD'
+  PARAMS: 'default'
+  EPOCH: 50
+  CHECKPOINT_PERIOD: 1
+  EVAL_PERIOD: 5
+  DENSE_EVAL_EPOCH: 40
+  BASE_LR: 2e-4
+  BASE_LR_MIXBLOCK: 0.02
+  WEIGHT_DECAY: 0.05
+  WEIGHT_DECAY_MIXBLOCK: 0.0001
+  MOMENTUM: 0.9
+  ALPHA: 0.99
+  BETAS: [0.9, 0.999]
+  WRITE_PERIOD: 50
+  AUTO_LR: False
+  GRAD_CLIP: 1.
+  GRAD_CLIP_MIXBLOCK: 20.
+
+LR_SCHEDULER:
+  NAME: 'WarmupCosineLR'
+  WARMUP_EPOCH: 5
+
+LOSSES:
+  # NAMES: ['LabelSmoothing']
+  # LABELSMOOTHING: 0.1
+  NAMES: ['SoftTargetCrossEntropy']
+
+
+INFERENCE:
+  NAME: 'ClsEvaluator'
+[07/04 10:57:18] pytorchvideo INFO: Running with full config:
+CUDNN_BENCHMARK: True
+DATALOADER:
+  CLIP_LENGTH: 1
+  FORMAT: DECORD_.mp4
+  NUM_CLIPS: 1
+  NUM_CROPS: 1
+  NUM_SEGMENTS: 16
+  NUM_STEPS: 1
+  NUM_WORKERS: 4
+  ROOT_PATH: /data/tanyi/diving48
+  SHUFFLE: True
+  TEST_BATCH_SIZE: 8
+  TEST_LIST_FILE: trainValTest/val.txt
+  TOTAL_BATCH_SIZE: 32
+  TRAIN_BATCH_SIZE: 8
+  TRAIN_LIST_FILE: trainValTest/train.txt
+DATASET:
+  NAME: VideoClsDataset
+ENGINE:
+  BEST_METRICS: ['ACC-1crop@1']
+  FP16: True
+  NAME: DefaultTrainer
+INFERENCE:
+  NAME: ClsEvaluator
+LOSSES:
+  LABELSMOOTHING: 0.2
+  NAMES: ['SoftTargetCrossEntropy']
+  WEIGHTS: [1.0]
+LR_SCHEDULER:
+  GAMMA: 0.1
+  MILESTONES: (3,)
+  NAME: WarmupCosineLR
+  STEP_SIZE: 3
+  WARMUP_EPOCH: 5
+MODEL:
+  ARCH: video_swin_vit_s_p4_w7
+  ARCH_CFGS: []
+  DEVICE: cuda
+  DROPOUT_RATIO: 0.0
+  DROP_PATH_RATIO: 0.2
+  EARLY_STRIDE: 1
+  FROZEN_BN: False
+  NAME: VIDEO_SWIN
+  NUM_CLASSES: 48
+  REMOVE_FC: True
+  TRANSFER_WEIGHTS: True
+  WEIGHTS: /data/tanyi/swin_small_patch244_window877_kinetics400_1k.pth
+OUTPUT_DIR: experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002
+SEED: -1
+SOLVER:
+  ALPHA: 0.99
+  AUTO_LR: False
+  BASE_LR: 0.0002
+  BASE_LR_MIXBLOCK: 0.02
+  BETAS: [0.9, 0.999]
+  BIAS_LR_FACTOR: 1.0
+  CHECKPOINT_PERIOD: 1
+  DENSE_EVAL_EPOCH: 40
+  EPOCH: 50
+  EPS: 1e-08
+  EVAL_PERIOD: 5
+  FC_LR5: False
+  GRAD_CLIP: 1.0
+  GRAD_CLIP_MIXBLOCK: 20.0
+  GRAD_CLIP_TYPE: norm
+  MOMENTUM: 0.9
+  NAME: AdamW
+  NAME_MIXBLOCK: SGD
+  NESTEROV: False
+  NORM_TYPE: 2.0
+  PARAMS: default
+  REGULARIZE: 1.0
+  SNAPSHOT: 
+  WEIGHT_DECAY: 0.05
+  WEIGHT_DECAY_BIAS: 0.0
+  WEIGHT_DECAY_MIXBLOCK: 0.0001
+  WEIGHT_DECAY_NORM: 0.0
+  WRITE_PERIOD: 50
+TRANSFORM:
+  AUTO_AUG: rand-m7-n4-mstd0.5-inc1
+  CROP_SIZE: 224
+  MASK_MIX: 0.0
+  MASK_MOTION_CUT: 1.0
+  MASK_MOTION_CUT_STATIC: 0.0
+  MIXUP_LABELSMOOTHING: 0.1
+  MIXUP_PROB: 1.0
+  MOTION_CUT: 0.0
+  MOTION_CUT_STATIC: 0.0
+  NAME: SIFARTransform
+  NO_HORIZONTAL_FLIP: False
+  SALIENCY_CUT: 0.0
+  SWITCH_PROB: 0.5
+  TEST_CROP_SIZE: 224
+  TIME_DIM: T
+  USE_FLOW: False
+VERSION: 1
+[07/04 10:57:18] pytorchvideo INFO: Full config saved to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/config.yaml
+[07/04 10:57:18] pts.utils.env INFO: Using a generated random seed 20859962
+[07/04 11:03:43] pytorchvideo INFO: Rank of current process: 0. World size: 4
+[07/04 11:03:44] pytorchvideo INFO: Environment info:
+----------------------  ---------------------------------------------------------------------------------------
+sys.platform            linux
+Python                  3.9.0 (default, Nov 15 2020, 14:28:56) [GCC 7.3.0]
+numpy                   1.24.2
+PyTorch                 2.0.0+cu117 @/data/tanyi/anaconda3/envs/torch2/lib/python3.9/site-packages/torch
+PyTorch debug build     False
+GPU available           True
+GPU 0,1,2,3             NVIDIA GeForce RTX 3090 (arch=8.6)
+CUDA_HOME               /usr
+Pillow                  10.0.1
+torchvision             0.15.1+cu117 @/data/tanyi/anaconda3/envs/torch2/lib/python3.9/site-packages/torchvision
+torchvision arch flags  3.5, 5.0, 6.0, 7.0, 7.5, 8.0, 8.6
+fvcore                  0.1.5.post20221221
+iopath                  0.1.10
+----------------------  ---------------------------------------------------------------------------------------
+PyTorch built with:
+  - GCC 9.3
+  - C++ Version: 201703
+  - Intel(R) oneAPI Math Kernel Library Version 2022.2-Product Build 20220804 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.7.3 (Git Hash 6dbeffbae1f23cbbeae17adb7b5b13f1f37c080e)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.7
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.5
+  - Magma 2.6.1
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.7, CUDNN_VERSION=8.5.0, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -D_GLIBCXX_USE_CXX11_ABI=0 -fabi-version=11 -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOROCTRACER -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wunused-local-typedefs -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Werror=cast-function-type -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_DISABLE_GPU_ASSERTS=ON, TORCH_VERSION=2.0.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=1, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+[07/04 11:03:44] pytorchvideo INFO: Command line arguments: Namespace(config_file='experiments/d48_swin_s2s+t2t_8gpu_mixlr002.yaml', resume=False, eval_only=False, num_gpus=4, repeat_time=1, num_machines=1, machine_rank=0, dist_url='auto', opts=[])
+[07/04 11:03:44] pytorchvideo INFO: Contents of args.config_file=experiments/d48_swin_s2s+t2t_8gpu_mixlr002.yaml:
+DATASET:
+  NAME: 'VideoClsDataset'
+
+DATALOADER:
+  TRAIN_BATCH_SIZE: 8
+  TEST_BATCH_SIZE: 8
+  TOTAL_BATCH_SIZE: 32
+  NUM_WORKERS: 4
+  ROOT_PATH: '/data/tanyi/diving48'
+  TRAIN_LIST_FILE: 'trainValTest/train.txt'
+  TEST_LIST_FILE: 'trainValTest/val.txt'
+  FORMAT: 'DECORD_.mp4'
+  NUM_CLIPS: 1
+  NUM_CROPS: 1
+  NUM_SEGMENTS: 16
+  CLIP_LENGTH: 1
+  NUM_STEPS: 1
+
+ENGINE:
+  NAME: 'DefaultTrainer'
+  BEST_METRICS: ['ACC-1crop@1']
+  FP16: True
+
+TRANSFORM:
+  NAME: 'SIFARTransform'
+  CROP_SIZE: 224
+  TEST_CROP_SIZE: 224
+  NO_HORIZONTAL_FLIP: False
+  TIME_DIM: 'T'
+  MIXUP_PROB: 1.
+  SWITCH_PROB: .5
+  MASK_MOTION_CUT: 1.
+  MIXUP_LABELSMOOTHING: .1
+
+
+MODEL:
+  NAME: 'VIDEO_SWIN'
+  ARCH: 'video_swin_vit_s_p4_w7'
+  NUM_CLASSES: 48
+  DROP_PATH_RATIO: 0.2
+  WEIGHTS: '/data/tanyi/swin_small_patch244_window877_kinetics400_1k.pth'
+  REMOVE_FC: True
+  FROZEN_BN: False
+  TRANSFER_WEIGHTS: True
+
+SOLVER:
+  NAME: 'AdamW'
+  NAME_MIXBLOCK: 'SGD'
+  PARAMS: 'default'
+  EPOCH: 50
+  CHECKPOINT_PERIOD: 1
+  EVAL_PERIOD: 5
+  DENSE_EVAL_EPOCH: 40
+  BASE_LR: 2e-4
+  BASE_LR_MIXBLOCK: 0.02
+  WEIGHT_DECAY: 0.05
+  WEIGHT_DECAY_MIXBLOCK: 0.0001
+  MOMENTUM: 0.9
+  ALPHA: 0.99
+  BETAS: [0.9, 0.999]
+  WRITE_PERIOD: 50
+  AUTO_LR: False
+  GRAD_CLIP: 1.
+  GRAD_CLIP_MIXBLOCK: 20.
+
+LR_SCHEDULER:
+  NAME: 'WarmupCosineLR'
+  WARMUP_EPOCH: 5
+
+LOSSES:
+  # NAMES: ['LabelSmoothing']
+  # LABELSMOOTHING: 0.1
+  NAMES: ['SoftTargetCrossEntropy']
+
+
+INFERENCE:
+  NAME: 'ClsEvaluator'
+[07/04 11:03:44] pytorchvideo INFO: Running with full config:
+CUDNN_BENCHMARK: True
+DATALOADER:
+  CLIP_LENGTH: 1
+  FORMAT: DECORD_.mp4
+  NUM_CLIPS: 1
+  NUM_CROPS: 1
+  NUM_SEGMENTS: 16
+  NUM_STEPS: 1
+  NUM_WORKERS: 4
+  ROOT_PATH: /data/tanyi/diving48
+  SHUFFLE: True
+  TEST_BATCH_SIZE: 8
+  TEST_LIST_FILE: trainValTest/val.txt
+  TOTAL_BATCH_SIZE: 32
+  TRAIN_BATCH_SIZE: 8
+  TRAIN_LIST_FILE: trainValTest/train.txt
+DATASET:
+  NAME: VideoClsDataset
+ENGINE:
+  BEST_METRICS: ['ACC-1crop@1']
+  FP16: True
+  NAME: DefaultTrainer
+INFERENCE:
+  NAME: ClsEvaluator
+LOSSES:
+  LABELSMOOTHING: 0.2
+  NAMES: ['SoftTargetCrossEntropy']
+  WEIGHTS: [1.0]
+LR_SCHEDULER:
+  GAMMA: 0.1
+  MILESTONES: (3,)
+  NAME: WarmupCosineLR
+  STEP_SIZE: 3
+  WARMUP_EPOCH: 5
+MODEL:
+  ARCH: video_swin_vit_s_p4_w7
+  ARCH_CFGS: []
+  DEVICE: cuda
+  DROPOUT_RATIO: 0.0
+  DROP_PATH_RATIO: 0.2
+  EARLY_STRIDE: 1
+  FROZEN_BN: False
+  NAME: VIDEO_SWIN
+  NUM_CLASSES: 48
+  REMOVE_FC: True
+  TRANSFER_WEIGHTS: True
+  WEIGHTS: /data/tanyi/swin_small_patch244_window877_kinetics400_1k.pth
+OUTPUT_DIR: experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002
+SEED: -1
+SOLVER:
+  ALPHA: 0.99
+  AUTO_LR: False
+  BASE_LR: 0.0002
+  BASE_LR_MIXBLOCK: 0.02
+  BETAS: [0.9, 0.999]
+  BIAS_LR_FACTOR: 1.0
+  CHECKPOINT_PERIOD: 1
+  DENSE_EVAL_EPOCH: 40
+  EPOCH: 50
+  EPS: 1e-08
+  EVAL_PERIOD: 5
+  FC_LR5: False
+  GRAD_CLIP: 1.0
+  GRAD_CLIP_MIXBLOCK: 20.0
+  GRAD_CLIP_TYPE: norm
+  MOMENTUM: 0.9
+  NAME: AdamW
+  NAME_MIXBLOCK: SGD
+  NESTEROV: False
+  NORM_TYPE: 2.0
+  PARAMS: default
+  REGULARIZE: 1.0
+  SNAPSHOT: 
+  WEIGHT_DECAY: 0.05
+  WEIGHT_DECAY_BIAS: 0.0
+  WEIGHT_DECAY_MIXBLOCK: 0.0001
+  WEIGHT_DECAY_NORM: 0.0
+  WRITE_PERIOD: 50
+TRANSFORM:
+  AUTO_AUG: rand-m7-n4-mstd0.5-inc1
+  CROP_SIZE: 224
+  MASK_MIX: 0.0
+  MASK_MOTION_CUT: 1.0
+  MASK_MOTION_CUT_STATIC: 0.0
+  MIXUP_LABELSMOOTHING: 0.1
+  MIXUP_PROB: 1.0
+  MOTION_CUT: 0.0
+  MOTION_CUT_STATIC: 0.0
+  NAME: SIFARTransform
+  NO_HORIZONTAL_FLIP: False
+  SALIENCY_CUT: 0.0
+  SWITCH_PROB: 0.5
+  TEST_CROP_SIZE: 224
+  TIME_DIM: T
+  USE_FLOW: False
+VERSION: 1
+[07/04 11:03:44] pytorchvideo INFO: Full config saved to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/config.yaml
+[07/04 11:03:44] pts.utils.env INFO: Using a generated random seed 47036927
+[07/04 11:03:59] pts.model.base_net INFO: Missing keys: ['layers.0.blocks.0.attn.relative_position_index', 'layers.0.blocks.1.attn.relative_position_index', 'layers.1.blocks.0.attn.relative_position_index', 'layers.1.blocks.1.attn.relative_position_index', 'layers.2.blocks.0.attn.relative_position_index', 'layers.2.blocks.1.attn.relative_position_index', 'layers.2.blocks.2.attn.relative_position_index', 'layers.2.blocks.3.attn.relative_position_index', 'layers.2.blocks.4.attn.relative_position_index', 'layers.2.blocks.5.attn.relative_position_index', 'layers.2.blocks.6.attn.relative_position_index', 'layers.2.blocks.7.attn.relative_position_index', 'layers.2.blocks.8.attn.relative_position_index', 'layers.2.blocks.9.attn.relative_position_index', 'layers.2.blocks.10.attn.relative_position_index', 'layers.2.blocks.11.attn.relative_position_index', 'layers.2.blocks.12.attn.relative_position_index', 'layers.2.blocks.13.attn.relative_position_index', 'layers.2.blocks.14.attn.relative_position_index', 'layers.2.blocks.15.attn.relative_position_index', 'layers.2.blocks.16.attn.relative_position_index', 'layers.2.blocks.17.attn.relative_position_index', 'layers.3.blocks.0.attn.relative_position_index', 'layers.3.blocks.1.attn.relative_position_index', 'fc.weight', 'fc.bias']
+[07/04 11:03:59] pts.model.base_net INFO: Unexpect keys: ['cls_head.fc_cls.weight', 'cls_head.fc_cls.bias']
+[07/04 11:03:59] pts.model.base_net INFO: ==> loaded checkpoint '/data/tanyi/swin_small_patch244_window877_kinetics400_1k.pth'
+[07/04 11:04:17] pts.model.base_net INFO: Missing keys: ['layers.0.blocks.0.attn.relative_position_index', 'layers.0.blocks.1.attn.relative_position_index', 'layers.1.blocks.0.attn.relative_position_index', 'layers.1.blocks.1.attn.relative_position_index', 'layers.2.blocks.0.attn.relative_position_index', 'layers.2.blocks.1.attn.relative_position_index', 'layers.2.blocks.2.attn.relative_position_index', 'layers.2.blocks.3.attn.relative_position_index', 'layers.2.blocks.4.attn.relative_position_index', 'layers.2.blocks.5.attn.relative_position_index', 'layers.2.blocks.6.attn.relative_position_index', 'layers.2.blocks.7.attn.relative_position_index', 'layers.2.blocks.8.attn.relative_position_index', 'layers.2.blocks.9.attn.relative_position_index', 'layers.2.blocks.10.attn.relative_position_index', 'layers.2.blocks.11.attn.relative_position_index', 'layers.2.blocks.12.attn.relative_position_index', 'layers.2.blocks.13.attn.relative_position_index', 'layers.2.blocks.14.attn.relative_position_index', 'layers.2.blocks.15.attn.relative_position_index', 'layers.2.blocks.16.attn.relative_position_index', 'layers.2.blocks.17.attn.relative_position_index', 'layers.3.blocks.0.attn.relative_position_index', 'layers.3.blocks.1.attn.relative_position_index', 'fc.weight', 'fc.bias']
+[07/04 11:04:17] pts.model.base_net INFO: Unexpect keys: ['cls_head.fc_cls.weight', 'cls_head.fc_cls.bias']
+[07/04 11:04:17] pts.model.base_net INFO: ==> loaded checkpoint '/data/tanyi/swin_small_patch244_window877_kinetics400_1k.pth'
+[07/04 11:04:17] pts.engine.defaults INFO: Model:
+VIDEO_SWIN(
+  (patch_embed): PatchEmbed3D(
+    (proj): Conv3d(3, 96, kernel_size=(2, 4, 4), stride=(2, 4, 4))
+    (norm): LayerNorm((96,), eps=1e-05, elementwise_affine=True)
+  )
+  (pos_drop): Dropout(p=0.0, inplace=False)
+  (layers): ModuleList(
+    (0): BasicLayer(
+      (blocks): ModuleList(
+        (0): SwinTransformerBlock3D(
+          (norm1): LayerNorm((96,), eps=1e-05, elementwise_affine=True)
+          (attn): WindowAttention3D(
+            (qkv): Linear(in_features=96, out_features=288, bias=True)
+            (attn_drop): Dropout(p=0.0, inplace=False)
+            (proj): Linear(in_features=96, out_features=96, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (drop_path): Identity()
+          (norm2): LayerNorm((96,), eps=1e-05, elementwise_affine=True)
+          (mlp): Mlp(
+            (fc1): Linear(in_features=96, out_features=384, bias=True)
+            (act): GELU(approximate='none')
+            (fc2): Linear(in_features=384, out_features=96, bias=True)
+            (drop): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (1): SwinTransformerBlock3D(
+          (norm1): LayerNorm((96,), eps=1e-05, elementwise_affine=True)
+          (attn): WindowAttention3D(
+            (qkv): Linear(in_features=96, out_features=288, bias=True)
+            (attn_drop): Dropout(p=0.0, inplace=False)
+            (proj): Linear(in_features=96, out_features=96, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (drop_path): DropPath()
+          (norm2): LayerNorm((96,), eps=1e-05, elementwise_affine=True)
+          (mlp): Mlp(
+            (fc1): Linear(in_features=96, out_features=384, bias=True)
+            (act): GELU(approximate='none')
+            (fc2): Linear(in_features=384, out_features=96, bias=True)
+            (drop): Dropout(p=0.0, inplace=False)
+          )
+        )
+      )
+      (downsample): PatchMerging(
+        (reduction): Linear(in_features=384, out_features=192, bias=False)
+        (norm): LayerNorm((384,), eps=1e-05, elementwise_affine=True)
+      )
+    )
+    (1): BasicLayer(
+      (blocks): ModuleList(
+        (0-1): 2 x SwinTransformerBlock3D(
+          (norm1): LayerNorm((192,), eps=1e-05, elementwise_affine=True)
+          (attn): WindowAttention3D(
+            (qkv): Linear(in_features=192, out_features=576, bias=True)
+            (attn_drop): Dropout(p=0.0, inplace=False)
+            (proj): Linear(in_features=192, out_features=192, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (drop_path): DropPath()
+          (norm2): LayerNorm((192,), eps=1e-05, elementwise_affine=True)
+          (mlp): Mlp(
+            (fc1): Linear(in_features=192, out_features=768, bias=True)
+            (act): GELU(approximate='none')
+            (fc2): Linear(in_features=768, out_features=192, bias=True)
+            (drop): Dropout(p=0.0, inplace=False)
+          )
+        )
+      )
+      (downsample): PatchMerging(
+        (reduction): Linear(in_features=768, out_features=384, bias=False)
+        (norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      )
+    )
+    (2): BasicLayer(
+      (blocks): ModuleList(
+        (0-17): 18 x SwinTransformerBlock3D(
+          (norm1): LayerNorm((384,), eps=1e-05, elementwise_affine=True)
+          (attn): WindowAttention3D(
+            (qkv): Linear(in_features=384, out_features=1152, bias=True)
+            (attn_drop): Dropout(p=0.0, inplace=False)
+            (proj): Linear(in_features=384, out_features=384, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (drop_path): DropPath()
+          (norm2): LayerNorm((384,), eps=1e-05, elementwise_affine=True)
+          (mlp): Mlp(
+            (fc1): Linear(in_features=384, out_features=1536, bias=True)
+            (act): GELU(approximate='none')
+            (fc2): Linear(in_features=1536, out_features=384, bias=True)
+            (drop): Dropout(p=0.0, inplace=False)
+          )
+        )
+      )
+      (downsample): PatchMerging(
+        (reduction): Linear(in_features=1536, out_features=768, bias=False)
+        (norm): LayerNorm((1536,), eps=1e-05, elementwise_affine=True)
+      )
+    )
+    (3): BasicLayer(
+      (blocks): ModuleList(
+        (0-1): 2 x SwinTransformerBlock3D(
+          (norm1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (attn): WindowAttention3D(
+            (qkv): Linear(in_features=768, out_features=2304, bias=True)
+            (attn_drop): Dropout(p=0.0, inplace=False)
+            (proj): Linear(in_features=768, out_features=768, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (drop_path): DropPath()
+          (norm2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (mlp): Mlp(
+            (fc1): Linear(in_features=768, out_features=3072, bias=True)
+            (act): GELU(approximate='none')
+            (fc2): Linear(in_features=3072, out_features=768, bias=True)
+            (drop): Dropout(p=0.0, inplace=False)
+          )
+        )
+      )
+    )
+  )
+  (norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (avgpool): AdaptiveAvgPool3d(output_size=1)
+  (fc): Linear(in_features=768, out_features=48, bias=True)
+)
+[07/04 11:04:26] fvcore.common.checkpoint INFO: No checkpoint found. Initializing model from scratch
+[07/04 11:04:26] pts.engine.train_loop INFO: Starting training from iteration 0
+[07/04 11:04:27] pts.engine.train_loop ERROR: Exception during training:
+Traceback (most recent call last):
+  File "/data/tanyi/ICCV23_learning_mask_tip_addEXP/pytorchvideo/engine/train_loop.py", line 151, in train
+    self.run_step()
+  File "/data/tanyi/ICCV23_learning_mask_tip_addEXP/pytorchvideo/engine/defaults.py", line 432, in run_step
+    x, label, x_ofl, label_ofl, mask_loss = self.mixup(data[kfg.FRAMES], data[kfg.LABELS])
+  File "/data/tanyi/ICCV23_learning_mask_tip_addEXP/pytorchvideo/transform/maskmotioncut.py", line 710, in __call__
+    lam, lam_ofl, rand_index_ol, rand_index_ofl, x_ol, x_ofl, mask_loss = self._mix_batch(x,target)
+  File "/data/tanyi/ICCV23_learning_mask_tip_addEXP/pytorchvideo/transform/maskmotioncut.py", line 589, in _mix_batch
+    _,feature_map = self.tsm_model(data,featuremap='7x7')
+  File "/data/tanyi/anaconda3/envs/torch2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/data/tanyi/anaconda3/envs/torch2/lib/python3.9/site-packages/torch/_dynamo/eval_frame.py", line 82, in forward
+    return self.dynamo_ctx(self._orig_mod.forward)(*args, **kwargs)
+  File "/data/tanyi/anaconda3/envs/torch2/lib/python3.9/site-packages/torch/_dynamo/eval_frame.py", line 209, in _fn
+    return fn(*args, **kwargs)
+  File "/data/tanyi/anaconda3/envs/torch2/lib/python3.9/site-packages/torch/nn/parallel/distributed.py", line 1156, in forward
+    output = self._run_ddp_forward(*inputs, **kwargs)
+  File "/data/tanyi/anaconda3/envs/torch2/lib/python3.9/site-packages/torch/nn/parallel/distributed.py", line 1110, in _run_ddp_forward
+    return module_to_run(*inputs[0], **kwargs[0])  # type: ignore[index]
+  File "/data/tanyi/anaconda3/envs/torch2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/data/tanyi/ICCV23_learning_mask_tip_addEXP/pytorchvideo/model/video_swin.py", line 174, in forward
+    def forward(self, x, featuremap=None):
+AttributeError: 'dict' object has no attribute 'size'
+[07/04 11:04:27] pts.engine.hooks INFO: Total training time: 0:00:01 (0:00:00 on hooks)
+[07/04 11:04:27] pts.engine.hooks INFO: Best accuracy 0.000%
+[07/04 11:04:27] pts.utils.events INFO:  iter: 0 -- [0/469]    lr: N/A  max_mem: 931M
+[07/04 11:14:56] pytorchvideo INFO: Rank of current process: 0. World size: 4
+[07/04 11:14:56] pytorchvideo INFO: Environment info:
+----------------------  ---------------------------------------------------------------------------------------
+sys.platform            linux
+Python                  3.9.0 (default, Nov 15 2020, 14:28:56) [GCC 7.3.0]
+numpy                   1.24.2
+PyTorch                 2.0.0+cu117 @/data/tanyi/anaconda3/envs/torch2/lib/python3.9/site-packages/torch
+PyTorch debug build     False
+GPU available           True
+GPU 0,1,2,3             NVIDIA GeForce RTX 3090 (arch=8.6)
+CUDA_HOME               /usr
+Pillow                  10.0.1
+torchvision             0.15.1+cu117 @/data/tanyi/anaconda3/envs/torch2/lib/python3.9/site-packages/torchvision
+torchvision arch flags  3.5, 5.0, 6.0, 7.0, 7.5, 8.0, 8.6
+fvcore                  0.1.5.post20221221
+iopath                  0.1.10
+----------------------  ---------------------------------------------------------------------------------------
+PyTorch built with:
+  - GCC 9.3
+  - C++ Version: 201703
+  - Intel(R) oneAPI Math Kernel Library Version 2022.2-Product Build 20220804 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.7.3 (Git Hash 6dbeffbae1f23cbbeae17adb7b5b13f1f37c080e)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.7
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.5
+  - Magma 2.6.1
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.7, CUDNN_VERSION=8.5.0, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -D_GLIBCXX_USE_CXX11_ABI=0 -fabi-version=11 -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOROCTRACER -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wunused-local-typedefs -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Werror=cast-function-type -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_DISABLE_GPU_ASSERTS=ON, TORCH_VERSION=2.0.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=1, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+[07/04 11:14:56] pytorchvideo INFO: Command line arguments: Namespace(config_file='experiments/d48_swin_s2s+t2t_8gpu_mixlr002.yaml', resume=False, eval_only=False, num_gpus=4, repeat_time=1, num_machines=1, machine_rank=0, dist_url='auto', opts=[])
+[07/04 11:14:56] pytorchvideo INFO: Contents of args.config_file=experiments/d48_swin_s2s+t2t_8gpu_mixlr002.yaml:
+DATASET:
+  NAME: 'VideoClsDataset'
+
+DATALOADER:
+  TRAIN_BATCH_SIZE: 8
+  TEST_BATCH_SIZE: 8
+  TOTAL_BATCH_SIZE: 32
+  NUM_WORKERS: 4
+  ROOT_PATH: '/data/tanyi/diving48'
+  TRAIN_LIST_FILE: 'trainValTest/train.txt'
+  TEST_LIST_FILE: 'trainValTest/val.txt'
+  FORMAT: 'DECORD_.mp4'
+  NUM_CLIPS: 1
+  NUM_CROPS: 1
+  NUM_SEGMENTS: 16
+  CLIP_LENGTH: 1
+  NUM_STEPS: 1
+
+ENGINE:
+  NAME: 'DefaultTrainer'
+  BEST_METRICS: ['ACC-1crop@1']
+  FP16: True
+
+TRANSFORM:
+  NAME: 'SIFARTransform'
+  CROP_SIZE: 224
+  TEST_CROP_SIZE: 224
+  NO_HORIZONTAL_FLIP: False
+  TIME_DIM: 'T'
+  MIXUP_PROB: 1.
+  SWITCH_PROB: .5
+  MASK_MOTION_CUT: 1.
+  MIXUP_LABELSMOOTHING: .1
+
+
+MODEL:
+  NAME: 'VIDEO_SWIN'
+  ARCH: 'video_swin_vit_s_p4_w7'
+  NUM_CLASSES: 48
+  DROP_PATH_RATIO: 0.2
+  WEIGHTS: '/data/tanyi/swin_small_patch244_window877_kinetics400_1k.pth'
+  REMOVE_FC: True
+  FROZEN_BN: False
+  TRANSFER_WEIGHTS: True
+
+SOLVER:
+  NAME: 'AdamW'
+  NAME_MIXBLOCK: 'SGD'
+  PARAMS: 'default'
+  EPOCH: 50
+  CHECKPOINT_PERIOD: 1
+  EVAL_PERIOD: 5
+  DENSE_EVAL_EPOCH: 40
+  BASE_LR: 2e-4
+  BASE_LR_MIXBLOCK: 0.02
+  WEIGHT_DECAY: 0.05
+  WEIGHT_DECAY_MIXBLOCK: 0.0001
+  MOMENTUM: 0.9
+  ALPHA: 0.99
+  BETAS: [0.9, 0.999]
+  WRITE_PERIOD: 50
+  AUTO_LR: False
+  GRAD_CLIP: 1.
+  GRAD_CLIP_MIXBLOCK: 20.
+
+LR_SCHEDULER:
+  NAME: 'WarmupCosineLR'
+  WARMUP_EPOCH: 5
+
+LOSSES:
+  # NAMES: ['LabelSmoothing']
+  # LABELSMOOTHING: 0.1
+  NAMES: ['SoftTargetCrossEntropy']
+
+
+INFERENCE:
+  NAME: 'ClsEvaluator'
+[07/04 11:14:56] pytorchvideo INFO: Running with full config:
+CUDNN_BENCHMARK: True
+DATALOADER:
+  CLIP_LENGTH: 1
+  FORMAT: DECORD_.mp4
+  NUM_CLIPS: 1
+  NUM_CROPS: 1
+  NUM_SEGMENTS: 16
+  NUM_STEPS: 1
+  NUM_WORKERS: 4
+  ROOT_PATH: /data/tanyi/diving48
+  SHUFFLE: True
+  TEST_BATCH_SIZE: 8
+  TEST_LIST_FILE: trainValTest/val.txt
+  TOTAL_BATCH_SIZE: 32
+  TRAIN_BATCH_SIZE: 8
+  TRAIN_LIST_FILE: trainValTest/train.txt
+DATASET:
+  NAME: VideoClsDataset
+ENGINE:
+  BEST_METRICS: ['ACC-1crop@1']
+  FP16: True
+  NAME: DefaultTrainer
+INFERENCE:
+  NAME: ClsEvaluator
+LOSSES:
+  LABELSMOOTHING: 0.2
+  NAMES: ['SoftTargetCrossEntropy']
+  WEIGHTS: [1.0]
+LR_SCHEDULER:
+  GAMMA: 0.1
+  MILESTONES: (3,)
+  NAME: WarmupCosineLR
+  STEP_SIZE: 3
+  WARMUP_EPOCH: 5
+MODEL:
+  ARCH: video_swin_vit_s_p4_w7
+  ARCH_CFGS: []
+  DEVICE: cuda
+  DROPOUT_RATIO: 0.0
+  DROP_PATH_RATIO: 0.2
+  EARLY_STRIDE: 1
+  FROZEN_BN: False
+  NAME: VIDEO_SWIN
+  NUM_CLASSES: 48
+  REMOVE_FC: True
+  TRANSFER_WEIGHTS: True
+  WEIGHTS: /data/tanyi/swin_small_patch244_window877_kinetics400_1k.pth
+OUTPUT_DIR: experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002
+SEED: -1
+SOLVER:
+  ALPHA: 0.99
+  AUTO_LR: False
+  BASE_LR: 0.0002
+  BASE_LR_MIXBLOCK: 0.02
+  BETAS: [0.9, 0.999]
+  BIAS_LR_FACTOR: 1.0
+  CHECKPOINT_PERIOD: 1
+  DENSE_EVAL_EPOCH: 40
+  EPOCH: 50
+  EPS: 1e-08
+  EVAL_PERIOD: 5
+  FC_LR5: False
+  GRAD_CLIP: 1.0
+  GRAD_CLIP_MIXBLOCK: 20.0
+  GRAD_CLIP_TYPE: norm
+  MOMENTUM: 0.9
+  NAME: AdamW
+  NAME_MIXBLOCK: SGD
+  NESTEROV: False
+  NORM_TYPE: 2.0
+  PARAMS: default
+  REGULARIZE: 1.0
+  SNAPSHOT: 
+  WEIGHT_DECAY: 0.05
+  WEIGHT_DECAY_BIAS: 0.0
+  WEIGHT_DECAY_MIXBLOCK: 0.0001
+  WEIGHT_DECAY_NORM: 0.0
+  WRITE_PERIOD: 50
+TRANSFORM:
+  AUTO_AUG: rand-m7-n4-mstd0.5-inc1
+  CROP_SIZE: 224
+  MASK_MIX: 0.0
+  MASK_MOTION_CUT: 1.0
+  MASK_MOTION_CUT_STATIC: 0.0
+  MIXUP_LABELSMOOTHING: 0.1
+  MIXUP_PROB: 1.0
+  MOTION_CUT: 0.0
+  MOTION_CUT_STATIC: 0.0
+  NAME: SIFARTransform
+  NO_HORIZONTAL_FLIP: False
+  SALIENCY_CUT: 0.0
+  SWITCH_PROB: 0.5
+  TEST_CROP_SIZE: 224
+  TIME_DIM: T
+  USE_FLOW: False
+VERSION: 1
+[07/04 11:14:56] pytorchvideo INFO: Full config saved to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/config.yaml
+[07/04 11:14:56] pts.utils.env INFO: Using a generated random seed 59376172
+[07/04 13:52:47] pytorchvideo INFO: Rank of current process: 0. World size: 4
+[07/04 13:52:47] pytorchvideo INFO: Environment info:
+----------------------  ---------------------------------------------------------------------------------------
+sys.platform            linux
+Python                  3.9.0 (default, Nov 15 2020, 14:28:56) [GCC 7.3.0]
+numpy                   1.24.2
+PyTorch                 2.0.0+cu117 @/data/tanyi/anaconda3/envs/torch2/lib/python3.9/site-packages/torch
+PyTorch debug build     False
+GPU available           True
+GPU 0,1,2,3             NVIDIA GeForce RTX 3090 (arch=8.6)
+CUDA_HOME               /usr
+Pillow                  10.0.1
+torchvision             0.15.1+cu117 @/data/tanyi/anaconda3/envs/torch2/lib/python3.9/site-packages/torchvision
+torchvision arch flags  3.5, 5.0, 6.0, 7.0, 7.5, 8.0, 8.6
+fvcore                  0.1.5.post20221221
+iopath                  0.1.10
+----------------------  ---------------------------------------------------------------------------------------
+PyTorch built with:
+  - GCC 9.3
+  - C++ Version: 201703
+  - Intel(R) oneAPI Math Kernel Library Version 2022.2-Product Build 20220804 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.7.3 (Git Hash 6dbeffbae1f23cbbeae17adb7b5b13f1f37c080e)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.7
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.5
+  - Magma 2.6.1
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.7, CUDNN_VERSION=8.5.0, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -D_GLIBCXX_USE_CXX11_ABI=0 -fabi-version=11 -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOROCTRACER -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wunused-local-typedefs -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Werror=cast-function-type -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_DISABLE_GPU_ASSERTS=ON, TORCH_VERSION=2.0.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=1, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+[07/04 13:52:47] pytorchvideo INFO: Command line arguments: Namespace(config_file='experiments/d48_swin_s2s+t2t_8gpu_mixlr002.yaml', resume=False, eval_only=False, num_gpus=4, repeat_time=1, num_machines=1, machine_rank=0, dist_url='auto', opts=[])
+[07/04 13:52:47] pytorchvideo INFO: Contents of args.config_file=experiments/d48_swin_s2s+t2t_8gpu_mixlr002.yaml:
+DATASET:
+  NAME: 'VideoClsDataset'
+
+DATALOADER:
+  TRAIN_BATCH_SIZE: 8
+  TEST_BATCH_SIZE: 8
+  TOTAL_BATCH_SIZE: 32
+  NUM_WORKERS: 4
+  ROOT_PATH: '/data/tanyi/diving48'
+  TRAIN_LIST_FILE: 'trainValTest/train.txt'
+  TEST_LIST_FILE: 'trainValTest/val.txt'
+  FORMAT: 'DECORD_.mp4'
+  NUM_CLIPS: 1
+  NUM_CROPS: 1
+  NUM_SEGMENTS: 16
+  CLIP_LENGTH: 1
+  NUM_STEPS: 1
+
+ENGINE:
+  NAME: 'DefaultTrainer'
+  BEST_METRICS: ['ACC-1crop@1']
+  FP16: True
+
+TRANSFORM:
+  NAME: 'SIFARTransform'
+  CROP_SIZE: 224
+  TEST_CROP_SIZE: 224
+  NO_HORIZONTAL_FLIP: False
+  TIME_DIM: 'T'
+  MIXUP_PROB: 1.
+  SWITCH_PROB: .5
+  MASK_MOTION_CUT: 1.
+  MIXUP_LABELSMOOTHING: .1
+
+
+MODEL:
+  NAME: 'VIDEO_SWIN'
+  ARCH: 'video_swin_vit_s_p4_w7'
+  NUM_CLASSES: 48
+  DROP_PATH_RATIO: 0.2
+  WEIGHTS: '/data/tanyi/swin_small_patch244_window877_kinetics400_1k.pth'
+  REMOVE_FC: True
+  FROZEN_BN: False
+  TRANSFER_WEIGHTS: True
+
+SOLVER:
+  NAME: 'AdamW'
+  NAME_MIXBLOCK: 'SGD'
+  PARAMS: 'default'
+  EPOCH: 50
+  CHECKPOINT_PERIOD: 1
+  EVAL_PERIOD: 5
+  DENSE_EVAL_EPOCH: 40
+  BASE_LR: 2e-4
+  BASE_LR_MIXBLOCK: 0.02
+  WEIGHT_DECAY: 0.05
+  WEIGHT_DECAY_MIXBLOCK: 0.0001
+  MOMENTUM: 0.9
+  ALPHA: 0.99
+  BETAS: [0.9, 0.999]
+  WRITE_PERIOD: 50
+  AUTO_LR: False
+  GRAD_CLIP: 1.
+  GRAD_CLIP_MIXBLOCK: 20.
+
+LR_SCHEDULER:
+  NAME: 'WarmupCosineLR'
+  WARMUP_EPOCH: 5
+
+LOSSES:
+  # NAMES: ['LabelSmoothing']
+  # LABELSMOOTHING: 0.1
+  NAMES: ['SoftTargetCrossEntropy']
+
+
+INFERENCE:
+  NAME: 'ClsEvaluator'
+[07/04 13:52:47] pytorchvideo INFO: Running with full config:
+CUDNN_BENCHMARK: True
+DATALOADER:
+  CLIP_LENGTH: 1
+  FORMAT: DECORD_.mp4
+  NUM_CLIPS: 1
+  NUM_CROPS: 1
+  NUM_SEGMENTS: 16
+  NUM_STEPS: 1
+  NUM_WORKERS: 4
+  ROOT_PATH: /data/tanyi/diving48
+  SHUFFLE: True
+  TEST_BATCH_SIZE: 8
+  TEST_LIST_FILE: trainValTest/val.txt
+  TOTAL_BATCH_SIZE: 32
+  TRAIN_BATCH_SIZE: 8
+  TRAIN_LIST_FILE: trainValTest/train.txt
+DATASET:
+  NAME: VideoClsDataset
+ENGINE:
+  BEST_METRICS: ['ACC-1crop@1']
+  FP16: True
+  NAME: DefaultTrainer
+INFERENCE:
+  NAME: ClsEvaluator
+LOSSES:
+  LABELSMOOTHING: 0.2
+  NAMES: ['SoftTargetCrossEntropy']
+  WEIGHTS: [1.0]
+LR_SCHEDULER:
+  GAMMA: 0.1
+  MILESTONES: (3,)
+  NAME: WarmupCosineLR
+  STEP_SIZE: 3
+  WARMUP_EPOCH: 5
+MODEL:
+  ARCH: video_swin_vit_s_p4_w7
+  ARCH_CFGS: []
+  DEVICE: cuda
+  DROPOUT_RATIO: 0.0
+  DROP_PATH_RATIO: 0.2
+  EARLY_STRIDE: 1
+  FROZEN_BN: False
+  NAME: VIDEO_SWIN
+  NUM_CLASSES: 48
+  REMOVE_FC: True
+  TRANSFER_WEIGHTS: True
+  WEIGHTS: /data/tanyi/swin_small_patch244_window877_kinetics400_1k.pth
+OUTPUT_DIR: experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002
+SEED: -1
+SOLVER:
+  ALPHA: 0.99
+  AUTO_LR: False
+  BASE_LR: 0.0002
+  BASE_LR_MIXBLOCK: 0.02
+  BETAS: [0.9, 0.999]
+  BIAS_LR_FACTOR: 1.0
+  CHECKPOINT_PERIOD: 1
+  DENSE_EVAL_EPOCH: 40
+  EPOCH: 50
+  EPS: 1e-08
+  EVAL_PERIOD: 5
+  FC_LR5: False
+  GRAD_CLIP: 1.0
+  GRAD_CLIP_MIXBLOCK: 20.0
+  GRAD_CLIP_TYPE: norm
+  MOMENTUM: 0.9
+  NAME: AdamW
+  NAME_MIXBLOCK: SGD
+  NESTEROV: False
+  NORM_TYPE: 2.0
+  PARAMS: default
+  REGULARIZE: 1.0
+  SNAPSHOT: 
+  WEIGHT_DECAY: 0.05
+  WEIGHT_DECAY_BIAS: 0.0
+  WEIGHT_DECAY_MIXBLOCK: 0.0001
+  WEIGHT_DECAY_NORM: 0.0
+  WRITE_PERIOD: 50
+TRANSFORM:
+  AUTO_AUG: rand-m7-n4-mstd0.5-inc1
+  CROP_SIZE: 224
+  MASK_MIX: 0.0
+  MASK_MOTION_CUT: 1.0
+  MASK_MOTION_CUT_STATIC: 0.0
+  MIXUP_LABELSMOOTHING: 0.1
+  MIXUP_PROB: 1.0
+  MOTION_CUT: 0.0
+  MOTION_CUT_STATIC: 0.0
+  NAME: SIFARTransform
+  NO_HORIZONTAL_FLIP: False
+  SALIENCY_CUT: 0.0
+  SWITCH_PROB: 0.5
+  TEST_CROP_SIZE: 224
+  TIME_DIM: T
+  USE_FLOW: False
+VERSION: 1
+[07/04 13:52:47] pytorchvideo INFO: Full config saved to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/config.yaml
+[07/04 13:52:47] pts.utils.env INFO: Using a generated random seed 48514431
+[07/04 13:53:04] pts.model.base_net INFO: Missing keys: ['layers.0.blocks.0.attn.relative_position_index', 'layers.0.blocks.1.attn.relative_position_index', 'layers.1.blocks.0.attn.relative_position_index', 'layers.1.blocks.1.attn.relative_position_index', 'layers.2.blocks.0.attn.relative_position_index', 'layers.2.blocks.1.attn.relative_position_index', 'layers.2.blocks.2.attn.relative_position_index', 'layers.2.blocks.3.attn.relative_position_index', 'layers.2.blocks.4.attn.relative_position_index', 'layers.2.blocks.5.attn.relative_position_index', 'layers.2.blocks.6.attn.relative_position_index', 'layers.2.blocks.7.attn.relative_position_index', 'layers.2.blocks.8.attn.relative_position_index', 'layers.2.blocks.9.attn.relative_position_index', 'layers.2.blocks.10.attn.relative_position_index', 'layers.2.blocks.11.attn.relative_position_index', 'layers.2.blocks.12.attn.relative_position_index', 'layers.2.blocks.13.attn.relative_position_index', 'layers.2.blocks.14.attn.relative_position_index', 'layers.2.blocks.15.attn.relative_position_index', 'layers.2.blocks.16.attn.relative_position_index', 'layers.2.blocks.17.attn.relative_position_index', 'layers.3.blocks.0.attn.relative_position_index', 'layers.3.blocks.1.attn.relative_position_index', 'fc.weight', 'fc.bias']
+[07/04 13:53:04] pts.model.base_net INFO: Unexpect keys: ['cls_head.fc_cls.weight', 'cls_head.fc_cls.bias']
+[07/04 13:53:04] pts.model.base_net INFO: ==> loaded checkpoint '/data/tanyi/swin_small_patch244_window877_kinetics400_1k.pth'
+[07/04 13:53:20] pts.model.base_net INFO: Missing keys: ['layers.0.blocks.0.attn.relative_position_index', 'layers.0.blocks.1.attn.relative_position_index', 'layers.1.blocks.0.attn.relative_position_index', 'layers.1.blocks.1.attn.relative_position_index', 'layers.2.blocks.0.attn.relative_position_index', 'layers.2.blocks.1.attn.relative_position_index', 'layers.2.blocks.2.attn.relative_position_index', 'layers.2.blocks.3.attn.relative_position_index', 'layers.2.blocks.4.attn.relative_position_index', 'layers.2.blocks.5.attn.relative_position_index', 'layers.2.blocks.6.attn.relative_position_index', 'layers.2.blocks.7.attn.relative_position_index', 'layers.2.blocks.8.attn.relative_position_index', 'layers.2.blocks.9.attn.relative_position_index', 'layers.2.blocks.10.attn.relative_position_index', 'layers.2.blocks.11.attn.relative_position_index', 'layers.2.blocks.12.attn.relative_position_index', 'layers.2.blocks.13.attn.relative_position_index', 'layers.2.blocks.14.attn.relative_position_index', 'layers.2.blocks.15.attn.relative_position_index', 'layers.2.blocks.16.attn.relative_position_index', 'layers.2.blocks.17.attn.relative_position_index', 'layers.3.blocks.0.attn.relative_position_index', 'layers.3.blocks.1.attn.relative_position_index', 'fc.weight', 'fc.bias']
+[07/04 13:53:20] pts.model.base_net INFO: Unexpect keys: ['cls_head.fc_cls.weight', 'cls_head.fc_cls.bias']
+[07/04 13:53:20] pts.model.base_net INFO: ==> loaded checkpoint '/data/tanyi/swin_small_patch244_window877_kinetics400_1k.pth'
+[07/04 13:53:21] pts.engine.defaults INFO: Model:
+VIDEO_SWIN(
+  (patch_embed): PatchEmbed3D(
+    (proj): Conv3d(3, 96, kernel_size=(2, 4, 4), stride=(2, 4, 4))
+    (norm): LayerNorm((96,), eps=1e-05, elementwise_affine=True)
+  )
+  (pos_drop): Dropout(p=0.0, inplace=False)
+  (layers): ModuleList(
+    (0): BasicLayer(
+      (blocks): ModuleList(
+        (0): SwinTransformerBlock3D(
+          (norm1): LayerNorm((96,), eps=1e-05, elementwise_affine=True)
+          (attn): WindowAttention3D(
+            (qkv): Linear(in_features=96, out_features=288, bias=True)
+            (attn_drop): Dropout(p=0.0, inplace=False)
+            (proj): Linear(in_features=96, out_features=96, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (drop_path): Identity()
+          (norm2): LayerNorm((96,), eps=1e-05, elementwise_affine=True)
+          (mlp): Mlp(
+            (fc1): Linear(in_features=96, out_features=384, bias=True)
+            (act): GELU(approximate='none')
+            (fc2): Linear(in_features=384, out_features=96, bias=True)
+            (drop): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (1): SwinTransformerBlock3D(
+          (norm1): LayerNorm((96,), eps=1e-05, elementwise_affine=True)
+          (attn): WindowAttention3D(
+            (qkv): Linear(in_features=96, out_features=288, bias=True)
+            (attn_drop): Dropout(p=0.0, inplace=False)
+            (proj): Linear(in_features=96, out_features=96, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (drop_path): DropPath()
+          (norm2): LayerNorm((96,), eps=1e-05, elementwise_affine=True)
+          (mlp): Mlp(
+            (fc1): Linear(in_features=96, out_features=384, bias=True)
+            (act): GELU(approximate='none')
+            (fc2): Linear(in_features=384, out_features=96, bias=True)
+            (drop): Dropout(p=0.0, inplace=False)
+          )
+        )
+      )
+      (downsample): PatchMerging(
+        (reduction): Linear(in_features=384, out_features=192, bias=False)
+        (norm): LayerNorm((384,), eps=1e-05, elementwise_affine=True)
+      )
+    )
+    (1): BasicLayer(
+      (blocks): ModuleList(
+        (0-1): 2 x SwinTransformerBlock3D(
+          (norm1): LayerNorm((192,), eps=1e-05, elementwise_affine=True)
+          (attn): WindowAttention3D(
+            (qkv): Linear(in_features=192, out_features=576, bias=True)
+            (attn_drop): Dropout(p=0.0, inplace=False)
+            (proj): Linear(in_features=192, out_features=192, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (drop_path): DropPath()
+          (norm2): LayerNorm((192,), eps=1e-05, elementwise_affine=True)
+          (mlp): Mlp(
+            (fc1): Linear(in_features=192, out_features=768, bias=True)
+            (act): GELU(approximate='none')
+            (fc2): Linear(in_features=768, out_features=192, bias=True)
+            (drop): Dropout(p=0.0, inplace=False)
+          )
+        )
+      )
+      (downsample): PatchMerging(
+        (reduction): Linear(in_features=768, out_features=384, bias=False)
+        (norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      )
+    )
+    (2): BasicLayer(
+      (blocks): ModuleList(
+        (0-17): 18 x SwinTransformerBlock3D(
+          (norm1): LayerNorm((384,), eps=1e-05, elementwise_affine=True)
+          (attn): WindowAttention3D(
+            (qkv): Linear(in_features=384, out_features=1152, bias=True)
+            (attn_drop): Dropout(p=0.0, inplace=False)
+            (proj): Linear(in_features=384, out_features=384, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (drop_path): DropPath()
+          (norm2): LayerNorm((384,), eps=1e-05, elementwise_affine=True)
+          (mlp): Mlp(
+            (fc1): Linear(in_features=384, out_features=1536, bias=True)
+            (act): GELU(approximate='none')
+            (fc2): Linear(in_features=1536, out_features=384, bias=True)
+            (drop): Dropout(p=0.0, inplace=False)
+          )
+        )
+      )
+      (downsample): PatchMerging(
+        (reduction): Linear(in_features=1536, out_features=768, bias=False)
+        (norm): LayerNorm((1536,), eps=1e-05, elementwise_affine=True)
+      )
+    )
+    (3): BasicLayer(
+      (blocks): ModuleList(
+        (0-1): 2 x SwinTransformerBlock3D(
+          (norm1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (attn): WindowAttention3D(
+            (qkv): Linear(in_features=768, out_features=2304, bias=True)
+            (attn_drop): Dropout(p=0.0, inplace=False)
+            (proj): Linear(in_features=768, out_features=768, bias=True)
+            (proj_drop): Dropout(p=0.0, inplace=False)
+            (softmax): Softmax(dim=-1)
+          )
+          (drop_path): DropPath()
+          (norm2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (mlp): Mlp(
+            (fc1): Linear(in_features=768, out_features=3072, bias=True)
+            (act): GELU(approximate='none')
+            (fc2): Linear(in_features=3072, out_features=768, bias=True)
+            (drop): Dropout(p=0.0, inplace=False)
+          )
+        )
+      )
+    )
+  )
+  (norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (avgpool): AdaptiveAvgPool3d(output_size=1)
+  (fc): Linear(in_features=768, out_features=48, bias=True)
+)
+[07/04 13:53:29] fvcore.common.checkpoint INFO: No checkpoint found. Initializing model from scratch
+[07/04 13:53:29] pts.engine.train_loop INFO: Starting training from iteration 0
+[07/04 13:56:08] pts.utils.events INFO:  eta: 3:40:51  iter: 49 -- [49/469]  total_loss: 7.716  soft_target_cross_entropy_loss: 3.857  loss_ofl: 3.856  mask_loss: 7.483e-05  time: 0.5908  data_time: 0.0002  lr: 6.1373e-06  max_mem: 21174M
+[07/04 13:56:37] pts.utils.events INFO:  eta: 3:42:47  iter: 99 -- [99/469]  total_loss: 7.541  soft_target_cross_entropy_loss: 3.685  loss_ofl: 3.865  mask_loss: 0  time: 0.5838  data_time: 0.0002  lr: 1.0359e-05  max_mem: 21174M
+[07/04 13:57:08] pts.utils.events INFO:  eta: 3:43:21  iter: 149 -- [149/469]  total_loss: 7.427  soft_target_cross_entropy_loss: 3.58  loss_ofl: 3.843  mask_loss: 0  time: 0.5873  data_time: 0.0002  lr: 1.4581e-05  max_mem: 21174M
+[07/04 13:57:38] pts.utils.events INFO:  eta: 3:44:29  iter: 199 -- [199/469]  total_loss: 7.39  soft_target_cross_entropy_loss: 3.558  loss_ofl: 3.859  mask_loss: 0  time: 0.5894  data_time: 0.0010  lr: 1.8803e-05  max_mem: 21174M
+[07/04 13:58:09] pts.utils.events INFO:  eta: 3:45:30  iter: 249 -- [249/469]  total_loss: 7.298  soft_target_cross_entropy_loss: 3.452  loss_ofl: 3.831  mask_loss: 0  time: 0.5940  data_time: 0.0002  lr: 2.3024e-05  max_mem: 21174M
+[07/04 13:58:39] pts.utils.events INFO:  eta: 3:45:10  iter: 299 -- [299/469]  total_loss: 7.224  soft_target_cross_entropy_loss: 3.398  loss_ofl: 3.838  mask_loss: 0  time: 0.5925  data_time: 0.0002  lr: 2.7246e-05  max_mem: 21174M
+[07/04 13:59:09] pts.utils.events INFO:  eta: 3:44:28  iter: 349 -- [349/469]  total_loss: 7.175  soft_target_cross_entropy_loss: 3.33  loss_ofl: 3.83  mask_loss: 0  time: 0.5910  data_time: 0.0002  lr: 3.1468e-05  max_mem: 21174M
+[07/04 13:59:39] pts.utils.events INFO:  eta: 3:43:49  iter: 399 -- [399/469]  total_loss: 7.096  soft_target_cross_entropy_loss: 3.274  loss_ofl: 3.814  mask_loss: 0  time: 0.5897  data_time: 0.0002  lr: 3.569e-05  max_mem: 21174M
+[07/04 14:00:09] pts.utils.events INFO:  eta: 3:43:04  iter: 449 -- [449/469]  total_loss: 6.977  soft_target_cross_entropy_loss: 3.177  loss_ofl: 3.805  mask_loss: 0  time: 0.5885  data_time: 0.0002  lr: 3.9911e-05  max_mem: 21174M
+[07/04 14:00:20] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 14:00:54] pts.utils.events INFO:  eta: 3:42:23  iter: 499 -- [30/469]  total_loss: 6.942  soft_target_cross_entropy_loss: 3.147  loss_ofl: 3.792  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 4.4133e-05  max_mem: 21174M
+[07/04 14:01:24] pts.utils.events INFO:  eta: 3:42:00  iter: 549 -- [80/469]  total_loss: 6.788  soft_target_cross_entropy_loss: 3.059  loss_ofl: 3.748  mask_loss: 0  time: 0.6135  data_time: 0.0002  lr: 4.8355e-05  max_mem: 21174M
+[07/04 14:01:54] pts.utils.events INFO:  eta: 3:41:46  iter: 599 -- [130/469]  total_loss: 6.837  soft_target_cross_entropy_loss: 3.092  loss_ofl: 3.759  mask_loss: 0  time: 0.6121  data_time: 0.0002  lr: 5.2577e-05  max_mem: 21174M
+[07/04 14:02:24] pts.utils.events INFO:  eta: 3:41:18  iter: 649 -- [180/469]  total_loss: 6.657  soft_target_cross_entropy_loss: 2.949  loss_ofl: 3.71  mask_loss: 0  time: 0.6099  data_time: 0.0002  lr: 5.6798e-05  max_mem: 21174M
+[07/04 14:02:54] pts.utils.events INFO:  eta: 3:40:50  iter: 699 -- [230/469]  total_loss: 6.52  soft_target_cross_entropy_loss: 2.842  loss_ofl: 3.685  mask_loss: 0  time: 0.6078  data_time: 0.0002  lr: 6.102e-05  max_mem: 21174M
+[07/04 14:03:24] pts.utils.events INFO:  eta: 3:40:25  iter: 749 -- [280/469]  total_loss: 6.534  soft_target_cross_entropy_loss: 2.892  loss_ofl: 3.657  mask_loss: 0  time: 0.6062  data_time: 0.0002  lr: 6.5242e-05  max_mem: 21174M
+[07/04 14:03:54] pts.utils.events INFO:  eta: 3:39:51  iter: 799 -- [330/469]  total_loss: 6.438  soft_target_cross_entropy_loss: 2.844  loss_ofl: 3.596  mask_loss: 0  time: 0.6047  data_time: 0.0002  lr: 6.9464e-05  max_mem: 21174M
+[07/04 14:04:24] pts.utils.events INFO:  eta: 3:39:26  iter: 849 -- [380/469]  total_loss: 6.391  soft_target_cross_entropy_loss: 2.798  loss_ofl: 3.589  mask_loss: 0  time: 0.6036  data_time: 0.0002  lr: 7.3685e-05  max_mem: 21174M
+[07/04 14:04:54] pts.utils.events INFO:  eta: 3:39:07  iter: 899 -- [430/469]  total_loss: 6.213  soft_target_cross_entropy_loss: 2.745  loss_ofl: 3.516  mask_loss: 0  time: 0.6031  data_time: 0.0002  lr: 7.7907e-05  max_mem: 21174M
+[07/04 14:05:17] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 14:05:39] pts.utils.events INFO:  eta: 3:38:43  iter: 949 -- [11/469]  total_loss: 6.24  soft_target_cross_entropy_loss: 2.76  loss_ofl: 3.503  mask_loss: 0  time: 0.6161  data_time: 0.7043  lr: 8.2129e-05  max_mem: 21174M
+[07/04 14:06:09] pts.utils.events INFO:  eta: 3:38:10  iter: 999 -- [61/469]  total_loss: 5.945  soft_target_cross_entropy_loss: 2.52  loss_ofl: 3.409  mask_loss: 0  time: 0.6143  data_time: 0.0003  lr: 8.6351e-05  max_mem: 21174M
+[07/04 14:06:39] pts.utils.events INFO:  eta: 3:37:48  iter: 1049 -- [111/469]  total_loss: 6.011  soft_target_cross_entropy_loss: 2.627  loss_ofl: 3.37  mask_loss: 0  time: 0.6130  data_time: 0.0002  lr: 9.0572e-05  max_mem: 21174M
+[07/04 14:07:09] pts.utils.events INFO:  eta: 3:37:37  iter: 1099 -- [161/469]  total_loss: 5.84  soft_target_cross_entropy_loss: 2.597  loss_ofl: 3.3  mask_loss: 0  time: 0.6122  data_time: 0.0002  lr: 9.4794e-05  max_mem: 21174M
+[07/04 14:07:39] pts.utils.events INFO:  eta: 3:37:10  iter: 1149 -- [211/469]  total_loss: 6.029  soft_target_cross_entropy_loss: 2.741  loss_ofl: 3.282  mask_loss: 0  time: 0.6110  data_time: 0.0002  lr: 9.9016e-05  max_mem: 21174M
+[07/04 14:08:09] pts.utils.events INFO:  eta: 3:36:31  iter: 1199 -- [261/469]  total_loss: 5.863  soft_target_cross_entropy_loss: 2.574  loss_ofl: 3.256  mask_loss: 0  time: 0.6098  data_time: 0.0002  lr: 0.00010324  max_mem: 21174M
+[07/04 14:08:39] pts.utils.events INFO:  eta: 3:35:50  iter: 1249 -- [311/469]  total_loss: 5.76  soft_target_cross_entropy_loss: 2.565  loss_ofl: 3.24  mask_loss: 0  time: 0.6090  data_time: 0.0002  lr: 0.00010746  max_mem: 21174M
+[07/04 14:09:09] pts.utils.events INFO:  eta: 3:35:18  iter: 1299 -- [361/469]  total_loss: 5.698  soft_target_cross_entropy_loss: 2.592  loss_ofl: 3.113  mask_loss: 0  time: 0.6082  data_time: 0.0002  lr: 0.00011168  max_mem: 21174M
+[07/04 14:09:39] pts.utils.events INFO:  eta: 3:34:50  iter: 1349 -- [411/469]  total_loss: 5.673  soft_target_cross_entropy_loss: 2.616  loss_ofl: 3.08  mask_loss: 0  time: 0.6073  data_time: 0.0002  lr: 0.0001159  max_mem: 21174M
+[07/04 14:10:10] pts.utils.events INFO:  eta: 3:34:34  iter: 1399 -- [461/469]  total_loss: 5.636  soft_target_cross_entropy_loss: 2.56  loss_ofl: 3  mask_loss: 1.318e-05  time: 0.6070  data_time: 0.0002  lr: 0.00012012  max_mem: 21174M
+[07/04 14:10:14] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 14:10:55] pts.utils.events INFO:  eta: 3:34:11  iter: 1449 -- [42/469]  total_loss: 5.496  soft_target_cross_entropy_loss: 2.544  loss_ofl: 3.001  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 0.00012435  max_mem: 21174M
+[07/04 14:11:26] pts.utils.events INFO:  eta: 3:33:52  iter: 1499 -- [92/469]  total_loss: 5.387  soft_target_cross_entropy_loss: 2.452  loss_ofl: 2.869  mask_loss: 0  time: 0.6154  data_time: 0.0002  lr: 0.00012857  max_mem: 21174M
+[07/04 14:11:56] pts.utils.events INFO:  eta: 3:33:23  iter: 1549 -- [142/469]  total_loss: 5.256  soft_target_cross_entropy_loss: 2.499  loss_ofl: 2.863  mask_loss: 0  time: 0.6143  data_time: 0.0002  lr: 0.00013279  max_mem: 21174M
+[07/04 14:12:25] pts.utils.events INFO:  eta: 3:32:44  iter: 1599 -- [192/469]  total_loss: 5.074  soft_target_cross_entropy_loss: 2.476  loss_ofl: 2.776  mask_loss: 0  time: 0.6133  data_time: 0.0002  lr: 0.00013701  max_mem: 21174M
+[07/04 14:12:55] pts.utils.events INFO:  eta: 3:32:15  iter: 1649 -- [242/469]  total_loss: 5.245  soft_target_cross_entropy_loss: 2.372  loss_ofl: 2.821  mask_loss: 0  time: 0.6124  data_time: 0.0002  lr: 0.00014123  max_mem: 21174M
+[07/04 14:13:25] pts.utils.events INFO:  eta: 3:31:46  iter: 1699 -- [292/469]  total_loss: 5.138  soft_target_cross_entropy_loss: 2.331  loss_ofl: 2.765  mask_loss: 0  time: 0.6115  data_time: 0.0002  lr: 0.00014546  max_mem: 21174M
+[07/04 14:13:55] pts.utils.events INFO:  eta: 3:31:14  iter: 1749 -- [342/469]  total_loss: 4.912  soft_target_cross_entropy_loss: 2.334  loss_ofl: 2.591  mask_loss: 0  time: 0.6107  data_time: 0.0002  lr: 0.00014968  max_mem: 21174M
+[07/04 14:14:25] pts.utils.events INFO:  eta: 3:30:57  iter: 1799 -- [392/469]  total_loss: 4.989  soft_target_cross_entropy_loss: 2.414  loss_ofl: 2.504  mask_loss: 0  time: 0.6103  data_time: 0.0002  lr: 0.0001539  max_mem: 21174M
+[07/04 14:14:56] pts.utils.events INFO:  eta: 3:30:33  iter: 1849 -- [442/469]  total_loss: 4.815  soft_target_cross_entropy_loss: 2.301  loss_ofl: 2.503  mask_loss: 0  time: 0.6098  data_time: 0.0002  lr: 0.00015812  max_mem: 21174M
+[07/04 14:15:11] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 14:15:40] pts.utils.events INFO:  eta: 3:29:54  iter: 1899 -- [23/469]  total_loss: 4.755  soft_target_cross_entropy_loss: 2.249  loss_ofl: 2.516  mask_loss: 0  time: 0.6161  data_time: 0.0003  lr: 0.00016234  max_mem: 21174M
+[07/04 14:16:09] pts.utils.events INFO:  eta: 3:29:07  iter: 1949 -- [73/469]  total_loss: 4.819  soft_target_cross_entropy_loss: 2.346  loss_ofl: 2.55  mask_loss: 0  time: 0.6150  data_time: 0.0002  lr: 0.00016656  max_mem: 21174M
+[07/04 14:16:39] pts.utils.events INFO:  eta: 3:28:42  iter: 1999 -- [123/469]  total_loss: 4.861  soft_target_cross_entropy_loss: 2.328  loss_ofl: 2.455  mask_loss: 0  time: 0.6143  data_time: 0.0002  lr: 0.00017079  max_mem: 21174M
+[07/04 14:17:10] pts.utils.events INFO:  eta: 3:28:20  iter: 2049 -- [173/469]  total_loss: 4.84  soft_target_cross_entropy_loss: 2.405  loss_ofl: 2.383  mask_loss: 0  time: 0.6137  data_time: 0.0002  lr: 0.00017501  max_mem: 21174M
+[07/04 14:17:39] pts.utils.events INFO:  eta: 3:27:32  iter: 2099 -- [223/469]  total_loss: 4.795  soft_target_cross_entropy_loss: 2.463  loss_ofl: 2.438  mask_loss: 0  time: 0.6128  data_time: 0.0002  lr: 0.00017923  max_mem: 21174M
+[07/04 14:18:09] pts.utils.events INFO:  eta: 3:26:56  iter: 2149 -- [273/469]  total_loss: 4.714  soft_target_cross_entropy_loss: 2.287  loss_ofl: 2.392  mask_loss: 0  time: 0.6120  data_time: 0.0002  lr: 0.00018345  max_mem: 21174M
+[07/04 14:18:38] pts.utils.events INFO:  eta: 3:26:26  iter: 2199 -- [323/469]  total_loss: 4.582  soft_target_cross_entropy_loss: 2.304  loss_ofl: 2.289  mask_loss: 0  time: 0.6113  data_time: 0.0002  lr: 0.00018767  max_mem: 21174M
+[07/04 14:19:08] pts.utils.events INFO:  eta: 3:25:55  iter: 2249 -- [373/469]  total_loss: 4.695  soft_target_cross_entropy_loss: 2.378  loss_ofl: 2.376  mask_loss: 0  time: 0.6107  data_time: 0.0002  lr: 0.00019189  max_mem: 21174M
+[07/04 14:19:38] pts.utils.events INFO:  eta: 3:25:34  iter: 2299 -- [423/469]  total_loss: 4.674  soft_target_cross_entropy_loss: 2.342  loss_ofl: 2.323  mask_loss: 0  time: 0.6101  data_time: 0.0002  lr: 0.00019612  max_mem: 21174M
+[07/04 14:21:57] pts.engine.hooks INFO: ############################## Test: 5 ##############################
+[07/04 14:21:57] pts.engine.hooks INFO: ACC-1crop@1: 0.5756345391273499
+[07/04 14:21:57] pts.engine.hooks INFO: ACC-1crop@5: 0.9197970032691956
+[07/04 14:21:57] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 14:21:58] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/best.pth
+[07/04 14:22:18] pts.utils.events INFO:  eta: 3:25:11  iter: 2349 -- [4/469]  total_loss: 4.432  soft_target_cross_entropy_loss: 2.242  loss_ofl: 2.232  mask_loss: 0  time: 0.6176  data_time: 0.6813  lr: 0.0002  max_mem: 21174M
+[07/04 14:22:48] pts.utils.events INFO:  eta: 3:24:22  iter: 2399 -- [54/469]  total_loss: 4.501  soft_target_cross_entropy_loss: 2.308  loss_ofl: 2.218  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 0.0002  max_mem: 21174M
+[07/04 14:23:17] pts.utils.events INFO:  eta: 3:23:47  iter: 2449 -- [104/469]  total_loss: 4.457  soft_target_cross_entropy_loss: 2.23  loss_ofl: 2.222  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 0.00019999  max_mem: 21174M
+[07/04 14:23:48] pts.utils.events INFO:  eta: 3:23:13  iter: 2499 -- [154/469]  total_loss: 4.54  soft_target_cross_entropy_loss: 2.365  loss_ofl: 2.16  mask_loss: 0  time: 0.6154  data_time: 0.0002  lr: 0.00019997  max_mem: 21174M
+[07/04 14:24:18] pts.utils.events INFO:  eta: 3:22:51  iter: 2549 -- [204/469]  total_loss: 4.424  soft_target_cross_entropy_loss: 2.269  loss_ofl: 2.126  mask_loss: 0  time: 0.6149  data_time: 0.0002  lr: 0.00019995  max_mem: 21174M
+[07/04 14:24:48] pts.utils.events INFO:  eta: 3:22:17  iter: 2599 -- [254/469]  total_loss: 4.379  soft_target_cross_entropy_loss: 2.27  loss_ofl: 2.092  mask_loss: 0  time: 0.6143  data_time: 0.0002  lr: 0.00019993  max_mem: 21174M
+[07/04 14:25:17] pts.utils.events INFO:  eta: 3:21:43  iter: 2649 -- [304/469]  total_loss: 4.491  soft_target_cross_entropy_loss: 2.299  loss_ofl: 2.227  mask_loss: 0  time: 0.6136  data_time: 0.0002  lr: 0.0001999  max_mem: 21174M
+[07/04 14:25:47] pts.utils.events INFO:  eta: 3:21:04  iter: 2699 -- [354/469]  total_loss: 4.551  soft_target_cross_entropy_loss: 2.378  loss_ofl: 2.198  mask_loss: 0  time: 0.6130  data_time: 0.0002  lr: 0.00019986  max_mem: 21174M
+[07/04 14:26:17] pts.utils.events INFO:  eta: 3:20:35  iter: 2749 -- [404/469]  total_loss: 4.431  soft_target_cross_entropy_loss: 2.247  loss_ofl: 2.18  mask_loss: 0  time: 0.6124  data_time: 0.0002  lr: 0.00019982  max_mem: 21174M
+[07/04 14:26:46] pts.utils.events INFO:  eta: 3:19:58  iter: 2799 -- [454/469]  total_loss: 4.365  soft_target_cross_entropy_loss: 2.202  loss_ofl: 2.076  mask_loss: 0  time: 0.6119  data_time: 0.0002  lr: 0.00019977  max_mem: 21174M
+[07/04 14:26:55] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 14:27:31] pts.utils.events INFO:  eta: 3:19:19  iter: 2849 -- [35/469]  total_loss: 4.174  soft_target_cross_entropy_loss: 2.065  loss_ofl: 2.064  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 0.00019972  max_mem: 21174M
+[07/04 14:28:02] pts.utils.events INFO:  eta: 3:18:56  iter: 2899 -- [85/469]  total_loss: 4.311  soft_target_cross_entropy_loss: 2.284  loss_ofl: 2.044  mask_loss: 0  time: 0.6156  data_time: 0.0002  lr: 0.00019966  max_mem: 21174M
+[07/04 14:28:32] pts.utils.events INFO:  eta: 3:18:45  iter: 2949 -- [135/469]  total_loss: 4.202  soft_target_cross_entropy_loss: 2.239  loss_ofl: 1.985  mask_loss: 0  time: 0.6154  data_time: 0.0002  lr: 0.0001996  max_mem: 21174M
+[07/04 14:29:02] pts.utils.events INFO:  eta: 3:18:28  iter: 2999 -- [185/469]  total_loss: 4.3  soft_target_cross_entropy_loss: 2.224  loss_ofl: 2.077  mask_loss: 0  time: 0.6149  data_time: 0.0002  lr: 0.00019953  max_mem: 21174M
+[07/04 14:29:33] pts.utils.events INFO:  eta: 3:17:48  iter: 3049 -- [235/469]  total_loss: 4.095  soft_target_cross_entropy_loss: 2.16  loss_ofl: 1.969  mask_loss: 0  time: 0.6145  data_time: 0.0002  lr: 0.00019946  max_mem: 21174M
+[07/04 14:30:02] pts.utils.events INFO:  eta: 3:17:23  iter: 3099 -- [285/469]  total_loss: 4.436  soft_target_cross_entropy_loss: 2.336  loss_ofl: 2.086  mask_loss: 0  time: 0.6140  data_time: 0.0002  lr: 0.00019938  max_mem: 21174M
+[07/04 14:30:32] pts.utils.events INFO:  eta: 3:16:54  iter: 3149 -- [335/469]  total_loss: 4.273  soft_target_cross_entropy_loss: 2.323  loss_ofl: 1.974  mask_loss: 0  time: 0.6134  data_time: 0.0002  lr: 0.00019929  max_mem: 21174M
+[07/04 14:31:02] pts.utils.events INFO:  eta: 3:16:34  iter: 3199 -- [385/469]  total_loss: 4.317  soft_target_cross_entropy_loss: 2.247  loss_ofl: 2.032  mask_loss: 0  time: 0.6130  data_time: 0.0002  lr: 0.0001992  max_mem: 21174M
+[07/04 14:31:33] pts.utils.events INFO:  eta: 3:16:17  iter: 3249 -- [435/469]  total_loss: 4.14  soft_target_cross_entropy_loss: 2.262  loss_ofl: 1.968  mask_loss: 0  time: 0.6128  data_time: 0.0002  lr: 0.0001991  max_mem: 21174M
+[07/04 14:31:52] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 14:32:18] pts.utils.events INFO:  eta: 3:15:41  iter: 3299 -- [16/469]  total_loss: 4.099  soft_target_cross_entropy_loss: 2.15  loss_ofl: 1.963  mask_loss: 0  time: 0.6165  data_time: 0.7028  lr: 0.000199  max_mem: 21174M
+[07/04 14:32:48] pts.utils.events INFO:  eta: 3:14:58  iter: 3349 -- [66/469]  total_loss: 4.273  soft_target_cross_entropy_loss: 2.251  loss_ofl: 2.007  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 0.00019889  max_mem: 21174M
+[07/04 14:33:18] pts.utils.events INFO:  eta: 3:14:46  iter: 3399 -- [116/469]  total_loss: 4.201  soft_target_cross_entropy_loss: 2.253  loss_ofl: 1.982  mask_loss: 0  time: 0.6157  data_time: 0.0002  lr: 0.00019878  max_mem: 21174M
+[07/04 14:33:49] pts.utils.events INFO:  eta: 3:14:36  iter: 3449 -- [166/469]  total_loss: 4.227  soft_target_cross_entropy_loss: 2.172  loss_ofl: 2.046  mask_loss: 0  time: 0.6156  data_time: 0.0002  lr: 0.00019866  max_mem: 21174M
+[07/04 14:34:20] pts.utils.events INFO:  eta: 3:14:08  iter: 3499 -- [216/469]  total_loss: 4.116  soft_target_cross_entropy_loss: 2.154  loss_ofl: 1.912  mask_loss: 0  time: 0.6153  data_time: 0.0002  lr: 0.00019854  max_mem: 21174M
+[07/04 14:34:50] pts.utils.events INFO:  eta: 3:13:38  iter: 3549 -- [266/469]  total_loss: 4.014  soft_target_cross_entropy_loss: 2.06  loss_ofl: 1.961  mask_loss: 0  time: 0.6149  data_time: 0.0002  lr: 0.00019841  max_mem: 21174M
+[07/04 14:35:20] pts.utils.events INFO:  eta: 3:13:09  iter: 3599 -- [316/469]  total_loss: 4.244  soft_target_cross_entropy_loss: 2.213  loss_ofl: 1.966  mask_loss: 0  time: 0.6144  data_time: 0.0002  lr: 0.00019827  max_mem: 21174M
+[07/04 14:35:49] pts.utils.events INFO:  eta: 3:12:41  iter: 3649 -- [366/469]  total_loss: 4.081  soft_target_cross_entropy_loss: 2.077  loss_ofl: 1.989  mask_loss: 0  time: 0.6139  data_time: 0.0002  lr: 0.00019813  max_mem: 21174M
+[07/04 14:36:19] pts.utils.events INFO:  eta: 3:12:19  iter: 3699 -- [416/469]  total_loss: 4.184  soft_target_cross_entropy_loss: 2.234  loss_ofl: 2.048  mask_loss: 0  time: 0.6135  data_time: 0.0002  lr: 0.00019799  max_mem: 21174M
+[07/04 14:36:50] pts.utils.events INFO:  eta: 3:12:02  iter: 3749 -- [466/469]  total_loss: 4.11  soft_target_cross_entropy_loss: 2.071  loss_ofl: 1.979  mask_loss: 0  time: 0.6133  data_time: 0.0002  lr: 0.00019784  max_mem: 21174M
+[07/04 14:36:51] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 14:37:35] pts.utils.events INFO:  eta: 3:11:28  iter: 3799 -- [47/469]  total_loss: 4.033  soft_target_cross_entropy_loss: 2.167  loss_ofl: 2.055  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 0.00019768  max_mem: 21174M
+[07/04 14:38:05] pts.utils.events INFO:  eta: 3:11:19  iter: 3849 -- [97/469]  total_loss: 4.001  soft_target_cross_entropy_loss: 2.189  loss_ofl: 1.934  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 0.00019752  max_mem: 21174M
+[07/04 14:38:36] pts.utils.events INFO:  eta: 3:10:53  iter: 3899 -- [147/469]  total_loss: 4.025  soft_target_cross_entropy_loss: 2.202  loss_ofl: 1.853  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 0.00019735  max_mem: 21174M
+[07/04 14:39:06] pts.utils.events INFO:  eta: 3:10:09  iter: 3949 -- [197/469]  total_loss: 4.024  soft_target_cross_entropy_loss: 2.094  loss_ofl: 1.824  mask_loss: 0  time: 0.6155  data_time: 0.0002  lr: 0.00019718  max_mem: 21174M
+[07/04 14:39:35] pts.utils.events INFO:  eta: 3:09:31  iter: 3999 -- [247/469]  total_loss: 4.023  soft_target_cross_entropy_loss: 2.211  loss_ofl: 1.909  mask_loss: 0  time: 0.6151  data_time: 0.0002  lr: 0.000197  max_mem: 21174M
+[07/04 14:40:05] pts.utils.events INFO:  eta: 3:09:00  iter: 4049 -- [297/469]  total_loss: 3.921  soft_target_cross_entropy_loss: 2.059  loss_ofl: 1.881  mask_loss: 0  time: 0.6146  data_time: 0.0002  lr: 0.00019682  max_mem: 21174M
+[07/04 14:40:35] pts.utils.events INFO:  eta: 3:08:26  iter: 4099 -- [347/469]  total_loss: 4.044  soft_target_cross_entropy_loss: 2.097  loss_ofl: 1.933  mask_loss: 0  time: 0.6142  data_time: 0.0002  lr: 0.00019663  max_mem: 21174M
+[07/04 14:41:05] pts.utils.events INFO:  eta: 3:08:07  iter: 4149 -- [397/469]  total_loss: 4.092  soft_target_cross_entropy_loss: 2.138  loss_ofl: 1.955  mask_loss: 0  time: 0.6139  data_time: 0.0002  lr: 0.00019644  max_mem: 21174M
+[07/04 14:41:35] pts.utils.events INFO:  eta: 3:07:42  iter: 4199 -- [447/469]  total_loss: 3.972  soft_target_cross_entropy_loss: 2.052  loss_ofl: 1.924  mask_loss: 0  time: 0.6136  data_time: 0.0002  lr: 0.00019624  max_mem: 21174M
+[07/04 14:41:48] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 14:42:20] pts.utils.events INFO:  eta: 3:06:53  iter: 4249 -- [28/469]  total_loss: 3.824  soft_target_cross_entropy_loss: 2.019  loss_ofl: 1.824  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 0.00019603  max_mem: 21174M
+[07/04 14:42:50] pts.utils.events INFO:  eta: 3:06:22  iter: 4299 -- [78/469]  total_loss: 3.821  soft_target_cross_entropy_loss: 1.967  loss_ofl: 1.941  mask_loss: 0  time: 0.6160  data_time: 0.0003  lr: 0.00019582  max_mem: 21174M
+[07/04 14:43:20] pts.utils.events INFO:  eta: 3:06:07  iter: 4349 -- [128/469]  total_loss: 3.809  soft_target_cross_entropy_loss: 2.003  loss_ofl: 1.802  mask_loss: 0  time: 0.6157  data_time: 0.0002  lr: 0.00019561  max_mem: 21174M
+[07/04 14:43:50] pts.utils.events INFO:  eta: 3:05:37  iter: 4399 -- [178/469]  total_loss: 3.939  soft_target_cross_entropy_loss: 1.999  loss_ofl: 1.861  mask_loss: 0  time: 0.6155  data_time: 0.0002  lr: 0.00019539  max_mem: 21174M
+[07/04 14:44:20] pts.utils.events INFO:  eta: 3:04:52  iter: 4449 -- [228/469]  total_loss: 3.877  soft_target_cross_entropy_loss: 1.989  loss_ofl: 1.913  mask_loss: 0  time: 0.6151  data_time: 0.0002  lr: 0.00019516  max_mem: 21174M
+[07/04 14:44:50] pts.utils.events INFO:  eta: 3:04:12  iter: 4499 -- [278/469]  total_loss: 3.648  soft_target_cross_entropy_loss: 1.925  loss_ofl: 1.759  mask_loss: 0  time: 0.6148  data_time: 0.0002  lr: 0.00019493  max_mem: 21174M
+[07/04 14:45:20] pts.utils.events INFO:  eta: 3:03:33  iter: 4549 -- [328/469]  total_loss: 4.014  soft_target_cross_entropy_loss: 2.174  loss_ofl: 1.875  mask_loss: 0  time: 0.6144  data_time: 0.0002  lr: 0.0001947  max_mem: 21174M
+[07/04 14:45:50] pts.utils.events INFO:  eta: 3:03:00  iter: 4599 -- [378/469]  total_loss: 4.01  soft_target_cross_entropy_loss: 2.139  loss_ofl: 1.935  mask_loss: 0  time: 0.6140  data_time: 0.0002  lr: 0.00019446  max_mem: 21174M
+[07/04 14:46:20] pts.utils.events INFO:  eta: 3:02:43  iter: 4649 -- [428/469]  total_loss: 4.066  soft_target_cross_entropy_loss: 2.152  loss_ofl: 1.886  mask_loss: 0  time: 0.6137  data_time: 0.0002  lr: 0.00019421  max_mem: 21174M
+[07/04 14:47:31] pts.engine.hooks INFO: ############################## Test: 10 ##############################
+[07/04 14:47:31] pts.engine.hooks INFO: ACC-1crop@1: 0.7263959646224976
+[07/04 14:47:31] pts.engine.hooks INFO: ACC-1crop@5: 0.9736040830612183
+[07/04 14:47:31] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 14:47:33] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/best.pth
+[07/04 14:47:55] pts.utils.events INFO:  eta: 3:02:15  iter: 4699 -- [9/469]  total_loss: 3.804  soft_target_cross_entropy_loss: 2.08  loss_ofl: 1.765  mask_loss: 0  time: 0.6175  data_time: 0.7243  lr: 0.00019396  max_mem: 21174M
+[07/04 14:48:24] pts.utils.events INFO:  eta: 3:01:25  iter: 4749 -- [59/469]  total_loss: 3.709  soft_target_cross_entropy_loss: 1.991  loss_ofl: 1.751  mask_loss: 0  time: 0.6170  data_time: 0.0002  lr: 0.0001937  max_mem: 21174M
+[07/04 14:48:54] pts.utils.events INFO:  eta: 3:00:56  iter: 4799 -- [109/469]  total_loss: 3.67  soft_target_cross_entropy_loss: 1.998  loss_ofl: 1.764  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 0.00019344  max_mem: 21174M
+[07/04 14:49:24] pts.utils.events INFO:  eta: 3:00:26  iter: 4849 -- [159/469]  total_loss: 3.943  soft_target_cross_entropy_loss: 2.027  loss_ofl: 1.855  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 0.00019317  max_mem: 21174M
+[07/04 14:49:55] pts.utils.events INFO:  eta: 2:59:56  iter: 4899 -- [209/469]  total_loss: 3.76  soft_target_cross_entropy_loss: 1.987  loss_ofl: 1.814  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 0.0001929  max_mem: 21174M
+[07/04 14:50:25] pts.utils.events INFO:  eta: 2:59:14  iter: 4949 -- [259/469]  total_loss: 3.845  soft_target_cross_entropy_loss: 2.137  loss_ofl: 1.741  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 0.00019262  max_mem: 21174M
+[07/04 14:50:54] pts.utils.events INFO:  eta: 2:58:39  iter: 4999 -- [309/469]  total_loss: 3.658  soft_target_cross_entropy_loss: 1.895  loss_ofl: 1.801  mask_loss: 0  time: 0.6155  data_time: 0.0002  lr: 0.00019234  max_mem: 21174M
+[07/04 14:51:23] pts.utils.events INFO:  eta: 2:58:10  iter: 5049 -- [359/469]  total_loss: 3.656  soft_target_cross_entropy_loss: 1.964  loss_ofl: 1.687  mask_loss: 0  time: 0.6151  data_time: 0.0002  lr: 0.00019205  max_mem: 21174M
+[07/04 14:51:53] pts.utils.events INFO:  eta: 2:57:45  iter: 5099 -- [409/469]  total_loss: 3.658  soft_target_cross_entropy_loss: 1.928  loss_ofl: 1.719  mask_loss: 0  time: 0.6148  data_time: 0.0002  lr: 0.00019176  max_mem: 21174M
+[07/04 14:52:23] pts.utils.events INFO:  eta: 2:57:07  iter: 5149 -- [459/469]  total_loss: 3.635  soft_target_cross_entropy_loss: 1.892  loss_ofl: 1.699  mask_loss: 0  time: 0.6144  data_time: 0.0002  lr: 0.00019146  max_mem: 21174M
+[07/04 14:52:28] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 14:53:08] pts.utils.events INFO:  eta: 2:56:34  iter: 5199 -- [40/469]  total_loss: 3.661  soft_target_cross_entropy_loss: 2.023  loss_ofl: 1.79  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 0.00019116  max_mem: 21174M
+[07/04 14:53:38] pts.utils.events INFO:  eta: 2:56:16  iter: 5249 -- [90/469]  total_loss: 3.625  soft_target_cross_entropy_loss: 1.957  loss_ofl: 1.644  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 0.00019085  max_mem: 21174M
+[07/04 14:54:09] pts.utils.events INFO:  eta: 2:56:08  iter: 5299 -- [140/469]  total_loss: 3.805  soft_target_cross_entropy_loss: 2.007  loss_ofl: 1.869  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 0.00019054  max_mem: 21174M
+[07/04 14:54:39] pts.utils.events INFO:  eta: 2:55:39  iter: 5349 -- [190/469]  total_loss: 3.683  soft_target_cross_entropy_loss: 1.945  loss_ofl: 1.793  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 0.00019022  max_mem: 21174M
+[07/04 14:55:09] pts.utils.events INFO:  eta: 2:55:08  iter: 5399 -- [240/469]  total_loss: 3.625  soft_target_cross_entropy_loss: 2.008  loss_ofl: 1.721  mask_loss: 0  time: 0.6157  data_time: 0.0002  lr: 0.0001899  max_mem: 21174M
+[07/04 14:55:39] pts.utils.events INFO:  eta: 2:54:56  iter: 5449 -- [290/469]  total_loss: 3.552  soft_target_cross_entropy_loss: 1.86  loss_ofl: 1.647  mask_loss: 0  time: 0.6155  data_time: 0.0002  lr: 0.00018957  max_mem: 21174M
+[07/04 14:56:09] pts.utils.events INFO:  eta: 2:54:43  iter: 5499 -- [340/469]  total_loss: 3.684  soft_target_cross_entropy_loss: 1.874  loss_ofl: 1.785  mask_loss: 0  time: 0.6153  data_time: 0.0002  lr: 0.00018924  max_mem: 21174M
+[07/04 14:56:40] pts.utils.events INFO:  eta: 2:54:27  iter: 5549 -- [390/469]  total_loss: 3.838  soft_target_cross_entropy_loss: 2.012  loss_ofl: 1.713  mask_loss: 0  time: 0.6151  data_time: 0.0002  lr: 0.0001889  max_mem: 21174M
+[07/04 14:57:10] pts.utils.events INFO:  eta: 2:54:10  iter: 5599 -- [440/469]  total_loss: 3.702  soft_target_cross_entropy_loss: 1.948  loss_ofl: 1.714  mask_loss: 0  time: 0.6149  data_time: 0.0002  lr: 0.00018856  max_mem: 21174M
+[07/04 14:57:27] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 14:57:55] pts.utils.events INFO:  eta: 2:53:43  iter: 5649 -- [21/469]  total_loss: 3.655  soft_target_cross_entropy_loss: 1.885  loss_ofl: 1.768  mask_loss: 0  time: 0.6171  data_time: 0.0003  lr: 0.00018821  max_mem: 21174M
+[07/04 14:58:25] pts.utils.events INFO:  eta: 2:53:06  iter: 5699 -- [71/469]  total_loss: 3.581  soft_target_cross_entropy_loss: 1.937  loss_ofl: 1.701  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 0.00018786  max_mem: 21174M
+[07/04 14:58:55] pts.utils.events INFO:  eta: 2:52:48  iter: 5749 -- [121/469]  total_loss: 3.503  soft_target_cross_entropy_loss: 1.844  loss_ofl: 1.715  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 0.0001875  max_mem: 21174M
+[07/04 14:59:26] pts.utils.events INFO:  eta: 2:52:25  iter: 5799 -- [171/469]  total_loss: 3.704  soft_target_cross_entropy_loss: 1.788  loss_ofl: 1.802  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 0.00018714  max_mem: 21174M
+[07/04 14:59:56] pts.utils.events INFO:  eta: 2:51:50  iter: 5849 -- [221/469]  total_loss: 3.582  soft_target_cross_entropy_loss: 1.87  loss_ofl: 1.709  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 0.00018678  max_mem: 21174M
+[07/04 15:00:26] pts.utils.events INFO:  eta: 2:51:10  iter: 5899 -- [271/469]  total_loss: 3.525  soft_target_cross_entropy_loss: 1.888  loss_ofl: 1.667  mask_loss: 0  time: 0.6158  data_time: 0.0002  lr: 0.00018641  max_mem: 21174M
+[07/04 15:00:56] pts.utils.events INFO:  eta: 2:50:40  iter: 5949 -- [321/469]  total_loss: 3.377  soft_target_cross_entropy_loss: 1.777  loss_ofl: 1.546  mask_loss: 0  time: 0.6156  data_time: 0.0002  lr: 0.00018603  max_mem: 21174M
+[07/04 15:01:26] pts.utils.events INFO:  eta: 2:50:14  iter: 5999 -- [371/469]  total_loss: 3.639  soft_target_cross_entropy_loss: 1.941  loss_ofl: 1.762  mask_loss: 0  time: 0.6153  data_time: 0.0002  lr: 0.00018565  max_mem: 21174M
+[07/04 15:01:55] pts.utils.events INFO:  eta: 2:49:49  iter: 6049 -- [421/469]  total_loss: 3.606  soft_target_cross_entropy_loss: 1.877  loss_ofl: 1.704  mask_loss: 0  time: 0.6150  data_time: 0.0002  lr: 0.00018526  max_mem: 21174M
+[07/04 15:02:24] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 15:02:40] pts.utils.events INFO:  eta: 2:49:28  iter: 6099 -- [2/469]  total_loss: 3.621  soft_target_cross_entropy_loss: 1.844  loss_ofl: 1.785  mask_loss: 0  time: 0.6169  data_time: 0.6831  lr: 0.00018487  max_mem: 21174M
+[07/04 15:03:10] pts.utils.events INFO:  eta: 2:48:58  iter: 6149 -- [52/469]  total_loss: 3.474  soft_target_cross_entropy_loss: 1.793  loss_ofl: 1.676  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 0.00018448  max_mem: 21174M
+[07/04 15:03:40] pts.utils.events INFO:  eta: 2:48:36  iter: 6199 -- [102/469]  total_loss: 3.584  soft_target_cross_entropy_loss: 1.878  loss_ofl: 1.684  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 0.00018408  max_mem: 21174M
+[07/04 15:04:10] pts.utils.events INFO:  eta: 2:48:05  iter: 6249 -- [152/469]  total_loss: 3.387  soft_target_cross_entropy_loss: 1.844  loss_ofl: 1.592  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 0.00018367  max_mem: 21174M
+[07/04 15:04:40] pts.utils.events INFO:  eta: 2:47:26  iter: 6299 -- [202/469]  total_loss: 3.407  soft_target_cross_entropy_loss: 1.832  loss_ofl: 1.655  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 0.00018327  max_mem: 21174M
+[07/04 15:05:10] pts.utils.events INFO:  eta: 2:46:47  iter: 6349 -- [252/469]  total_loss: 3.408  soft_target_cross_entropy_loss: 1.869  loss_ofl: 1.596  mask_loss: 0  time: 0.6157  data_time: 0.0002  lr: 0.00018285  max_mem: 21174M
+[07/04 15:05:39] pts.utils.events INFO:  eta: 2:46:11  iter: 6399 -- [302/469]  total_loss: 3.407  soft_target_cross_entropy_loss: 1.787  loss_ofl: 1.635  mask_loss: 0  time: 0.6154  data_time: 0.0002  lr: 0.00018243  max_mem: 21174M
+[07/04 15:06:10] pts.utils.events INFO:  eta: 2:45:35  iter: 6449 -- [352/469]  total_loss: 3.6  soft_target_cross_entropy_loss: 1.935  loss_ofl: 1.666  mask_loss: 0  time: 0.6152  data_time: 0.0002  lr: 0.00018201  max_mem: 21174M
+[07/04 15:06:40] pts.utils.events INFO:  eta: 2:44:59  iter: 6499 -- [402/469]  total_loss: 3.426  soft_target_cross_entropy_loss: 1.84  loss_ofl: 1.547  mask_loss: 0  time: 0.6150  data_time: 0.0002  lr: 0.00018159  max_mem: 21174M
+[07/04 15:07:10] pts.utils.events INFO:  eta: 2:44:27  iter: 6549 -- [452/469]  total_loss: 3.654  soft_target_cross_entropy_loss: 1.887  loss_ofl: 1.721  mask_loss: 0  time: 0.6148  data_time: 0.0002  lr: 0.00018115  max_mem: 21174M
+[07/04 15:07:20] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 15:07:55] pts.utils.events INFO:  eta: 2:43:48  iter: 6599 -- [33/469]  total_loss: 3.594  soft_target_cross_entropy_loss: 1.929  loss_ofl: 1.671  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 0.00018072  max_mem: 21174M
+[07/04 15:08:25] pts.utils.events INFO:  eta: 2:43:19  iter: 6649 -- [83/469]  total_loss: 3.517  soft_target_cross_entropy_loss: 1.966  loss_ofl: 1.649  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 0.00018028  max_mem: 21174M
+[07/04 15:08:55] pts.utils.events INFO:  eta: 2:42:57  iter: 6699 -- [133/469]  total_loss: 3.502  soft_target_cross_entropy_loss: 1.848  loss_ofl: 1.666  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 0.00017983  max_mem: 21174M
+[07/04 15:09:25] pts.utils.events INFO:  eta: 2:42:27  iter: 6749 -- [183/469]  total_loss: 3.498  soft_target_cross_entropy_loss: 1.845  loss_ofl: 1.675  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 0.00017938  max_mem: 21174M
+[07/04 15:09:55] pts.utils.events INFO:  eta: 2:41:47  iter: 6799 -- [233/469]  total_loss: 3.245  soft_target_cross_entropy_loss: 1.761  loss_ofl: 1.53  mask_loss: 0  time: 0.6157  data_time: 0.0002  lr: 0.00017893  max_mem: 21174M
+[07/04 15:10:25] pts.utils.events INFO:  eta: 2:41:14  iter: 6849 -- [283/469]  total_loss: 3.516  soft_target_cross_entropy_loss: 1.845  loss_ofl: 1.662  mask_loss: 0  time: 0.6155  data_time: 0.0002  lr: 0.00017847  max_mem: 21174M
+[07/04 15:10:54] pts.utils.events INFO:  eta: 2:40:43  iter: 6899 -- [333/469]  total_loss: 3.556  soft_target_cross_entropy_loss: 1.92  loss_ofl: 1.618  mask_loss: 0  time: 0.6152  data_time: 0.0002  lr: 0.00017801  max_mem: 21174M
+[07/04 15:11:24] pts.utils.events INFO:  eta: 2:40:14  iter: 6949 -- [383/469]  total_loss: 3.483  soft_target_cross_entropy_loss: 1.865  loss_ofl: 1.615  mask_loss: 0  time: 0.6150  data_time: 0.0002  lr: 0.00017754  max_mem: 21174M
+[07/04 15:11:54] pts.utils.events INFO:  eta: 2:39:49  iter: 6999 -- [433/469]  total_loss: 3.312  soft_target_cross_entropy_loss: 1.707  loss_ofl: 1.568  mask_loss: 0  time: 0.6148  data_time: 0.0002  lr: 0.00017707  max_mem: 21174M
+[07/04 15:13:04] pts.engine.hooks INFO: ############################## Test: 15 ##############################
+[07/04 15:13:04] pts.engine.hooks INFO: ACC-1crop@1: 0.7751269340515137
+[07/04 15:13:04] pts.engine.hooks INFO: ACC-1crop@5: 0.9786802530288696
+[07/04 15:13:04] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 15:13:05] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/best.pth
+[07/04 15:13:28] pts.utils.events INFO:  eta: 2:39:16  iter: 7049 -- [14/469]  total_loss: 3.493  soft_target_cross_entropy_loss: 1.892  loss_ofl: 1.625  mask_loss: 0  time: 0.6171  data_time: 0.7347  lr: 0.0001766  max_mem: 21174M
+[07/04 15:13:58] pts.utils.events INFO:  eta: 2:38:38  iter: 7099 -- [64/469]  total_loss: 3.486  soft_target_cross_entropy_loss: 1.834  loss_ofl: 1.63  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 0.00017612  max_mem: 21174M
+[07/04 15:14:27] pts.utils.events INFO:  eta: 2:38:05  iter: 7149 -- [114/469]  total_loss: 3.62  soft_target_cross_entropy_loss: 1.901  loss_ofl: 1.658  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 0.00017563  max_mem: 21174M
+[07/04 15:14:58] pts.utils.events INFO:  eta: 2:37:34  iter: 7199 -- [164/469]  total_loss: 3.37  soft_target_cross_entropy_loss: 1.76  loss_ofl: 1.567  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 0.00017515  max_mem: 21174M
+[07/04 15:15:28] pts.utils.events INFO:  eta: 2:37:07  iter: 7249 -- [214/469]  total_loss: 3.398  soft_target_cross_entropy_loss: 1.783  loss_ofl: 1.586  mask_loss: 0  time: 0.6162  data_time: 0.0003  lr: 0.00017466  max_mem: 21174M
+[07/04 15:15:58] pts.utils.events INFO:  eta: 2:36:36  iter: 7299 -- [264/469]  total_loss: 3.249  soft_target_cross_entropy_loss: 1.771  loss_ofl: 1.475  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 0.00017416  max_mem: 21174M
+[07/04 15:16:27] pts.utils.events INFO:  eta: 2:36:07  iter: 7349 -- [314/469]  total_loss: 3.382  soft_target_cross_entropy_loss: 1.785  loss_ofl: 1.559  mask_loss: 0  time: 0.6157  data_time: 0.0002  lr: 0.00017366  max_mem: 21174M
+[07/04 15:16:57] pts.utils.events INFO:  eta: 2:35:40  iter: 7399 -- [364/469]  total_loss: 3.195  soft_target_cross_entropy_loss: 1.775  loss_ofl: 1.469  mask_loss: 0  time: 0.6154  data_time: 0.0002  lr: 0.00017316  max_mem: 21174M
+[07/04 15:17:26] pts.utils.events INFO:  eta: 2:35:06  iter: 7449 -- [414/469]  total_loss: 3.325  soft_target_cross_entropy_loss: 1.642  loss_ofl: 1.585  mask_loss: 0  time: 0.6152  data_time: 0.0002  lr: 0.00017265  max_mem: 21174M
+[07/04 15:17:57] pts.utils.events INFO:  eta: 2:34:34  iter: 7499 -- [464/469]  total_loss: 3.344  soft_target_cross_entropy_loss: 1.77  loss_ofl: 1.574  mask_loss: 0  time: 0.6150  data_time: 0.0002  lr: 0.00017214  max_mem: 21174M
+[07/04 15:17:59] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 15:18:41] pts.utils.events INFO:  eta: 2:33:59  iter: 7549 -- [45/469]  total_loss: 3.501  soft_target_cross_entropy_loss: 1.808  loss_ofl: 1.618  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 0.00017162  max_mem: 21174M
+[07/04 15:19:12] pts.utils.events INFO:  eta: 2:33:38  iter: 7599 -- [95/469]  total_loss: 3.254  soft_target_cross_entropy_loss: 1.667  loss_ofl: 1.591  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 0.0001711  max_mem: 21174M
+[07/04 15:19:42] pts.utils.events INFO:  eta: 2:33:09  iter: 7649 -- [145/469]  total_loss: 3.382  soft_target_cross_entropy_loss: 1.748  loss_ofl: 1.591  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 0.00017058  max_mem: 21174M
+[07/04 15:20:11] pts.utils.events INFO:  eta: 2:32:32  iter: 7699 -- [195/469]  total_loss: 3.307  soft_target_cross_entropy_loss: 1.801  loss_ofl: 1.518  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 0.00017005  max_mem: 21174M
+[07/04 15:20:41] pts.utils.events INFO:  eta: 2:32:04  iter: 7749 -- [245/469]  total_loss: 3.354  soft_target_cross_entropy_loss: 1.781  loss_ofl: 1.621  mask_loss: 0  time: 0.6158  data_time: 0.0002  lr: 0.00016952  max_mem: 21174M
+[07/04 15:21:11] pts.utils.events INFO:  eta: 2:31:43  iter: 7799 -- [295/469]  total_loss: 3.237  soft_target_cross_entropy_loss: 1.706  loss_ofl: 1.573  mask_loss: 0  time: 0.6156  data_time: 0.0002  lr: 0.00016898  max_mem: 21174M
+[07/04 15:21:41] pts.utils.events INFO:  eta: 2:31:14  iter: 7849 -- [345/469]  total_loss: 3.487  soft_target_cross_entropy_loss: 1.917  loss_ofl: 1.536  mask_loss: 0  time: 0.6154  data_time: 0.0002  lr: 0.00016844  max_mem: 21174M
+[07/04 15:22:12] pts.utils.events INFO:  eta: 2:30:55  iter: 7899 -- [395/469]  total_loss: 3.307  soft_target_cross_entropy_loss: 1.741  loss_ofl: 1.562  mask_loss: 0  time: 0.6153  data_time: 0.0002  lr: 0.0001679  max_mem: 21174M
+[07/04 15:22:42] pts.utils.events INFO:  eta: 2:30:32  iter: 7949 -- [445/469]  total_loss: 3.313  soft_target_cross_entropy_loss: 1.671  loss_ofl: 1.529  mask_loss: 0  time: 0.6151  data_time: 0.0002  lr: 0.00016735  max_mem: 21174M
+[07/04 15:22:55] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 15:23:26] pts.utils.events INFO:  eta: 2:29:57  iter: 7999 -- [26/469]  total_loss: 3.176  soft_target_cross_entropy_loss: 1.651  loss_ofl: 1.456  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 0.0001668  max_mem: 21174M
+[07/04 15:23:57] pts.utils.events INFO:  eta: 2:29:27  iter: 8049 -- [76/469]  total_loss: 3.243  soft_target_cross_entropy_loss: 1.721  loss_ofl: 1.547  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 0.00016625  max_mem: 21174M
+[07/04 15:24:27] pts.utils.events INFO:  eta: 2:29:11  iter: 8099 -- [126/469]  total_loss: 3.378  soft_target_cross_entropy_loss: 1.8  loss_ofl: 1.536  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 0.00016569  max_mem: 21174M
+[07/04 15:24:57] pts.utils.events INFO:  eta: 2:28:50  iter: 8149 -- [176/469]  total_loss: 3.333  soft_target_cross_entropy_loss: 1.796  loss_ofl: 1.519  mask_loss: 0  time: 0.6161  data_time: 0.0003  lr: 0.00016513  max_mem: 21174M
+[07/04 15:25:27] pts.utils.events INFO:  eta: 2:28:16  iter: 8199 -- [226/469]  total_loss: 3.255  soft_target_cross_entropy_loss: 1.717  loss_ofl: 1.503  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 0.00016457  max_mem: 21174M
+[07/04 15:25:57] pts.utils.events INFO:  eta: 2:27:46  iter: 8249 -- [276/469]  total_loss: 3.205  soft_target_cross_entropy_loss: 1.74  loss_ofl: 1.502  mask_loss: 0  time: 0.6157  data_time: 0.0002  lr: 0.000164  max_mem: 21174M
+[07/04 15:26:27] pts.utils.events INFO:  eta: 2:27:20  iter: 8299 -- [326/469]  total_loss: 3.334  soft_target_cross_entropy_loss: 1.79  loss_ofl: 1.499  mask_loss: 0  time: 0.6155  data_time: 0.0002  lr: 0.00016342  max_mem: 21174M
+[07/04 15:26:57] pts.utils.events INFO:  eta: 2:26:52  iter: 8349 -- [376/469]  total_loss: 3.363  soft_target_cross_entropy_loss: 1.826  loss_ofl: 1.518  mask_loss: 0  time: 0.6153  data_time: 0.0002  lr: 0.00016285  max_mem: 21174M
+[07/04 15:27:27] pts.utils.events INFO:  eta: 2:26:27  iter: 8399 -- [426/469]  total_loss: 3.289  soft_target_cross_entropy_loss: 1.71  loss_ofl: 1.544  mask_loss: 0  time: 0.6151  data_time: 0.0002  lr: 0.00016227  max_mem: 21174M
+[07/04 15:27:52] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 15:28:13] pts.utils.events INFO:  eta: 2:26:08  iter: 8449 -- [7/469]  total_loss: 3.335  soft_target_cross_entropy_loss: 1.766  loss_ofl: 1.605  mask_loss: 0  time: 0.6167  data_time: 0.7251  lr: 0.00016169  max_mem: 21174M
+[07/04 15:28:43] pts.utils.events INFO:  eta: 2:25:37  iter: 8499 -- [57/469]  total_loss: 3.165  soft_target_cross_entropy_loss: 1.756  loss_ofl: 1.512  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 0.0001611  max_mem: 21174M
+[07/04 15:29:13] pts.utils.events INFO:  eta: 2:25:10  iter: 8549 -- [107/469]  total_loss: 3.165  soft_target_cross_entropy_loss: 1.667  loss_ofl: 1.509  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 0.00016051  max_mem: 21174M
+[07/04 15:29:42] pts.utils.events INFO:  eta: 2:24:32  iter: 8599 -- [157/469]  total_loss: 3.282  soft_target_cross_entropy_loss: 1.755  loss_ofl: 1.488  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 0.00015992  max_mem: 21174M
+[07/04 15:30:12] pts.utils.events INFO:  eta: 2:23:56  iter: 8649 -- [207/469]  total_loss: 3.276  soft_target_cross_entropy_loss: 1.79  loss_ofl: 1.551  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 0.00015933  max_mem: 21174M
+[07/04 15:30:42] pts.utils.events INFO:  eta: 2:23:26  iter: 8699 -- [257/469]  total_loss: 3.147  soft_target_cross_entropy_loss: 1.646  loss_ofl: 1.406  mask_loss: 0  time: 0.6157  data_time: 0.0002  lr: 0.00015873  max_mem: 21174M
+[07/04 15:31:12] pts.utils.events INFO:  eta: 2:22:52  iter: 8749 -- [307/469]  total_loss: 3.101  soft_target_cross_entropy_loss: 1.679  loss_ofl: 1.474  mask_loss: 0  time: 0.6155  data_time: 0.0002  lr: 0.00015812  max_mem: 21174M
+[07/04 15:31:42] pts.utils.events INFO:  eta: 2:22:22  iter: 8799 -- [357/469]  total_loss: 3.38  soft_target_cross_entropy_loss: 1.716  loss_ofl: 1.642  mask_loss: 0  time: 0.6153  data_time: 0.0002  lr: 0.00015752  max_mem: 21174M
+[07/04 15:32:12] pts.utils.events INFO:  eta: 2:21:59  iter: 8849 -- [407/469]  total_loss: 3.242  soft_target_cross_entropy_loss: 1.668  loss_ofl: 1.581  mask_loss: 0  time: 0.6152  data_time: 0.0002  lr: 0.00015691  max_mem: 21174M
+[07/04 15:32:42] pts.utils.events INFO:  eta: 2:21:30  iter: 8899 -- [457/469]  total_loss: 3.11  soft_target_cross_entropy_loss: 1.726  loss_ofl: 1.455  mask_loss: 0  time: 0.6151  data_time: 0.0002  lr: 0.0001563  max_mem: 21174M
+[07/04 15:32:49] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 15:33:27] pts.utils.events INFO:  eta: 2:20:53  iter: 8949 -- [38/469]  total_loss: 3.082  soft_target_cross_entropy_loss: 1.661  loss_ofl: 1.425  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 0.00015568  max_mem: 21174M
+[07/04 15:33:57] pts.utils.events INFO:  eta: 2:20:24  iter: 8999 -- [88/469]  total_loss: 3.159  soft_target_cross_entropy_loss: 1.66  loss_ofl: 1.461  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 0.00015507  max_mem: 21174M
+[07/04 15:34:27] pts.utils.events INFO:  eta: 2:20:03  iter: 9049 -- [138/469]  total_loss: 3.086  soft_target_cross_entropy_loss: 1.698  loss_ofl: 1.412  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 0.00015445  max_mem: 21174M
+[07/04 15:34:58] pts.utils.events INFO:  eta: 2:19:34  iter: 9099 -- [188/469]  total_loss: 3.229  soft_target_cross_entropy_loss: 1.756  loss_ofl: 1.498  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 0.00015382  max_mem: 21174M
+[07/04 15:35:28] pts.utils.events INFO:  eta: 2:19:00  iter: 9149 -- [238/469]  total_loss: 3.15  soft_target_cross_entropy_loss: 1.71  loss_ofl: 1.382  mask_loss: 0  time: 0.6158  data_time: 0.0002  lr: 0.0001532  max_mem: 21174M
+[07/04 15:35:58] pts.utils.events INFO:  eta: 2:18:32  iter: 9199 -- [288/469]  total_loss: 3.249  soft_target_cross_entropy_loss: 1.8  loss_ofl: 1.494  mask_loss: 0  time: 0.6157  data_time: 0.0002  lr: 0.00015257  max_mem: 21174M
+[07/04 15:36:27] pts.utils.events INFO:  eta: 2:17:57  iter: 9249 -- [338/469]  total_loss: 3.083  soft_target_cross_entropy_loss: 1.7  loss_ofl: 1.458  mask_loss: 0  time: 0.6155  data_time: 0.0002  lr: 0.00015193  max_mem: 21174M
+[07/04 15:36:57] pts.utils.events INFO:  eta: 2:17:30  iter: 9299 -- [388/469]  total_loss: 3.136  soft_target_cross_entropy_loss: 1.646  loss_ofl: 1.524  mask_loss: 0  time: 0.6153  data_time: 0.0002  lr: 0.0001513  max_mem: 21174M
+[07/04 15:37:27] pts.utils.events INFO:  eta: 2:17:06  iter: 9349 -- [438/469]  total_loss: 3.079  soft_target_cross_entropy_loss: 1.666  loss_ofl: 1.447  mask_loss: 0  time: 0.6151  data_time: 0.0002  lr: 0.00015066  max_mem: 21174M
+[07/04 15:38:36] pts.engine.hooks INFO: ############################## Test: 20 ##############################
+[07/04 15:38:36] pts.engine.hooks INFO: ACC-1crop@1: 0.8025380969047546
+[07/04 15:38:36] pts.engine.hooks INFO: ACC-1crop@5: 0.9751269221305847
+[07/04 15:38:36] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 15:38:37] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/best.pth
+[07/04 15:39:03] pts.utils.events INFO:  eta: 2:16:36  iter: 9399 -- [19/469]  total_loss: 3.189  soft_target_cross_entropy_loss: 1.7  loss_ofl: 1.523  mask_loss: 0  time: 0.6171  data_time: 0.7049  lr: 0.00015002  max_mem: 21174M
+[07/04 15:39:33] pts.utils.events INFO:  eta: 2:15:54  iter: 9449 -- [69/469]  total_loss: 3.071  soft_target_cross_entropy_loss: 1.629  loss_ofl: 1.477  mask_loss: 0  time: 0.6169  data_time: 0.0002  lr: 0.00014938  max_mem: 21174M
+[07/04 15:40:03] pts.utils.events INFO:  eta: 2:15:31  iter: 9499 -- [119/469]  total_loss: 3.138  soft_target_cross_entropy_loss: 1.638  loss_ofl: 1.501  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 0.00014873  max_mem: 21174M
+[07/04 15:40:34] pts.utils.events INFO:  eta: 2:15:10  iter: 9549 -- [169/469]  total_loss: 3.082  soft_target_cross_entropy_loss: 1.598  loss_ofl: 1.525  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 0.00014808  max_mem: 21174M
+[07/04 15:41:04] pts.utils.events INFO:  eta: 2:14:42  iter: 9599 -- [219/469]  total_loss: 3.079  soft_target_cross_entropy_loss: 1.68  loss_ofl: 1.439  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 0.00014743  max_mem: 21174M
+[07/04 15:41:34] pts.utils.events INFO:  eta: 2:14:14  iter: 9649 -- [269/469]  total_loss: 3.242  soft_target_cross_entropy_loss: 1.641  loss_ofl: 1.548  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 0.00014677  max_mem: 21174M
+[07/04 15:42:03] pts.utils.events INFO:  eta: 2:13:43  iter: 9699 -- [319/469]  total_loss: 3.182  soft_target_cross_entropy_loss: 1.691  loss_ofl: 1.514  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 0.00014612  max_mem: 21174M
+[07/04 15:42:33] pts.utils.events INFO:  eta: 2:13:15  iter: 9749 -- [369/469]  total_loss: 3.226  soft_target_cross_entropy_loss: 1.746  loss_ofl: 1.537  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 0.00014546  max_mem: 21174M
+[07/04 15:43:03] pts.utils.events INFO:  eta: 2:12:49  iter: 9799 -- [419/469]  total_loss: 3.121  soft_target_cross_entropy_loss: 1.694  loss_ofl: 1.44  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 0.0001448  max_mem: 21174M
+[07/04 15:43:33] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 15:43:49] pts.utils.events INFO:  eta: 2:12:21  iter: 9849 -- [0/469]  total_loss: 3.106  soft_target_cross_entropy_loss: 1.66  loss_ofl: 1.501  mask_loss: 0  time: 0.6172  data_time: 0.7258  lr: 0.00014413  max_mem: 21174M
+[07/04 15:44:19] pts.utils.events INFO:  eta: 2:11:45  iter: 9899 -- [50/469]  total_loss: 3.178  soft_target_cross_entropy_loss: 1.71  loss_ofl: 1.512  mask_loss: 0  time: 0.6170  data_time: 0.0012  lr: 0.00014346  max_mem: 21174M
+[07/04 15:44:49] pts.utils.events INFO:  eta: 2:11:21  iter: 9949 -- [100/469]  total_loss: 3.079  soft_target_cross_entropy_loss: 1.717  loss_ofl: 1.452  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 0.0001428  max_mem: 21174M
+[07/04 15:45:19] pts.utils.events INFO:  eta: 2:10:54  iter: 9999 -- [150/469]  total_loss: 3.086  soft_target_cross_entropy_loss: 1.624  loss_ofl: 1.394  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 0.00014212  max_mem: 21174M
+[07/04 15:45:49] pts.utils.events INFO:  eta: 2:10:18  iter: 10049 -- [200/469]  total_loss: 3.072  soft_target_cross_entropy_loss: 1.597  loss_ofl: 1.461  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 0.00014145  max_mem: 21174M
+[07/04 15:46:19] pts.utils.events INFO:  eta: 2:09:44  iter: 10099 -- [250/469]  total_loss: 2.937  soft_target_cross_entropy_loss: 1.562  loss_ofl: 1.415  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 0.00014077  max_mem: 21174M
+[07/04 15:46:48] pts.utils.events INFO:  eta: 2:09:10  iter: 10149 -- [300/469]  total_loss: 3.093  soft_target_cross_entropy_loss: 1.573  loss_ofl: 1.456  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 0.0001401  max_mem: 21174M
+[07/04 15:47:18] pts.utils.events INFO:  eta: 2:08:36  iter: 10199 -- [350/469]  total_loss: 3.106  soft_target_cross_entropy_loss: 1.694  loss_ofl: 1.447  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 0.00013942  max_mem: 21174M
+[07/04 15:47:48] pts.utils.events INFO:  eta: 2:08:14  iter: 10249 -- [400/469]  total_loss: 3.104  soft_target_cross_entropy_loss: 1.705  loss_ofl: 1.428  mask_loss: 0  time: 0.6158  data_time: 0.0002  lr: 0.00013873  max_mem: 21174M
+[07/04 15:48:18] pts.utils.events INFO:  eta: 2:07:46  iter: 10299 -- [450/469]  total_loss: 3.086  soft_target_cross_entropy_loss: 1.704  loss_ofl: 1.363  mask_loss: 0  time: 0.6157  data_time: 0.0002  lr: 0.00013805  max_mem: 21174M
+[07/04 15:48:29] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 15:49:03] pts.utils.events INFO:  eta: 2:07:08  iter: 10349 -- [31/469]  total_loss: 2.95  soft_target_cross_entropy_loss: 1.509  loss_ofl: 1.423  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 0.00013736  max_mem: 21174M
+[07/04 15:49:32] pts.utils.events INFO:  eta: 2:06:35  iter: 10399 -- [81/469]  total_loss: 3.042  soft_target_cross_entropy_loss: 1.642  loss_ofl: 1.419  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 0.00013667  max_mem: 21174M
+[07/04 15:50:02] pts.utils.events INFO:  eta: 2:06:16  iter: 10449 -- [131/469]  total_loss: 3.12  soft_target_cross_entropy_loss: 1.673  loss_ofl: 1.399  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 0.00013598  max_mem: 21174M
+[07/04 15:50:32] pts.utils.events INFO:  eta: 2:05:45  iter: 10499 -- [181/469]  total_loss: 3.097  soft_target_cross_entropy_loss: 1.636  loss_ofl: 1.418  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 0.00013529  max_mem: 21174M
+[07/04 15:51:02] pts.utils.events INFO:  eta: 2:05:09  iter: 10549 -- [231/469]  total_loss: 3.013  soft_target_cross_entropy_loss: 1.61  loss_ofl: 1.372  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 0.00013459  max_mem: 21174M
+[07/04 15:51:32] pts.utils.events INFO:  eta: 2:04:38  iter: 10599 -- [281/469]  total_loss: 3.071  soft_target_cross_entropy_loss: 1.608  loss_ofl: 1.42  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 0.0001339  max_mem: 21174M
+[07/04 15:52:02] pts.utils.events INFO:  eta: 2:04:10  iter: 10649 -- [331/469]  total_loss: 2.979  soft_target_cross_entropy_loss: 1.615  loss_ofl: 1.436  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 0.0001332  max_mem: 21174M
+[07/04 15:52:32] pts.utils.events INFO:  eta: 2:03:44  iter: 10699 -- [381/469]  total_loss: 3.146  soft_target_cross_entropy_loss: 1.597  loss_ofl: 1.507  mask_loss: 0  time: 0.6157  data_time: 0.0002  lr: 0.0001325  max_mem: 21174M
+[07/04 15:53:02] pts.utils.events INFO:  eta: 2:03:17  iter: 10749 -- [431/469]  total_loss: 2.928  soft_target_cross_entropy_loss: 1.577  loss_ofl: 1.376  mask_loss: 0  time: 0.6156  data_time: 0.0002  lr: 0.0001318  max_mem: 21174M
+[07/04 15:53:24] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 15:53:48] pts.utils.events INFO:  eta: 2:02:46  iter: 10799 -- [12/469]  total_loss: 3.039  soft_target_cross_entropy_loss: 1.619  loss_ofl: 1.444  mask_loss: 0  time: 0.6169  data_time: 0.7382  lr: 0.00013109  max_mem: 21174M
+[07/04 15:54:18] pts.utils.events INFO:  eta: 2:02:08  iter: 10849 -- [62/469]  total_loss: 3.163  soft_target_cross_entropy_loss: 1.666  loss_ofl: 1.506  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 0.00013039  max_mem: 21174M
+[07/04 15:54:48] pts.utils.events INFO:  eta: 2:01:45  iter: 10899 -- [112/469]  total_loss: 2.85  soft_target_cross_entropy_loss: 1.517  loss_ofl: 1.375  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 0.00012968  max_mem: 21174M
+[07/04 15:55:18] pts.utils.events INFO:  eta: 2:01:18  iter: 10949 -- [162/469]  total_loss: 2.875  soft_target_cross_entropy_loss: 1.536  loss_ofl: 1.329  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 0.00012897  max_mem: 21174M
+[07/04 15:55:49] pts.utils.events INFO:  eta: 2:00:46  iter: 10999 -- [212/469]  total_loss: 3.134  soft_target_cross_entropy_loss: 1.671  loss_ofl: 1.469  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 0.00012826  max_mem: 21174M
+[07/04 15:56:19] pts.utils.events INFO:  eta: 2:00:17  iter: 11049 -- [262/469]  total_loss: 3.07  soft_target_cross_entropy_loss: 1.604  loss_ofl: 1.494  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 0.00012755  max_mem: 21174M
+[07/04 15:56:48] pts.utils.events INFO:  eta: 1:59:46  iter: 11099 -- [312/469]  total_loss: 3.061  soft_target_cross_entropy_loss: 1.688  loss_ofl: 1.428  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 0.00012684  max_mem: 21174M
+[07/04 15:57:18] pts.utils.events INFO:  eta: 1:59:17  iter: 11149 -- [362/469]  total_loss: 2.976  soft_target_cross_entropy_loss: 1.539  loss_ofl: 1.406  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 0.00012612  max_mem: 21174M
+[07/04 15:57:48] pts.utils.events INFO:  eta: 1:58:49  iter: 11199 -- [412/469]  total_loss: 3.045  soft_target_cross_entropy_loss: 1.615  loss_ofl: 1.406  mask_loss: 0  time: 0.6157  data_time: 0.0002  lr: 0.0001254  max_mem: 21174M
+[07/04 15:58:18] pts.utils.events INFO:  eta: 1:58:21  iter: 11249 -- [462/469]  total_loss: 3.09  soft_target_cross_entropy_loss: 1.637  loss_ofl: 1.377  mask_loss: 0  time: 0.6156  data_time: 0.0002  lr: 0.00012469  max_mem: 21174M
+[07/04 15:58:21] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 15:59:03] pts.utils.events INFO:  eta: 1:57:45  iter: 11299 -- [43/469]  total_loss: 3.126  soft_target_cross_entropy_loss: 1.652  loss_ofl: 1.55  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 0.00012397  max_mem: 21174M
+[07/04 15:59:32] pts.utils.events INFO:  eta: 1:57:19  iter: 11349 -- [93/469]  total_loss: 2.936  soft_target_cross_entropy_loss: 1.553  loss_ofl: 1.424  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 0.00012325  max_mem: 21174M
+[07/04 16:00:03] pts.utils.events INFO:  eta: 1:57:00  iter: 11399 -- [143/469]  total_loss: 2.911  soft_target_cross_entropy_loss: 1.516  loss_ofl: 1.32  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 0.00012253  max_mem: 21174M
+[07/04 16:00:34] pts.utils.events INFO:  eta: 1:56:31  iter: 11449 -- [193/469]  total_loss: 2.949  soft_target_cross_entropy_loss: 1.578  loss_ofl: 1.32  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 0.0001218  max_mem: 21174M
+[07/04 16:01:03] pts.utils.events INFO:  eta: 1:55:58  iter: 11499 -- [243/469]  total_loss: 2.913  soft_target_cross_entropy_loss: 1.55  loss_ofl: 1.363  mask_loss: 0  time: 0.6162  data_time: 0.0003  lr: 0.00012108  max_mem: 21174M
+[07/04 16:01:33] pts.utils.events INFO:  eta: 1:55:33  iter: 11549 -- [293/469]  total_loss: 3.005  soft_target_cross_entropy_loss: 1.618  loss_ofl: 1.367  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 0.00012035  max_mem: 21174M
+[07/04 16:02:03] pts.utils.events INFO:  eta: 1:55:09  iter: 11599 -- [343/469]  total_loss: 3.142  soft_target_cross_entropy_loss: 1.692  loss_ofl: 1.486  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 0.00011963  max_mem: 21174M
+[07/04 16:02:33] pts.utils.events INFO:  eta: 1:54:41  iter: 11649 -- [393/469]  total_loss: 3.02  soft_target_cross_entropy_loss: 1.627  loss_ofl: 1.377  mask_loss: 0  time: 0.6158  data_time: 0.0002  lr: 0.0001189  max_mem: 21174M
+[07/04 16:03:03] pts.utils.events INFO:  eta: 1:54:15  iter: 11699 -- [443/469]  total_loss: 3.032  soft_target_cross_entropy_loss: 1.602  loss_ofl: 1.403  mask_loss: 0  time: 0.6157  data_time: 0.0002  lr: 0.00011817  max_mem: 21174M
+[07/04 16:04:06] pts.engine.hooks INFO: ############################## Test: 25 ##############################
+[07/04 16:04:06] pts.engine.hooks INFO: ACC-1crop@1: 0.8086294531822205
+[07/04 16:04:06] pts.engine.hooks INFO: ACC-1crop@5: 0.9751269221305847
+[07/04 16:04:06] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 16:04:07] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/best.pth
+[07/04 16:04:37] pts.utils.events INFO:  eta: 1:53:40  iter: 11749 -- [24/469]  total_loss: 2.983  soft_target_cross_entropy_loss: 1.551  loss_ofl: 1.371  mask_loss: 0  time: 0.6170  data_time: 0.0002  lr: 0.00011744  max_mem: 21174M
+[07/04 16:05:07] pts.utils.events INFO:  eta: 1:53:02  iter: 11799 -- [74/469]  total_loss: 2.846  soft_target_cross_entropy_loss: 1.513  loss_ofl: 1.335  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 0.00011671  max_mem: 21174M
+[07/04 16:05:37] pts.utils.events INFO:  eta: 1:52:40  iter: 11849 -- [124/469]  total_loss: 2.848  soft_target_cross_entropy_loss: 1.492  loss_ofl: 1.38  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 0.00011598  max_mem: 21174M
+[07/04 16:06:07] pts.utils.events INFO:  eta: 1:52:09  iter: 11899 -- [174/469]  total_loss: 2.9  soft_target_cross_entropy_loss: 1.592  loss_ofl: 1.345  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 0.00011525  max_mem: 21174M
+[07/04 16:06:37] pts.utils.events INFO:  eta: 1:51:36  iter: 11949 -- [224/469]  total_loss: 3.08  soft_target_cross_entropy_loss: 1.68  loss_ofl: 1.39  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 0.00011452  max_mem: 21174M
+[07/04 16:07:06] pts.utils.events INFO:  eta: 1:51:06  iter: 11999 -- [274/469]  total_loss: 2.921  soft_target_cross_entropy_loss: 1.55  loss_ofl: 1.383  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 0.00011378  max_mem: 21174M
+[07/04 16:07:36] pts.utils.events INFO:  eta: 1:50:37  iter: 12049 -- [324/469]  total_loss: 3.018  soft_target_cross_entropy_loss: 1.563  loss_ofl: 1.427  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 0.00011305  max_mem: 21174M
+[07/04 16:08:06] pts.utils.events INFO:  eta: 1:50:15  iter: 12099 -- [374/469]  total_loss: 2.973  soft_target_cross_entropy_loss: 1.509  loss_ofl: 1.407  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 0.00011231  max_mem: 21174M
+[07/04 16:08:36] pts.utils.events INFO:  eta: 1:49:49  iter: 12149 -- [424/469]  total_loss: 2.869  soft_target_cross_entropy_loss: 1.508  loss_ofl: 1.352  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 0.00011158  max_mem: 21174M
+[07/04 16:09:03] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 16:09:22] pts.utils.events INFO:  eta: 1:49:22  iter: 12199 -- [5/469]  total_loss: 3.095  soft_target_cross_entropy_loss: 1.671  loss_ofl: 1.438  mask_loss: 0  time: 0.6169  data_time: 0.7355  lr: 0.00011084  max_mem: 21174M
+[07/04 16:09:51] pts.utils.events INFO:  eta: 1:48:47  iter: 12249 -- [55/469]  total_loss: 2.957  soft_target_cross_entropy_loss: 1.537  loss_ofl: 1.347  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 0.0001101  max_mem: 21174M
+[07/04 16:10:22] pts.utils.events INFO:  eta: 1:48:27  iter: 12299 -- [105/469]  total_loss: 2.955  soft_target_cross_entropy_loss: 1.63  loss_ofl: 1.379  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 0.00010937  max_mem: 21174M
+[07/04 16:10:52] pts.utils.events INFO:  eta: 1:48:03  iter: 12349 -- [155/469]  total_loss: 2.937  soft_target_cross_entropy_loss: 1.557  loss_ofl: 1.408  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 0.00010863  max_mem: 21174M
+[07/04 16:11:22] pts.utils.events INFO:  eta: 1:47:25  iter: 12399 -- [205/469]  total_loss: 2.881  soft_target_cross_entropy_loss: 1.475  loss_ofl: 1.439  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 0.00010789  max_mem: 21174M
+[07/04 16:11:51] pts.utils.events INFO:  eta: 1:46:50  iter: 12449 -- [255/469]  total_loss: 2.872  soft_target_cross_entropy_loss: 1.497  loss_ofl: 1.398  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 0.00010715  max_mem: 21174M
+[07/04 16:12:21] pts.utils.events INFO:  eta: 1:46:21  iter: 12499 -- [305/469]  total_loss: 2.862  soft_target_cross_entropy_loss: 1.562  loss_ofl: 1.303  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 0.00010641  max_mem: 21174M
+[07/04 16:12:51] pts.utils.events INFO:  eta: 1:45:46  iter: 12549 -- [355/469]  total_loss: 2.898  soft_target_cross_entropy_loss: 1.508  loss_ofl: 1.394  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 0.00010567  max_mem: 21174M
+[07/04 16:13:21] pts.utils.events INFO:  eta: 1:45:19  iter: 12599 -- [405/469]  total_loss: 2.926  soft_target_cross_entropy_loss: 1.519  loss_ofl: 1.371  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 0.00010493  max_mem: 21174M
+[07/04 16:13:52] pts.utils.events INFO:  eta: 1:44:53  iter: 12649 -- [455/469]  total_loss: 2.88  soft_target_cross_entropy_loss: 1.5  loss_ofl: 1.372  mask_loss: 0  time: 0.6158  data_time: 0.0002  lr: 0.00010419  max_mem: 21174M
+[07/04 16:14:00] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 16:14:36] pts.utils.events INFO:  eta: 1:44:19  iter: 12699 -- [36/469]  total_loss: 2.929  soft_target_cross_entropy_loss: 1.55  loss_ofl: 1.394  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 0.00010345  max_mem: 21174M
+[07/04 16:15:06] pts.utils.events INFO:  eta: 1:43:47  iter: 12749 -- [86/469]  total_loss: 2.777  soft_target_cross_entropy_loss: 1.476  loss_ofl: 1.327  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 0.00010271  max_mem: 21174M
+[07/04 16:15:37] pts.utils.events INFO:  eta: 1:43:26  iter: 12799 -- [136/469]  total_loss: 2.907  soft_target_cross_entropy_loss: 1.44  loss_ofl: 1.343  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 0.00010197  max_mem: 21174M
+[07/04 16:16:07] pts.utils.events INFO:  eta: 1:43:00  iter: 12849 -- [186/469]  total_loss: 2.881  soft_target_cross_entropy_loss: 1.573  loss_ofl: 1.41  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 0.00010123  max_mem: 21174M
+[07/04 16:16:37] pts.utils.events INFO:  eta: 1:42:32  iter: 12899 -- [236/469]  total_loss: 2.919  soft_target_cross_entropy_loss: 1.497  loss_ofl: 1.433  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 0.00010049  max_mem: 21174M
+[07/04 16:17:07] pts.utils.events INFO:  eta: 1:42:07  iter: 12949 -- [286/469]  total_loss: 2.829  soft_target_cross_entropy_loss: 1.536  loss_ofl: 1.366  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 9.9752e-05  max_mem: 21174M
+[07/04 16:17:37] pts.utils.events INFO:  eta: 1:41:42  iter: 12999 -- [336/469]  total_loss: 2.822  soft_target_cross_entropy_loss: 1.466  loss_ofl: 1.366  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 9.9012e-05  max_mem: 21174M
+[07/04 16:18:07] pts.utils.events INFO:  eta: 1:41:14  iter: 13049 -- [386/469]  total_loss: 3.017  soft_target_cross_entropy_loss: 1.575  loss_ofl: 1.372  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 9.8271e-05  max_mem: 21174M
+[07/04 16:18:36] pts.utils.events INFO:  eta: 1:40:39  iter: 13099 -- [436/469]  total_loss: 2.926  soft_target_cross_entropy_loss: 1.548  loss_ofl: 1.382  mask_loss: 0  time: 0.6158  data_time: 0.0002  lr: 9.7531e-05  max_mem: 21174M
+[07/04 16:18:56] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 16:19:21] pts.utils.events INFO:  eta: 1:40:13  iter: 13149 -- [17/469]  total_loss: 2.956  soft_target_cross_entropy_loss: 1.528  loss_ofl: 1.448  mask_loss: 0  time: 0.6167  data_time: 0.7142  lr: 9.6791e-05  max_mem: 21174M
+[07/04 16:19:51] pts.utils.events INFO:  eta: 1:39:45  iter: 13199 -- [67/469]  total_loss: 2.793  soft_target_cross_entropy_loss: 1.491  loss_ofl: 1.373  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 9.6051e-05  max_mem: 21174M
+[07/04 16:20:22] pts.utils.events INFO:  eta: 1:39:23  iter: 13249 -- [117/469]  total_loss: 2.922  soft_target_cross_entropy_loss: 1.503  loss_ofl: 1.379  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 9.5311e-05  max_mem: 21174M
+[07/04 16:20:52] pts.utils.events INFO:  eta: 1:38:51  iter: 13299 -- [167/469]  total_loss: 2.979  soft_target_cross_entropy_loss: 1.586  loss_ofl: 1.416  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 9.4572e-05  max_mem: 21174M
+[07/04 16:21:22] pts.utils.events INFO:  eta: 1:38:17  iter: 13349 -- [217/469]  total_loss: 2.895  soft_target_cross_entropy_loss: 1.528  loss_ofl: 1.441  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 9.3833e-05  max_mem: 21174M
+[07/04 16:21:52] pts.utils.events INFO:  eta: 1:37:49  iter: 13399 -- [267/469]  total_loss: 2.972  soft_target_cross_entropy_loss: 1.52  loss_ofl: 1.364  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 9.3094e-05  max_mem: 21174M
+[07/04 16:22:21] pts.utils.events INFO:  eta: 1:37:23  iter: 13449 -- [317/469]  total_loss: 2.794  soft_target_cross_entropy_loss: 1.494  loss_ofl: 1.3  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 9.2356e-05  max_mem: 21174M
+[07/04 16:22:51] pts.utils.events INFO:  eta: 1:36:56  iter: 13499 -- [367/469]  total_loss: 2.868  soft_target_cross_entropy_loss: 1.488  loss_ofl: 1.377  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 9.1618e-05  max_mem: 21174M
+[07/04 16:23:21] pts.utils.events INFO:  eta: 1:36:30  iter: 13549 -- [417/469]  total_loss: 2.842  soft_target_cross_entropy_loss: 1.482  loss_ofl: 1.363  mask_loss: 0  time: 0.6158  data_time: 0.0002  lr: 9.088e-05  max_mem: 21174M
+[07/04 16:23:52] pts.utils.events INFO:  eta: 1:36:02  iter: 13599 -- [467/469]  total_loss: 2.768  soft_target_cross_entropy_loss: 1.446  loss_ofl: 1.328  mask_loss: 0  time: 0.6157  data_time: 0.0002  lr: 9.0144e-05  max_mem: 21174M
+[07/04 16:23:53] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 16:24:37] pts.utils.events INFO:  eta: 1:35:28  iter: 13649 -- [48/469]  total_loss: 2.849  soft_target_cross_entropy_loss: 1.481  loss_ofl: 1.387  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 8.9407e-05  max_mem: 21174M
+[07/04 16:25:08] pts.utils.events INFO:  eta: 1:35:03  iter: 13699 -- [98/469]  total_loss: 2.851  soft_target_cross_entropy_loss: 1.54  loss_ofl: 1.323  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 8.8672e-05  max_mem: 21174M
+[07/04 16:25:39] pts.utils.events INFO:  eta: 1:34:39  iter: 13749 -- [148/469]  total_loss: 2.785  soft_target_cross_entropy_loss: 1.518  loss_ofl: 1.322  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 8.7937e-05  max_mem: 21174M
+[07/04 16:26:08] pts.utils.events INFO:  eta: 1:34:08  iter: 13799 -- [198/469]  total_loss: 2.975  soft_target_cross_entropy_loss: 1.549  loss_ofl: 1.349  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 8.7203e-05  max_mem: 21174M
+[07/04 16:26:38] pts.utils.events INFO:  eta: 1:33:33  iter: 13849 -- [248/469]  total_loss: 2.811  soft_target_cross_entropy_loss: 1.502  loss_ofl: 1.355  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 8.6469e-05  max_mem: 21174M
+[07/04 16:27:08] pts.utils.events INFO:  eta: 1:32:59  iter: 13899 -- [298/469]  total_loss: 2.812  soft_target_cross_entropy_loss: 1.484  loss_ofl: 1.352  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 8.5736e-05  max_mem: 21174M
+[07/04 16:27:37] pts.utils.events INFO:  eta: 1:32:22  iter: 13949 -- [348/469]  total_loss: 3.001  soft_target_cross_entropy_loss: 1.553  loss_ofl: 1.389  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 8.5004e-05  max_mem: 21174M
+[07/04 16:28:07] pts.utils.events INFO:  eta: 1:31:50  iter: 13999 -- [398/469]  total_loss: 2.884  soft_target_cross_entropy_loss: 1.52  loss_ofl: 1.359  mask_loss: 0  time: 0.6158  data_time: 0.0002  lr: 8.4273e-05  max_mem: 21174M
+[07/04 16:28:40] pts.utils.events INFO:  eta: 1:31:24  iter: 14049 -- [448/469]  total_loss: 2.876  soft_target_cross_entropy_loss: 1.536  loss_ofl: 1.41  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 8.3543e-05  max_mem: 21174M
+[07/04 16:29:35] pts.engine.hooks INFO: ############################## Test: 30 ##############################
+[07/04 16:29:35] pts.engine.hooks INFO: ACC-1crop@1: 0.8223350644111633
+[07/04 16:29:35] pts.engine.hooks INFO: ACC-1crop@5: 0.9781726002693176
+[07/04 16:29:35] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 16:29:37] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/best.pth
+[07/04 16:30:09] pts.utils.events INFO:  eta: 1:30:56  iter: 14099 -- [29/469]  total_loss: 2.78  soft_target_cross_entropy_loss: 1.451  loss_ofl: 1.355  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 8.2814e-05  max_mem: 21174M
+[07/04 16:30:38] pts.utils.events INFO:  eta: 1:30:21  iter: 14149 -- [79/469]  total_loss: 2.76  soft_target_cross_entropy_loss: 1.375  loss_ofl: 1.347  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 8.2085e-05  max_mem: 21174M
+[07/04 16:31:09] pts.utils.events INFO:  eta: 1:29:54  iter: 14199 -- [129/469]  total_loss: 2.839  soft_target_cross_entropy_loss: 1.489  loss_ofl: 1.325  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 8.1358e-05  max_mem: 21174M
+[07/04 16:31:39] pts.utils.events INFO:  eta: 1:29:25  iter: 14249 -- [179/469]  total_loss: 2.679  soft_target_cross_entropy_loss: 1.466  loss_ofl: 1.345  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 8.0632e-05  max_mem: 21174M
+[07/04 16:32:10] pts.utils.events INFO:  eta: 1:28:57  iter: 14299 -- [229/469]  total_loss: 2.746  soft_target_cross_entropy_loss: 1.431  loss_ofl: 1.369  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 7.9907e-05  max_mem: 21174M
+[07/04 16:32:39] pts.utils.events INFO:  eta: 1:28:28  iter: 14349 -- [279/469]  total_loss: 2.716  soft_target_cross_entropy_loss: 1.423  loss_ofl: 1.313  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 7.9183e-05  max_mem: 21174M
+[07/04 16:33:09] pts.utils.events INFO:  eta: 1:27:57  iter: 14399 -- [329/469]  total_loss: 2.717  soft_target_cross_entropy_loss: 1.387  loss_ofl: 1.317  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 7.846e-05  max_mem: 21174M
+[07/04 16:33:39] pts.utils.events INFO:  eta: 1:27:31  iter: 14449 -- [379/469]  total_loss: 2.904  soft_target_cross_entropy_loss: 1.506  loss_ofl: 1.352  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 7.7739e-05  max_mem: 21174M
+[07/04 16:34:09] pts.utils.events INFO:  eta: 1:27:00  iter: 14499 -- [429/469]  total_loss: 2.622  soft_target_cross_entropy_loss: 1.366  loss_ofl: 1.264  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 7.7018e-05  max_mem: 21174M
+[07/04 16:34:32] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 16:34:54] pts.utils.events INFO:  eta: 1:26:31  iter: 14549 -- [10/469]  total_loss: 2.791  soft_target_cross_entropy_loss: 1.485  loss_ofl: 1.38  mask_loss: 0  time: 0.6168  data_time: 0.7089  lr: 7.6299e-05  max_mem: 21174M
+[07/04 16:35:24] pts.utils.events INFO:  eta: 1:25:54  iter: 14599 -- [60/469]  total_loss: 2.69  soft_target_cross_entropy_loss: 1.447  loss_ofl: 1.28  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 7.5582e-05  max_mem: 21174M
+[07/04 16:35:55] pts.utils.events INFO:  eta: 1:25:31  iter: 14649 -- [110/469]  total_loss: 2.706  soft_target_cross_entropy_loss: 1.403  loss_ofl: 1.335  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 7.4866e-05  max_mem: 21174M
+[07/04 16:36:25] pts.utils.events INFO:  eta: 1:25:00  iter: 14699 -- [160/469]  total_loss: 2.881  soft_target_cross_entropy_loss: 1.454  loss_ofl: 1.405  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 7.4151e-05  max_mem: 21174M
+[07/04 16:36:54] pts.utils.events INFO:  eta: 1:24:23  iter: 14749 -- [210/469]  total_loss: 2.688  soft_target_cross_entropy_loss: 1.406  loss_ofl: 1.318  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 7.3437e-05  max_mem: 21174M
+[07/04 16:37:24] pts.utils.events INFO:  eta: 1:23:52  iter: 14799 -- [260/469]  total_loss: 2.724  soft_target_cross_entropy_loss: 1.354  loss_ofl: 1.391  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 7.2725e-05  max_mem: 21174M
+[07/04 16:37:54] pts.utils.events INFO:  eta: 1:23:24  iter: 14849 -- [310/469]  total_loss: 2.882  soft_target_cross_entropy_loss: 1.432  loss_ofl: 1.374  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 7.2015e-05  max_mem: 21174M
+[07/04 16:38:24] pts.utils.events INFO:  eta: 1:22:57  iter: 14899 -- [360/469]  total_loss: 2.808  soft_target_cross_entropy_loss: 1.487  loss_ofl: 1.31  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 7.1306e-05  max_mem: 21174M
+[07/04 16:38:54] pts.utils.events INFO:  eta: 1:22:35  iter: 14949 -- [410/469]  total_loss: 2.752  soft_target_cross_entropy_loss: 1.401  loss_ofl: 1.345  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 7.0599e-05  max_mem: 21174M
+[07/04 16:39:24] pts.utils.events INFO:  eta: 1:22:10  iter: 14999 -- [460/469]  total_loss: 2.761  soft_target_cross_entropy_loss: 1.425  loss_ofl: 1.357  mask_loss: 0  time: 0.6158  data_time: 0.0002  lr: 6.9894e-05  max_mem: 21174M
+[07/04 16:39:28] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 16:40:08] pts.utils.events INFO:  eta: 1:21:38  iter: 15049 -- [41/469]  total_loss: 2.781  soft_target_cross_entropy_loss: 1.431  loss_ofl: 1.35  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 6.919e-05  max_mem: 21174M
+[07/04 16:40:38] pts.utils.events INFO:  eta: 1:21:08  iter: 15099 -- [91/469]  total_loss: 2.853  soft_target_cross_entropy_loss: 1.414  loss_ofl: 1.438  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 6.8488e-05  max_mem: 21174M
+[07/04 16:41:08] pts.utils.events INFO:  eta: 1:20:44  iter: 15149 -- [141/469]  total_loss: 2.764  soft_target_cross_entropy_loss: 1.387  loss_ofl: 1.322  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 6.7788e-05  max_mem: 21174M
+[07/04 16:41:38] pts.utils.events INFO:  eta: 1:20:15  iter: 15199 -- [191/469]  total_loss: 2.719  soft_target_cross_entropy_loss: 1.439  loss_ofl: 1.268  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 6.7089e-05  max_mem: 21174M
+[07/04 16:42:08] pts.utils.events INFO:  eta: 1:19:41  iter: 15249 -- [241/469]  total_loss: 2.875  soft_target_cross_entropy_loss: 1.511  loss_ofl: 1.452  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 6.6392e-05  max_mem: 21174M
+[07/04 16:42:38] pts.utils.events INFO:  eta: 1:19:08  iter: 15299 -- [291/469]  total_loss: 2.76  soft_target_cross_entropy_loss: 1.467  loss_ofl: 1.281  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 6.5698e-05  max_mem: 21174M
+[07/04 16:43:08] pts.utils.events INFO:  eta: 1:18:42  iter: 15349 -- [341/469]  total_loss: 2.817  soft_target_cross_entropy_loss: 1.529  loss_ofl: 1.337  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 6.5005e-05  max_mem: 21174M
+[07/04 16:43:38] pts.utils.events INFO:  eta: 1:18:16  iter: 15399 -- [391/469]  total_loss: 2.762  soft_target_cross_entropy_loss: 1.457  loss_ofl: 1.319  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 6.4314e-05  max_mem: 21174M
+[07/04 16:44:09] pts.utils.events INFO:  eta: 1:17:48  iter: 15449 -- [441/469]  total_loss: 2.651  soft_target_cross_entropy_loss: 1.382  loss_ofl: 1.28  mask_loss: 0  time: 0.6158  data_time: 0.0002  lr: 6.3625e-05  max_mem: 21174M
+[07/04 16:44:26] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 16:44:53] pts.utils.events INFO:  eta: 1:17:21  iter: 15499 -- [22/469]  total_loss: 2.726  soft_target_cross_entropy_loss: 1.387  loss_ofl: 1.372  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 6.2938e-05  max_mem: 21174M
+[07/04 16:45:23] pts.utils.events INFO:  eta: 1:16:49  iter: 15549 -- [72/469]  total_loss: 2.84  soft_target_cross_entropy_loss: 1.47  loss_ofl: 1.348  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 6.2254e-05  max_mem: 21174M
+[07/04 16:45:53] pts.utils.events INFO:  eta: 1:16:21  iter: 15599 -- [122/469]  total_loss: 2.71  soft_target_cross_entropy_loss: 1.437  loss_ofl: 1.326  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 6.1571e-05  max_mem: 21174M
+[07/04 16:46:23] pts.utils.events INFO:  eta: 1:15:48  iter: 15649 -- [172/469]  total_loss: 2.765  soft_target_cross_entropy_loss: 1.492  loss_ofl: 1.268  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 6.0891e-05  max_mem: 21174M
+[07/04 16:46:53] pts.utils.events INFO:  eta: 1:15:17  iter: 15699 -- [222/469]  total_loss: 2.779  soft_target_cross_entropy_loss: 1.463  loss_ofl: 1.286  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 6.0212e-05  max_mem: 21174M
+[07/04 16:47:23] pts.utils.events INFO:  eta: 1:14:49  iter: 15749 -- [272/469]  total_loss: 2.664  soft_target_cross_entropy_loss: 1.391  loss_ofl: 1.308  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 5.9536e-05  max_mem: 21174M
+[07/04 16:47:53] pts.utils.events INFO:  eta: 1:14:22  iter: 15799 -- [322/469]  total_loss: 2.738  soft_target_cross_entropy_loss: 1.405  loss_ofl: 1.325  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 5.8863e-05  max_mem: 21174M
+[07/04 16:48:23] pts.utils.events INFO:  eta: 1:13:52  iter: 15849 -- [372/469]  total_loss: 2.71  soft_target_cross_entropy_loss: 1.422  loss_ofl: 1.311  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 5.8191e-05  max_mem: 21174M
+[07/04 16:48:53] pts.utils.events INFO:  eta: 1:13:23  iter: 15899 -- [422/469]  total_loss: 2.691  soft_target_cross_entropy_loss: 1.45  loss_ofl: 1.24  mask_loss: 0  time: 0.6158  data_time: 0.0002  lr: 5.7522e-05  max_mem: 21174M
+[07/04 16:49:20] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 16:49:37] pts.utils.events INFO:  eta: 1:12:53  iter: 15949 -- [3/469]  total_loss: 2.776  soft_target_cross_entropy_loss: 1.438  loss_ofl: 1.293  mask_loss: 0  time: 0.6165  data_time: 0.7041  lr: 5.6855e-05  max_mem: 21174M
+[07/04 16:50:07] pts.utils.events INFO:  eta: 1:12:21  iter: 15999 -- [53/469]  total_loss: 2.778  soft_target_cross_entropy_loss: 1.408  loss_ofl: 1.407  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 5.6191e-05  max_mem: 21174M
+[07/04 16:50:37] pts.utils.events INFO:  eta: 1:11:56  iter: 16049 -- [103/469]  total_loss: 2.722  soft_target_cross_entropy_loss: 1.391  loss_ofl: 1.328  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 5.5529e-05  max_mem: 21174M
+[07/04 16:51:07] pts.utils.events INFO:  eta: 1:11:31  iter: 16099 -- [153/469]  total_loss: 2.747  soft_target_cross_entropy_loss: 1.465  loss_ofl: 1.293  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 5.487e-05  max_mem: 21174M
+[07/04 16:51:37] pts.utils.events INFO:  eta: 1:11:00  iter: 16149 -- [203/469]  total_loss: 2.645  soft_target_cross_entropy_loss: 1.362  loss_ofl: 1.267  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 5.4213e-05  max_mem: 21174M
+[07/04 16:52:08] pts.utils.events INFO:  eta: 1:10:30  iter: 16199 -- [253/469]  total_loss: 2.75  soft_target_cross_entropy_loss: 1.383  loss_ofl: 1.392  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 5.3559e-05  max_mem: 21174M
+[07/04 16:52:38] pts.utils.events INFO:  eta: 1:10:03  iter: 16249 -- [303/469]  total_loss: 2.764  soft_target_cross_entropy_loss: 1.407  loss_ofl: 1.289  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 5.2907e-05  max_mem: 21174M
+[07/04 16:53:07] pts.utils.events INFO:  eta: 1:09:35  iter: 16299 -- [353/469]  total_loss: 2.686  soft_target_cross_entropy_loss: 1.394  loss_ofl: 1.3  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 5.2258e-05  max_mem: 21174M
+[07/04 16:53:37] pts.utils.events INFO:  eta: 1:09:05  iter: 16349 -- [403/469]  total_loss: 2.693  soft_target_cross_entropy_loss: 1.446  loss_ofl: 1.234  mask_loss: 0  time: 0.6158  data_time: 0.0002  lr: 5.1612e-05  max_mem: 21174M
+[07/04 16:54:12] pts.utils.events INFO:  eta: 1:08:37  iter: 16399 -- [453/469]  total_loss: 2.713  soft_target_cross_entropy_loss: 1.413  loss_ofl: 1.345  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 5.0968e-05  max_mem: 21174M
+[07/04 16:55:06] pts.engine.hooks INFO: ############################## Test: 35 ##############################
+[07/04 16:55:06] pts.engine.hooks INFO: ACC-1crop@1: 0.8279188275337219
+[07/04 16:55:06] pts.engine.hooks INFO: ACC-1crop@5: 0.973096489906311
+[07/04 16:55:06] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 16:55:07] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/best.pth
+[07/04 16:55:43] pts.utils.events INFO:  eta: 1:08:02  iter: 16449 -- [34/469]  total_loss: 2.627  soft_target_cross_entropy_loss: 1.358  loss_ofl: 1.296  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 5.0327e-05  max_mem: 21174M
+[07/04 16:56:13] pts.utils.events INFO:  eta: 1:07:30  iter: 16499 -- [84/469]  total_loss: 2.753  soft_target_cross_entropy_loss: 1.4  loss_ofl: 1.341  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 4.9689e-05  max_mem: 21174M
+[07/04 16:56:43] pts.utils.events INFO:  eta: 1:07:04  iter: 16549 -- [134/469]  total_loss: 2.76  soft_target_cross_entropy_loss: 1.445  loss_ofl: 1.308  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 4.9054e-05  max_mem: 21174M
+[07/04 16:57:13] pts.utils.events INFO:  eta: 1:06:37  iter: 16599 -- [184/469]  total_loss: 2.804  soft_target_cross_entropy_loss: 1.445  loss_ofl: 1.369  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 4.8421e-05  max_mem: 21174M
+[07/04 16:57:43] pts.utils.events INFO:  eta: 1:06:10  iter: 16649 -- [234/469]  total_loss: 2.702  soft_target_cross_entropy_loss: 1.374  loss_ofl: 1.301  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 4.7792e-05  max_mem: 21174M
+[07/04 16:58:13] pts.utils.events INFO:  eta: 1:05:42  iter: 16699 -- [284/469]  total_loss: 2.564  soft_target_cross_entropy_loss: 1.342  loss_ofl: 1.262  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 4.7165e-05  max_mem: 21174M
+[07/04 16:58:43] pts.utils.events INFO:  eta: 1:05:12  iter: 16749 -- [334/469]  total_loss: 2.68  soft_target_cross_entropy_loss: 1.399  loss_ofl: 1.282  mask_loss: 0  time: 0.6162  data_time: 0.0003  lr: 4.6542e-05  max_mem: 21174M
+[07/04 16:59:13] pts.utils.events INFO:  eta: 1:04:42  iter: 16799 -- [384/469]  total_loss: 2.816  soft_target_cross_entropy_loss: 1.444  loss_ofl: 1.345  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 4.5921e-05  max_mem: 21174M
+[07/04 16:59:43] pts.utils.events INFO:  eta: 1:04:13  iter: 16849 -- [434/469]  total_loss: 2.697  soft_target_cross_entropy_loss: 1.412  loss_ofl: 1.299  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 4.5303e-05  max_mem: 21174M
+[07/04 17:00:03] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 17:00:29] pts.utils.events INFO:  eta: 1:03:44  iter: 16899 -- [15/469]  total_loss: 2.7  soft_target_cross_entropy_loss: 1.38  loss_ofl: 1.326  mask_loss: 0  time: 0.6167  data_time: 0.7537  lr: 4.4689e-05  max_mem: 21174M
+[07/04 17:00:59] pts.utils.events INFO:  eta: 1:03:13  iter: 16949 -- [65/469]  total_loss: 2.729  soft_target_cross_entropy_loss: 1.402  loss_ofl: 1.339  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 4.4077e-05  max_mem: 21174M
+[07/04 17:01:29] pts.utils.events INFO:  eta: 1:02:47  iter: 16999 -- [115/469]  total_loss: 2.73  soft_target_cross_entropy_loss: 1.444  loss_ofl: 1.36  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 4.3469e-05  max_mem: 21174M
+[07/04 17:01:59] pts.utils.events INFO:  eta: 1:02:18  iter: 17049 -- [165/469]  total_loss: 2.719  soft_target_cross_entropy_loss: 1.431  loss_ofl: 1.263  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 4.2863e-05  max_mem: 21174M
+[07/04 17:02:30] pts.utils.events INFO:  eta: 1:01:47  iter: 17099 -- [215/469]  total_loss: 2.707  soft_target_cross_entropy_loss: 1.441  loss_ofl: 1.273  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 4.2261e-05  max_mem: 21174M
+[07/04 17:02:59] pts.utils.events INFO:  eta: 1:01:14  iter: 17149 -- [265/469]  total_loss: 2.673  soft_target_cross_entropy_loss: 1.396  loss_ofl: 1.305  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 4.1662e-05  max_mem: 21174M
+[07/04 17:03:29] pts.utils.events INFO:  eta: 1:00:43  iter: 17199 -- [315/469]  total_loss: 2.814  soft_target_cross_entropy_loss: 1.44  loss_ofl: 1.31  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 4.1067e-05  max_mem: 21174M
+[07/04 17:03:59] pts.utils.events INFO:  eta: 1:00:12  iter: 17249 -- [365/469]  total_loss: 2.853  soft_target_cross_entropy_loss: 1.467  loss_ofl: 1.379  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 4.0475e-05  max_mem: 21174M
+[07/04 17:04:29] pts.utils.events INFO:  eta: 0:59:43  iter: 17299 -- [415/469]  total_loss: 2.776  soft_target_cross_entropy_loss: 1.454  loss_ofl: 1.309  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 3.9886e-05  max_mem: 21174M
+[07/04 17:04:59] pts.utils.events INFO:  eta: 0:59:12  iter: 17349 -- [465/469]  total_loss: 2.627  soft_target_cross_entropy_loss: 1.332  loss_ofl: 1.256  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 3.93e-05  max_mem: 21174M
+[07/04 17:05:00] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 17:05:42] pts.utils.events INFO:  eta: 0:58:37  iter: 17399 -- [46/469]  total_loss: 2.75  soft_target_cross_entropy_loss: 1.398  loss_ofl: 1.323  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 3.8718e-05  max_mem: 21174M
+[07/04 17:06:12] pts.utils.events INFO:  eta: 0:58:12  iter: 17449 -- [96/469]  total_loss: 2.57  soft_target_cross_entropy_loss: 1.395  loss_ofl: 1.255  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 3.8139e-05  max_mem: 21174M
+[07/04 17:06:43] pts.utils.events INFO:  eta: 0:57:48  iter: 17499 -- [146/469]  total_loss: 2.618  soft_target_cross_entropy_loss: 1.379  loss_ofl: 1.27  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 3.7564e-05  max_mem: 21174M
+[07/04 17:07:13] pts.utils.events INFO:  eta: 0:57:17  iter: 17549 -- [196/469]  total_loss: 2.693  soft_target_cross_entropy_loss: 1.396  loss_ofl: 1.299  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 3.6992e-05  max_mem: 21174M
+[07/04 17:07:43] pts.utils.events INFO:  eta: 0:56:47  iter: 17599 -- [246/469]  total_loss: 2.621  soft_target_cross_entropy_loss: 1.371  loss_ofl: 1.279  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 3.6424e-05  max_mem: 21174M
+[07/04 17:08:13] pts.utils.events INFO:  eta: 0:56:17  iter: 17649 -- [296/469]  total_loss: 2.683  soft_target_cross_entropy_loss: 1.407  loss_ofl: 1.315  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 3.5859e-05  max_mem: 21174M
+[07/04 17:08:43] pts.utils.events INFO:  eta: 0:55:46  iter: 17699 -- [346/469]  total_loss: 2.627  soft_target_cross_entropy_loss: 1.323  loss_ofl: 1.279  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 3.5298e-05  max_mem: 21174M
+[07/04 17:09:12] pts.utils.events INFO:  eta: 0:55:18  iter: 17749 -- [396/469]  total_loss: 2.628  soft_target_cross_entropy_loss: 1.325  loss_ofl: 1.284  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 3.474e-05  max_mem: 21174M
+[07/04 17:09:42] pts.utils.events INFO:  eta: 0:54:52  iter: 17799 -- [446/469]  total_loss: 2.705  soft_target_cross_entropy_loss: 1.361  loss_ofl: 1.325  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 3.4186e-05  max_mem: 21174M
+[07/04 17:09:56] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 17:10:27] pts.utils.events INFO:  eta: 0:54:24  iter: 17849 -- [27/469]  total_loss: 2.757  soft_target_cross_entropy_loss: 1.408  loss_ofl: 1.305  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 3.3636e-05  max_mem: 21174M
+[07/04 17:10:57] pts.utils.events INFO:  eta: 0:53:55  iter: 17899 -- [77/469]  total_loss: 2.687  soft_target_cross_entropy_loss: 1.36  loss_ofl: 1.305  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 3.3089e-05  max_mem: 21175M
+[07/04 17:11:28] pts.utils.events INFO:  eta: 0:53:29  iter: 17949 -- [127/469]  total_loss: 2.626  soft_target_cross_entropy_loss: 1.366  loss_ofl: 1.275  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 3.2546e-05  max_mem: 21175M
+[07/04 17:11:58] pts.utils.events INFO:  eta: 0:53:00  iter: 17999 -- [177/469]  total_loss: 2.724  soft_target_cross_entropy_loss: 1.45  loss_ofl: 1.278  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 3.2007e-05  max_mem: 21175M
+[07/04 17:12:28] pts.utils.events INFO:  eta: 0:52:29  iter: 18049 -- [227/469]  total_loss: 2.623  soft_target_cross_entropy_loss: 1.325  loss_ofl: 1.297  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 3.1472e-05  max_mem: 21175M
+[07/04 17:12:58] pts.utils.events INFO:  eta: 0:51:59  iter: 18099 -- [277/469]  total_loss: 2.74  soft_target_cross_entropy_loss: 1.409  loss_ofl: 1.307  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 3.0941e-05  max_mem: 21175M
+[07/04 17:13:28] pts.utils.events INFO:  eta: 0:51:33  iter: 18149 -- [327/469]  total_loss: 2.644  soft_target_cross_entropy_loss: 1.365  loss_ofl: 1.282  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 3.0413e-05  max_mem: 21175M
+[07/04 17:13:58] pts.utils.events INFO:  eta: 0:51:04  iter: 18199 -- [377/469]  total_loss: 2.734  soft_target_cross_entropy_loss: 1.407  loss_ofl: 1.282  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 2.9889e-05  max_mem: 21175M
+[07/04 17:14:28] pts.utils.events INFO:  eta: 0:50:39  iter: 18249 -- [427/469]  total_loss: 2.62  soft_target_cross_entropy_loss: 1.342  loss_ofl: 1.288  mask_loss: 0  time: 0.6159  data_time: 0.0002  lr: 2.937e-05  max_mem: 21175M
+[07/04 17:14:54] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 17:15:14] pts.utils.events INFO:  eta: 0:50:12  iter: 18299 -- [8/469]  total_loss: 2.719  soft_target_cross_entropy_loss: 1.388  loss_ofl: 1.304  mask_loss: 0  time: 0.6167  data_time: 0.7250  lr: 2.8854e-05  max_mem: 21175M
+[07/04 17:15:44] pts.utils.events INFO:  eta: 0:49:42  iter: 18349 -- [58/469]  total_loss: 2.685  soft_target_cross_entropy_loss: 1.353  loss_ofl: 1.315  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 2.8342e-05  max_mem: 21175M
+[07/04 17:16:14] pts.utils.events INFO:  eta: 0:49:16  iter: 18399 -- [108/469]  total_loss: 2.647  soft_target_cross_entropy_loss: 1.332  loss_ofl: 1.301  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 2.7834e-05  max_mem: 21175M
+[07/04 17:16:45] pts.utils.events INFO:  eta: 0:48:48  iter: 18449 -- [158/469]  total_loss: 2.617  soft_target_cross_entropy_loss: 1.326  loss_ofl: 1.296  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 2.733e-05  max_mem: 21175M
+[07/04 17:17:15] pts.utils.events INFO:  eta: 0:48:17  iter: 18499 -- [208/469]  total_loss: 2.624  soft_target_cross_entropy_loss: 1.359  loss_ofl: 1.249  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 2.683e-05  max_mem: 21175M
+[07/04 17:17:45] pts.utils.events INFO:  eta: 0:47:46  iter: 18549 -- [258/469]  total_loss: 2.512  soft_target_cross_entropy_loss: 1.322  loss_ofl: 1.209  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 2.6335e-05  max_mem: 21175M
+[07/04 17:18:15] pts.utils.events INFO:  eta: 0:47:17  iter: 18599 -- [308/469]  total_loss: 2.635  soft_target_cross_entropy_loss: 1.341  loss_ofl: 1.279  mask_loss: 0  time: 0.6162  data_time: 0.0002  lr: 2.5843e-05  max_mem: 21175M
+[07/04 17:18:45] pts.utils.events INFO:  eta: 0:46:48  iter: 18649 -- [358/469]  total_loss: 2.672  soft_target_cross_entropy_loss: 1.345  loss_ofl: 1.346  mask_loss: 0  time: 0.6161  data_time: 0.0002  lr: 2.5355e-05  max_mem: 21175M
+[07/04 17:19:15] pts.utils.events INFO:  eta: 0:46:20  iter: 18699 -- [408/469]  total_loss: 2.655  soft_target_cross_entropy_loss: 1.365  loss_ofl: 1.332  mask_loss: 0  time: 0.6160  data_time: 0.0002  lr: 2.4872e-05  max_mem: 21175M
+[07/04 17:19:52] pts.utils.events INFO:  eta: 0:45:51  iter: 18749 -- [458/469]  total_loss: 2.641  soft_target_cross_entropy_loss: 1.347  loss_ofl: 1.345  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 2.4393e-05  max_mem: 21175M
+[07/04 17:20:42] pts.engine.hooks INFO: ############################## Test: 40 ##############################
+[07/04 17:20:42] pts.engine.hooks INFO: ACC-1crop@1: 0.8121827840805054
+[07/04 17:20:42] pts.engine.hooks INFO: ACC-1crop@5: 0.9771574139595032
+[07/04 17:20:42] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 17:21:23] pts.utils.events INFO:  eta: 0:45:19  iter: 18799 -- [39/469]  total_loss: 2.635  soft_target_cross_entropy_loss: 1.379  loss_ofl: 1.275  mask_loss: 0  time: 0.6170  data_time: 0.0002  lr: 2.3918e-05  max_mem: 21175M
+[07/04 17:21:53] pts.utils.events INFO:  eta: 0:44:48  iter: 18849 -- [89/469]  total_loss: 2.606  soft_target_cross_entropy_loss: 1.323  loss_ofl: 1.247  mask_loss: 0  time: 0.6169  data_time: 0.0002  lr: 2.3447e-05  max_mem: 21175M
+[07/04 17:22:23] pts.utils.events INFO:  eta: 0:44:20  iter: 18899 -- [139/469]  total_loss: 2.614  soft_target_cross_entropy_loss: 1.366  loss_ofl: 1.212  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 2.2981e-05  max_mem: 21175M
+[07/04 17:22:53] pts.utils.events INFO:  eta: 0:43:50  iter: 18949 -- [189/469]  total_loss: 2.701  soft_target_cross_entropy_loss: 1.423  loss_ofl: 1.267  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 2.2519e-05  max_mem: 21175M
+[07/04 17:23:23] pts.utils.events INFO:  eta: 0:43:19  iter: 18999 -- [239/469]  total_loss: 2.629  soft_target_cross_entropy_loss: 1.429  loss_ofl: 1.248  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 2.2061e-05  max_mem: 21175M
+[07/04 17:23:53] pts.utils.events INFO:  eta: 0:42:50  iter: 19049 -- [289/469]  total_loss: 2.562  soft_target_cross_entropy_loss: 1.334  loss_ofl: 1.243  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 2.1608e-05  max_mem: 21175M
+[07/04 17:24:23] pts.utils.events INFO:  eta: 0:42:20  iter: 19099 -- [339/469]  total_loss: 2.706  soft_target_cross_entropy_loss: 1.344  loss_ofl: 1.345  mask_loss: 0  time: 0.6165  data_time: 0.0003  lr: 2.1158e-05  max_mem: 21175M
+[07/04 17:24:52] pts.utils.events INFO:  eta: 0:41:50  iter: 19149 -- [389/469]  total_loss: 2.656  soft_target_cross_entropy_loss: 1.334  loss_ofl: 1.314  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 2.0714e-05  max_mem: 21175M
+[07/04 17:25:22] pts.utils.events INFO:  eta: 0:41:21  iter: 19199 -- [439/469]  total_loss: 2.668  soft_target_cross_entropy_loss: 1.375  loss_ofl: 1.297  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 2.0274e-05  max_mem: 21175M
+[07/04 17:26:24] pts.engine.hooks INFO: ############################## Test: 41 ##############################
+[07/04 17:26:24] pts.engine.hooks INFO: ACC-1crop@1: 0.814213216304779
+[07/04 17:26:24] pts.engine.hooks INFO: ACC-1crop@5: 0.9771574139595032
+[07/04 17:26:24] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 17:26:53] pts.utils.events INFO:  eta: 0:40:51  iter: 19249 -- [20/469]  total_loss: 2.618  soft_target_cross_entropy_loss: 1.337  loss_ofl: 1.241  mask_loss: 0  time: 0.6170  data_time: 0.0002  lr: 1.9838e-05  max_mem: 21175M
+[07/04 17:27:23] pts.utils.events INFO:  eta: 0:40:19  iter: 19299 -- [70/469]  total_loss: 2.615  soft_target_cross_entropy_loss: 1.341  loss_ofl: 1.266  mask_loss: 0  time: 0.6169  data_time: 0.0002  lr: 1.9406e-05  max_mem: 21175M
+[07/04 17:27:53] pts.utils.events INFO:  eta: 0:39:52  iter: 19349 -- [120/469]  total_loss: 2.64  soft_target_cross_entropy_loss: 1.375  loss_ofl: 1.277  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 1.898e-05  max_mem: 21175M
+[07/04 17:28:24] pts.utils.events INFO:  eta: 0:39:23  iter: 19399 -- [170/469]  total_loss: 2.649  soft_target_cross_entropy_loss: 1.367  loss_ofl: 1.333  mask_loss: 0  time: 0.6168  data_time: 0.0003  lr: 1.8557e-05  max_mem: 21175M
+[07/04 17:28:54] pts.utils.events INFO:  eta: 0:38:53  iter: 19449 -- [220/469]  total_loss: 2.575  soft_target_cross_entropy_loss: 1.335  loss_ofl: 1.323  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 1.8139e-05  max_mem: 21175M
+[07/04 17:29:23] pts.utils.events INFO:  eta: 0:38:22  iter: 19499 -- [270/469]  total_loss: 2.646  soft_target_cross_entropy_loss: 1.345  loss_ofl: 1.299  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 1.7726e-05  max_mem: 21175M
+[07/04 17:29:53] pts.utils.events INFO:  eta: 0:37:53  iter: 19549 -- [320/469]  total_loss: 2.584  soft_target_cross_entropy_loss: 1.287  loss_ofl: 1.332  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 1.7317e-05  max_mem: 21175M
+[07/04 17:30:23] pts.utils.events INFO:  eta: 0:37:24  iter: 19599 -- [370/469]  total_loss: 2.669  soft_target_cross_entropy_loss: 1.388  loss_ofl: 1.306  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 1.6913e-05  max_mem: 21175M
+[07/04 17:30:53] pts.utils.events INFO:  eta: 0:36:54  iter: 19649 -- [420/469]  total_loss: 2.6  soft_target_cross_entropy_loss: 1.331  loss_ofl: 1.26  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 1.6514e-05  max_mem: 21175M
+[07/04 17:32:05] pts.engine.hooks INFO: ############################## Test: 42 ##############################
+[07/04 17:32:05] pts.engine.hooks INFO: ACC-1crop@1: 0.8126903772354126
+[07/04 17:32:05] pts.engine.hooks INFO: ACC-1crop@5: 0.9756345152854919
+[07/04 17:32:05] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 17:32:22] pts.utils.events INFO:  eta: 0:36:25  iter: 19699 -- [1/469]  total_loss: 2.52  soft_target_cross_entropy_loss: 1.325  loss_ofl: 1.17  mask_loss: 0  time: 0.6170  data_time: 0.7359  lr: 1.6119e-05  max_mem: 21175M
+[07/04 17:32:51] pts.utils.events INFO:  eta: 0:35:53  iter: 19749 -- [51/469]  total_loss: 2.69  soft_target_cross_entropy_loss: 1.415  loss_ofl: 1.275  mask_loss: 0  time: 0.6169  data_time: 0.0002  lr: 1.5729e-05  max_mem: 21175M
+[07/04 17:33:21] pts.utils.events INFO:  eta: 0:35:26  iter: 19799 -- [101/469]  total_loss: 2.667  soft_target_cross_entropy_loss: 1.404  loss_ofl: 1.287  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 1.5344e-05  max_mem: 21175M
+[07/04 17:33:52] pts.utils.events INFO:  eta: 0:35:00  iter: 19849 -- [151/469]  total_loss: 2.585  soft_target_cross_entropy_loss: 1.334  loss_ofl: 1.27  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 1.4963e-05  max_mem: 21175M
+[07/04 17:34:23] pts.utils.events INFO:  eta: 0:34:31  iter: 19899 -- [201/469]  total_loss: 2.485  soft_target_cross_entropy_loss: 1.303  loss_ofl: 1.212  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 1.4587e-05  max_mem: 21175M
+[07/04 17:34:53] pts.utils.events INFO:  eta: 0:34:02  iter: 19949 -- [251/469]  total_loss: 2.602  soft_target_cross_entropy_loss: 1.341  loss_ofl: 1.304  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 1.4216e-05  max_mem: 21175M
+[07/04 17:35:23] pts.utils.events INFO:  eta: 0:33:32  iter: 19999 -- [301/469]  total_loss: 2.602  soft_target_cross_entropy_loss: 1.3  loss_ofl: 1.307  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 1.385e-05  max_mem: 21175M
+[07/04 17:35:53] pts.utils.events INFO:  eta: 0:33:03  iter: 20049 -- [351/469]  total_loss: 2.591  soft_target_cross_entropy_loss: 1.321  loss_ofl: 1.28  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 1.3488e-05  max_mem: 21175M
+[07/04 17:36:22] pts.utils.events INFO:  eta: 0:32:34  iter: 20099 -- [401/469]  total_loss: 2.674  soft_target_cross_entropy_loss: 1.35  loss_ofl: 1.298  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 1.3131e-05  max_mem: 21175M
+[07/04 17:36:53] pts.utils.events INFO:  eta: 0:32:05  iter: 20149 -- [451/469]  total_loss: 2.677  soft_target_cross_entropy_loss: 1.342  loss_ofl: 1.232  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 1.2779e-05  max_mem: 21175M
+[07/04 17:37:46] pts.engine.hooks INFO: ############################## Test: 43 ##############################
+[07/04 17:37:46] pts.engine.hooks INFO: ACC-1crop@1: 0.8152284622192383
+[07/04 17:37:46] pts.engine.hooks INFO: ACC-1crop@5: 0.9751269221305847
+[07/04 17:37:46] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 17:38:22] pts.utils.events INFO:  eta: 0:31:35  iter: 20199 -- [32/469]  total_loss: 2.631  soft_target_cross_entropy_loss: 1.307  loss_ofl: 1.28  mask_loss: 0  time: 0.6170  data_time: 0.0002  lr: 1.2432e-05  max_mem: 21175M
+[07/04 17:38:51] pts.utils.events INFO:  eta: 0:31:06  iter: 20249 -- [82/469]  total_loss: 2.582  soft_target_cross_entropy_loss: 1.272  loss_ofl: 1.278  mask_loss: 0  time: 0.6169  data_time: 0.0002  lr: 1.209e-05  max_mem: 21175M
+[07/04 17:39:21] pts.utils.events INFO:  eta: 0:30:38  iter: 20299 -- [132/469]  total_loss: 2.494  soft_target_cross_entropy_loss: 1.282  loss_ofl: 1.209  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 1.1753e-05  max_mem: 21175M
+[07/04 17:39:52] pts.utils.events INFO:  eta: 0:30:09  iter: 20349 -- [182/469]  total_loss: 2.706  soft_target_cross_entropy_loss: 1.409  loss_ofl: 1.32  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 1.142e-05  max_mem: 21175M
+[07/04 17:40:22] pts.utils.events INFO:  eta: 0:29:38  iter: 20399 -- [232/469]  total_loss: 2.652  soft_target_cross_entropy_loss: 1.369  loss_ofl: 1.295  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 1.1093e-05  max_mem: 21175M
+[07/04 17:40:52] pts.utils.events INFO:  eta: 0:29:09  iter: 20449 -- [282/469]  total_loss: 2.629  soft_target_cross_entropy_loss: 1.329  loss_ofl: 1.284  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 1.077e-05  max_mem: 21175M
+[07/04 17:41:22] pts.utils.events INFO:  eta: 0:28:41  iter: 20499 -- [332/469]  total_loss: 2.697  soft_target_cross_entropy_loss: 1.419  loss_ofl: 1.256  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 1.0453e-05  max_mem: 21175M
+[07/04 17:41:51] pts.utils.events INFO:  eta: 0:28:11  iter: 20549 -- [382/469]  total_loss: 2.604  soft_target_cross_entropy_loss: 1.32  loss_ofl: 1.265  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 1.014e-05  max_mem: 21175M
+[07/04 17:42:21] pts.utils.events INFO:  eta: 0:27:41  iter: 20599 -- [432/469]  total_loss: 2.581  soft_target_cross_entropy_loss: 1.371  loss_ofl: 1.23  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 9.8326e-06  max_mem: 21175M
+[07/04 17:43:27] pts.engine.hooks INFO: ############################## Test: 44 ##############################
+[07/04 17:43:27] pts.engine.hooks INFO: ACC-1crop@1: 0.8162436485290527
+[07/04 17:43:27] pts.engine.hooks INFO: ACC-1crop@5: 0.9746193289756775
+[07/04 17:43:27] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 17:43:49] pts.utils.events INFO:  eta: 0:27:13  iter: 20649 -- [13/469]  total_loss: 2.599  soft_target_cross_entropy_loss: 1.323  loss_ofl: 1.264  mask_loss: 0  time: 0.6169  data_time: 0.7094  lr: 9.5301e-06  max_mem: 21175M
+[07/04 17:44:19] pts.utils.events INFO:  eta: 0:26:42  iter: 20699 -- [63/469]  total_loss: 2.574  soft_target_cross_entropy_loss: 1.355  loss_ofl: 1.221  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 9.2326e-06  max_mem: 21175M
+[07/04 17:44:49] pts.utils.events INFO:  eta: 0:26:14  iter: 20749 -- [113/469]  total_loss: 2.54  soft_target_cross_entropy_loss: 1.274  loss_ofl: 1.245  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 8.9402e-06  max_mem: 21175M
+[07/04 17:45:19] pts.utils.events INFO:  eta: 0:25:46  iter: 20799 -- [163/469]  total_loss: 2.654  soft_target_cross_entropy_loss: 1.369  loss_ofl: 1.299  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 8.6528e-06  max_mem: 21175M
+[07/04 17:45:50] pts.utils.events INFO:  eta: 0:25:16  iter: 20849 -- [213/469]  total_loss: 2.632  soft_target_cross_entropy_loss: 1.36  loss_ofl: 1.285  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 8.3706e-06  max_mem: 21175M
+[07/04 17:46:19] pts.utils.events INFO:  eta: 0:24:46  iter: 20899 -- [263/469]  total_loss: 2.554  soft_target_cross_entropy_loss: 1.333  loss_ofl: 1.291  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 8.0934e-06  max_mem: 21175M
+[07/04 17:46:49] pts.utils.events INFO:  eta: 0:24:16  iter: 20949 -- [313/469]  total_loss: 2.554  soft_target_cross_entropy_loss: 1.309  loss_ofl: 1.233  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 7.8214e-06  max_mem: 21175M
+[07/04 17:47:19] pts.utils.events INFO:  eta: 0:23:46  iter: 20999 -- [363/469]  total_loss: 2.552  soft_target_cross_entropy_loss: 1.343  loss_ofl: 1.258  mask_loss: 0  time: 0.6164  data_time: 0.0002  lr: 7.5545e-06  max_mem: 21175M
+[07/04 17:47:49] pts.utils.events INFO:  eta: 0:23:17  iter: 21049 -- [413/469]  total_loss: 2.53  soft_target_cross_entropy_loss: 1.332  loss_ofl: 1.259  mask_loss: 0  time: 0.6163  data_time: 0.0002  lr: 7.2927e-06  max_mem: 21175M
+[07/04 17:48:25] pts.utils.events INFO:  eta: 0:22:48  iter: 21099 -- [463/469]  total_loss: 2.62  soft_target_cross_entropy_loss: 1.369  loss_ofl: 1.237  mask_loss: 0  time: 0.6165  data_time: 0.0002  lr: 7.0361e-06  max_mem: 21175M
+[07/04 17:49:12] pts.engine.hooks INFO: ############################## Test: 45 ##############################
+[07/04 17:49:12] pts.engine.hooks INFO: ACC-1crop@1: 0.8192893862724304
+[07/04 17:49:12] pts.engine.hooks INFO: ACC-1crop@5: 0.9746193289756775
+[07/04 17:49:12] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 17:49:55] pts.utils.events INFO:  eta: 0:22:19  iter: 21149 -- [44/469]  total_loss: 2.51  soft_target_cross_entropy_loss: 1.322  loss_ofl: 1.243  mask_loss: 0  time: 0.6171  data_time: 0.0002  lr: 6.7847e-06  max_mem: 21175M
+[07/04 17:50:25] pts.utils.events INFO:  eta: 0:21:50  iter: 21199 -- [94/469]  total_loss: 2.557  soft_target_cross_entropy_loss: 1.336  loss_ofl: 1.184  mask_loss: 0  time: 0.6170  data_time: 0.0002  lr: 6.5384e-06  max_mem: 21175M
+[07/04 17:50:56] pts.utils.events INFO:  eta: 0:21:23  iter: 21249 -- [144/469]  total_loss: 2.537  soft_target_cross_entropy_loss: 1.322  loss_ofl: 1.226  mask_loss: 0  time: 0.6170  data_time: 0.0002  lr: 6.2974e-06  max_mem: 21175M
+[07/04 17:51:26] pts.utils.events INFO:  eta: 0:20:54  iter: 21299 -- [194/469]  total_loss: 2.648  soft_target_cross_entropy_loss: 1.362  loss_ofl: 1.249  mask_loss: 0  time: 0.6169  data_time: 0.0002  lr: 6.0616e-06  max_mem: 21175M
+[07/04 17:51:56] pts.utils.events INFO:  eta: 0:20:24  iter: 21349 -- [244/469]  total_loss: 2.632  soft_target_cross_entropy_loss: 1.312  loss_ofl: 1.3  mask_loss: 0  time: 0.6169  data_time: 0.0003  lr: 5.831e-06  max_mem: 21175M
+[07/04 17:52:26] pts.utils.events INFO:  eta: 0:19:55  iter: 21399 -- [294/469]  total_loss: 2.496  soft_target_cross_entropy_loss: 1.286  loss_ofl: 1.199  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 5.6057e-06  max_mem: 21175M
+[07/04 17:52:56] pts.utils.events INFO:  eta: 0:19:25  iter: 21449 -- [344/469]  total_loss: 2.654  soft_target_cross_entropy_loss: 1.351  loss_ofl: 1.309  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 5.3856e-06  max_mem: 21175M
+[07/04 17:53:26] pts.utils.events INFO:  eta: 0:18:56  iter: 21499 -- [394/469]  total_loss: 2.575  soft_target_cross_entropy_loss: 1.266  loss_ofl: 1.233  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 5.1708e-06  max_mem: 21175M
+[07/04 17:53:56] pts.utils.events INFO:  eta: 0:18:28  iter: 21549 -- [444/469]  total_loss: 2.505  soft_target_cross_entropy_loss: 1.297  loss_ofl: 1.223  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 4.9613e-06  max_mem: 21175M
+[07/04 17:54:53] pts.engine.hooks INFO: ############################## Test: 46 ##############################
+[07/04 17:54:53] pts.engine.hooks INFO: ACC-1crop@1: 0.817258894443512
+[07/04 17:54:53] pts.engine.hooks INFO: ACC-1crop@5: 0.9736040830612183
+[07/04 17:54:53] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 17:55:24] pts.utils.events INFO:  eta: 0:17:59  iter: 21599 -- [25/469]  total_loss: 2.662  soft_target_cross_entropy_loss: 1.351  loss_ofl: 1.283  mask_loss: 0  time: 0.6171  data_time: 0.0002  lr: 4.7571e-06  max_mem: 21175M
+[07/04 17:55:54] pts.utils.events INFO:  eta: 0:17:30  iter: 21649 -- [75/469]  total_loss: 2.567  soft_target_cross_entropy_loss: 1.324  loss_ofl: 1.246  mask_loss: 0  time: 0.6171  data_time: 0.0002  lr: 4.5582e-06  max_mem: 21175M
+[07/04 17:56:25] pts.utils.events INFO:  eta: 0:17:01  iter: 21699 -- [125/469]  total_loss: 2.634  soft_target_cross_entropy_loss: 1.305  loss_ofl: 1.264  mask_loss: 0  time: 0.6170  data_time: 0.0002  lr: 4.3646e-06  max_mem: 21175M
+[07/04 17:56:55] pts.utils.events INFO:  eta: 0:16:32  iter: 21749 -- [175/469]  total_loss: 2.525  soft_target_cross_entropy_loss: 1.321  loss_ofl: 1.221  mask_loss: 0  time: 0.6170  data_time: 0.0002  lr: 4.1763e-06  max_mem: 21175M
+[07/04 17:57:25] pts.utils.events INFO:  eta: 0:16:03  iter: 21799 -- [225/469]  total_loss: 2.523  soft_target_cross_entropy_loss: 1.299  loss_ofl: 1.271  mask_loss: 0  time: 0.6169  data_time: 0.0002  lr: 3.9933e-06  max_mem: 21175M
+[07/04 17:57:55] pts.utils.events INFO:  eta: 0:15:33  iter: 21849 -- [275/469]  total_loss: 2.596  soft_target_cross_entropy_loss: 1.323  loss_ofl: 1.267  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 3.8157e-06  max_mem: 21175M
+[07/04 17:58:25] pts.utils.events INFO:  eta: 0:15:04  iter: 21899 -- [325/469]  total_loss: 2.511  soft_target_cross_entropy_loss: 1.332  loss_ofl: 1.253  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 3.6435e-06  max_mem: 21175M
+[07/04 17:58:55] pts.utils.events INFO:  eta: 0:14:35  iter: 21949 -- [375/469]  total_loss: 2.658  soft_target_cross_entropy_loss: 1.363  loss_ofl: 1.294  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 3.4766e-06  max_mem: 21175M
+[07/04 17:59:25] pts.utils.events INFO:  eta: 0:14:06  iter: 21999 -- [425/469]  total_loss: 2.592  soft_target_cross_entropy_loss: 1.325  loss_ofl: 1.249  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 3.3151e-06  max_mem: 21175M
+[07/04 18:00:35] pts.engine.hooks INFO: ############################## Test: 47 ##############################
+[07/04 18:00:35] pts.engine.hooks INFO: ACC-1crop@1: 0.817766547203064
+[07/04 18:00:35] pts.engine.hooks INFO: ACC-1crop@5: 0.9741116762161255
+[07/04 18:00:35] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 18:00:55] pts.utils.events INFO:  eta: 0:13:38  iter: 22049 -- [6/469]  total_loss: 2.555  soft_target_cross_entropy_loss: 1.296  loss_ofl: 1.234  mask_loss: 0  time: 0.6172  data_time: 0.7459  lr: 3.1589e-06  max_mem: 21175M
+[07/04 18:01:25] pts.utils.events INFO:  eta: 0:13:08  iter: 22099 -- [56/469]  total_loss: 2.637  soft_target_cross_entropy_loss: 1.378  loss_ofl: 1.28  mask_loss: 0  time: 0.6171  data_time: 0.0002  lr: 3.0082e-06  max_mem: 21175M
+[07/04 18:01:55] pts.utils.events INFO:  eta: 0:12:39  iter: 22149 -- [106/469]  total_loss: 2.622  soft_target_cross_entropy_loss: 1.322  loss_ofl: 1.259  mask_loss: 0  time: 0.6171  data_time: 0.0002  lr: 2.8629e-06  max_mem: 21175M
+[07/04 18:02:25] pts.utils.events INFO:  eta: 0:12:10  iter: 22199 -- [156/469]  total_loss: 2.517  soft_target_cross_entropy_loss: 1.307  loss_ofl: 1.187  mask_loss: 0  time: 0.6170  data_time: 0.0002  lr: 2.723e-06  max_mem: 21175M
+[07/04 18:02:56] pts.utils.events INFO:  eta: 0:11:41  iter: 22249 -- [206/469]  total_loss: 2.616  soft_target_cross_entropy_loss: 1.29  loss_ofl: 1.275  mask_loss: 0  time: 0.6170  data_time: 0.0002  lr: 2.5884e-06  max_mem: 21175M
+[07/04 18:03:25] pts.utils.events INFO:  eta: 0:11:11  iter: 22299 -- [256/469]  total_loss: 2.493  soft_target_cross_entropy_loss: 1.295  loss_ofl: 1.23  mask_loss: 0  time: 0.6169  data_time: 0.0002  lr: 2.4594e-06  max_mem: 21175M
+[07/04 18:03:55] pts.utils.events INFO:  eta: 0:10:42  iter: 22349 -- [306/469]  total_loss: 2.586  soft_target_cross_entropy_loss: 1.332  loss_ofl: 1.257  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 2.3357e-06  max_mem: 21175M
+[07/04 18:04:25] pts.utils.events INFO:  eta: 0:10:12  iter: 22399 -- [356/469]  total_loss: 2.587  soft_target_cross_entropy_loss: 1.323  loss_ofl: 1.269  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 2.2175e-06  max_mem: 21175M
+[07/04 18:04:55] pts.utils.events INFO:  eta: 0:09:43  iter: 22449 -- [406/469]  total_loss: 2.595  soft_target_cross_entropy_loss: 1.364  loss_ofl: 1.213  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 2.1047e-06  max_mem: 21175M
+[07/04 18:05:25] pts.utils.events INFO:  eta: 0:09:14  iter: 22499 -- [456/469]  total_loss: 2.609  soft_target_cross_entropy_loss: 1.322  loss_ofl: 1.255  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 1.9974e-06  max_mem: 21175M
+[07/04 18:06:17] pts.engine.hooks INFO: ############################## Test: 48 ##############################
+[07/04 18:06:17] pts.engine.hooks INFO: ACC-1crop@1: 0.8182741403579712
+[07/04 18:06:17] pts.engine.hooks INFO: ACC-1crop@5: 0.9720812439918518
+[07/04 18:06:17] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 18:06:54] pts.utils.events INFO:  eta: 0:08:45  iter: 22549 -- [37/469]  total_loss: 2.505  soft_target_cross_entropy_loss: 1.321  loss_ofl: 1.214  mask_loss: 0  time: 0.6171  data_time: 0.0002  lr: 1.8955e-06  max_mem: 21175M
+[07/04 18:07:24] pts.utils.events INFO:  eta: 0:08:15  iter: 22599 -- [87/469]  total_loss: 2.535  soft_target_cross_entropy_loss: 1.28  loss_ofl: 1.259  mask_loss: 0  time: 0.6170  data_time: 0.0002  lr: 1.7991e-06  max_mem: 21175M
+[07/04 18:07:55] pts.utils.events INFO:  eta: 0:07:47  iter: 22649 -- [137/469]  total_loss: 2.489  soft_target_cross_entropy_loss: 1.262  loss_ofl: 1.2  mask_loss: 0  time: 0.6170  data_time: 0.0002  lr: 1.7082e-06  max_mem: 21175M
+[07/04 18:08:25] pts.utils.events INFO:  eta: 0:07:18  iter: 22699 -- [187/469]  total_loss: 2.625  soft_target_cross_entropy_loss: 1.344  loss_ofl: 1.244  mask_loss: 0  time: 0.6169  data_time: 0.0002  lr: 1.6227e-06  max_mem: 21175M
+[07/04 18:08:55] pts.utils.events INFO:  eta: 0:06:48  iter: 22749 -- [237/469]  total_loss: 2.637  soft_target_cross_entropy_loss: 1.301  loss_ofl: 1.315  mask_loss: 0  time: 0.6169  data_time: 0.0002  lr: 1.5428e-06  max_mem: 21175M
+[07/04 18:09:25] pts.utils.events INFO:  eta: 0:06:19  iter: 22799 -- [287/469]  total_loss: 2.637  soft_target_cross_entropy_loss: 1.35  loss_ofl: 1.25  mask_loss: 0  time: 0.6168  data_time: 0.0002  lr: 1.4682e-06  max_mem: 21175M
+[07/04 18:09:55] pts.utils.events INFO:  eta: 0:05:50  iter: 22849 -- [337/469]  total_loss: 2.565  soft_target_cross_entropy_loss: 1.315  loss_ofl: 1.271  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 1.3992e-06  max_mem: 21175M
+[07/04 18:10:26] pts.utils.events INFO:  eta: 0:05:21  iter: 22899 -- [387/469]  total_loss: 2.537  soft_target_cross_entropy_loss: 1.312  loss_ofl: 1.242  mask_loss: 0  time: 0.6167  data_time: 0.0002  lr: 1.3357e-06  max_mem: 21175M
+[07/04 18:10:56] pts.utils.events INFO:  eta: 0:04:52  iter: 22949 -- [437/469]  total_loss: 2.603  soft_target_cross_entropy_loss: 1.371  loss_ofl: 1.253  mask_loss: 0  time: 0.6166  data_time: 0.0002  lr: 1.2777e-06  max_mem: 21175M
+[07/04 18:11:58] pts.engine.hooks INFO: ############################## Test: 49 ##############################
+[07/04 18:11:58] pts.engine.hooks INFO: ACC-1crop@1: 0.8167513012886047
+[07/04 18:11:58] pts.engine.hooks INFO: ACC-1crop@5: 0.9715736508369446
+[07/04 18:11:58] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_d48_swin_s2s+t2t_8gpu_mixlr002/current.pth

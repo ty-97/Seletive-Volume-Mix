@@ -1,0 +1,926 @@
+[07/04 04:11:00] pytorchvideo INFO: Rank of current process: 0. World size: 4
+[07/04 04:11:01] pytorchvideo INFO: Environment info:
+----------------------  ---------------------------------------------------------------------------------------
+sys.platform            linux
+Python                  3.8.16 (default, Mar  2 2023, 03:21:46) [GCC 11.2.0]
+numpy                   1.24.2
+PyTorch                 2.0.0+cu117 @/data/tanyi/anaconda3/envs/torch2/lib/python3.8/site-packages/torch
+PyTorch debug build     False
+GPU available           True
+GPU 0,1,2,3             NVIDIA GeForce RTX 3090 (arch=8.6)
+CUDA_HOME               /usr/local/cuda
+Pillow                  10.3.0
+torchvision             0.15.1+cu117 @/data/tanyi/anaconda3/envs/torch2/lib/python3.8/site-packages/torchvision
+torchvision arch flags  3.5, 5.0, 6.0, 7.0, 7.5, 8.0, 8.6
+fvcore                  0.1.5.post20221221
+iopath                  0.1.10
+----------------------  ---------------------------------------------------------------------------------------
+PyTorch built with:
+  - GCC 9.3
+  - C++ Version: 201703
+  - Intel(R) oneAPI Math Kernel Library Version 2022.2-Product Build 20220804 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.7.3 (Git Hash 6dbeffbae1f23cbbeae17adb7b5b13f1f37c080e)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.7
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.5
+  - Magma 2.6.1
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.7, CUDNN_VERSION=8.5.0, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -D_GLIBCXX_USE_CXX11_ABI=0 -fabi-version=11 -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOROCTRACER -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wunused-local-typedefs -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Werror=cast-function-type -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_DISABLE_GPU_ASSERTS=ON, TORCH_VERSION=2.0.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=1, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+[07/04 04:11:01] pytorchvideo INFO: Command line arguments: Namespace(config_file='experiments/eg_uniformer_s2s+t2t_8gpu_mixlr002.yaml', dist_url='auto', eval_only=False, machine_rank=0, num_gpus=4, num_machines=1, opts=[], repeat_time=1, resume=False)
+[07/04 04:11:01] pytorchvideo INFO: Contents of args.config_file=experiments/eg_uniformer_s2s+t2t_8gpu_mixlr002.yaml:
+DATASET:
+  NAME: 'VideoClsDataset'
+
+DATALOADER:
+  TRAIN_BATCH_SIZE: 8
+  TEST_BATCH_SIZE: 8
+  TOTAL_BATCH_SIZE: 32
+  NUM_WORKERS: 4
+  ROOT_PATH: '/data/tanyi/EGTEA_Gaze+'
+  TRAIN_LIST_FILE: 'trainValTest/train1.txt'
+  TEST_LIST_FILE: 'trainValTest/val1.txt'
+  FORMAT: 'DECORD_.mp4'
+  NUM_CLIPS: 1
+  NUM_CROPS: 1
+  NUM_SEGMENTS: 16
+  CLIP_LENGTH: 1
+  NUM_STEPS: 1
+
+ENGINE:
+  NAME: 'DefaultTrainer'
+  BEST_METRICS: ['ACC-1crop@1']
+  FP16: True
+
+TRANSFORM:
+  NAME: 'SIFARTransform'
+  CROP_SIZE: 224
+  TEST_CROP_SIZE: 224
+  NO_HORIZONTAL_FLIP: False
+  TIME_DIM: 'T'
+  MIXUP_PROB: 1.
+  SWITCH_PROB: .5
+  MASK_MOTION_CUT: 1.
+  MIXUP_LABELSMOOTHING: .1
+
+
+MODEL:
+  NAME: 'Uniformer'
+  ARCH: 'uniformer_s'
+  NUM_CLASSES: 106
+  DROP_PATH_RATIO: 0.2
+  WEIGHTS: '/data/tanyi/uniformer_small_k400_16x4.pth'
+  REMOVE_FC: True
+  FROZEN_BN: False
+  TRANSFER_WEIGHTS: True
+
+SOLVER:
+  NAME: 'AdamW'
+  NAME_MIXBLOCK: 'SGD'
+  PARAMS: 'default'
+  EPOCH: 50
+  CHECKPOINT_PERIOD: 1
+  EVAL_PERIOD: 5
+  DENSE_EVAL_EPOCH: 40
+  BASE_LR: 2e-4
+  BASE_LR_MIXBLOCK: 0.02
+  WEIGHT_DECAY: 0.05
+  WEIGHT_DECAY_MIXBLOCK: 0.0001
+  MOMENTUM: 0.9
+  ALPHA: 0.99
+  BETAS: [0.9, 0.999]
+  WRITE_PERIOD: 50
+  AUTO_LR: False
+  GRAD_CLIP: 1.
+  GRAD_CLIP_MIXBLOCK: 20.
+
+LR_SCHEDULER:
+  NAME: 'WarmupCosineLR'
+  WARMUP_EPOCH: 5
+
+LOSSES:
+  # NAMES: ['LabelSmoothing']
+  # LABELSMOOTHING: 0.1
+  NAMES: ['SoftTargetCrossEntropy']
+
+
+INFERENCE:
+  NAME: 'ClsEvaluator'
+[07/04 04:11:01] pytorchvideo INFO: Running with full config:
+CUDNN_BENCHMARK: True
+DATALOADER:
+  CLIP_LENGTH: 1
+  FORMAT: DECORD_.mp4
+  NUM_CLIPS: 1
+  NUM_CROPS: 1
+  NUM_SEGMENTS: 16
+  NUM_STEPS: 1
+  NUM_WORKERS: 4
+  ROOT_PATH: /data/tanyi/EGTEA_Gaze+
+  SHUFFLE: True
+  TEST_BATCH_SIZE: 8
+  TEST_LIST_FILE: trainValTest/val1.txt
+  TOTAL_BATCH_SIZE: 32
+  TRAIN_BATCH_SIZE: 8
+  TRAIN_LIST_FILE: trainValTest/train1.txt
+DATASET:
+  NAME: VideoClsDataset
+ENGINE:
+  BEST_METRICS: ['ACC-1crop@1']
+  FP16: True
+  NAME: DefaultTrainer
+INFERENCE:
+  NAME: ClsEvaluator
+LOSSES:
+  LABELSMOOTHING: 0.2
+  NAMES: ['SoftTargetCrossEntropy']
+  WEIGHTS: [1.0]
+LR_SCHEDULER:
+  GAMMA: 0.1
+  MILESTONES: (3,)
+  NAME: WarmupCosineLR
+  STEP_SIZE: 3
+  WARMUP_EPOCH: 5
+MODEL:
+  ARCH: uniformer_s
+  ARCH_CFGS: []
+  DEVICE: cuda
+  DROPOUT_RATIO: 0.0
+  DROP_PATH_RATIO: 0.2
+  EARLY_STRIDE: 1
+  FROZEN_BN: False
+  NAME: Uniformer
+  NUM_CLASSES: 106
+  REMOVE_FC: True
+  TRANSFER_WEIGHTS: True
+  WEIGHTS: /data/tanyi/uniformer_small_k400_16x4.pth
+OUTPUT_DIR: experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002
+SEED: -1
+SOLVER:
+  ALPHA: 0.99
+  AUTO_LR: False
+  BASE_LR: 0.0002
+  BASE_LR_MIXBLOCK: 0.02
+  BETAS: [0.9, 0.999]
+  BIAS_LR_FACTOR: 1.0
+  CHECKPOINT_PERIOD: 1
+  DENSE_EVAL_EPOCH: 40
+  EPOCH: 50
+  EPS: 1e-08
+  EVAL_PERIOD: 5
+  FC_LR5: False
+  GRAD_CLIP: 1.0
+  GRAD_CLIP_MIXBLOCK: 20.0
+  GRAD_CLIP_TYPE: norm
+  MOMENTUM: 0.9
+  NAME: AdamW
+  NAME_MIXBLOCK: SGD
+  NESTEROV: False
+  NORM_TYPE: 2.0
+  PARAMS: default
+  REGULARIZE: 1.0
+  SNAPSHOT: 
+  WEIGHT_DECAY: 0.05
+  WEIGHT_DECAY_BIAS: 0.0
+  WEIGHT_DECAY_MIXBLOCK: 0.0001
+  WEIGHT_DECAY_NORM: 0.0
+  WRITE_PERIOD: 50
+TRANSFORM:
+  AUTO_AUG: rand-m7-n4-mstd0.5-inc1
+  CROP_SIZE: 224
+  MASK_MIX: 0.0
+  MASK_MOTION_CUT: 1.0
+  MASK_MOTION_CUT_STATIC: 0.0
+  MIXUP_LABELSMOOTHING: 0.1
+  MIXUP_PROB: 1.0
+  MOTION_CUT: 0.0
+  MOTION_CUT_STATIC: 0.0
+  NAME: SIFARTransform
+  NO_HORIZONTAL_FLIP: False
+  SALIENCY_CUT: 0.0
+  SWITCH_PROB: 0.5
+  TEST_CROP_SIZE: 224
+  TIME_DIM: T
+  USE_FLOW: False
+VERSION: 1
+[07/04 04:11:01] pytorchvideo INFO: Full config saved to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/config.yaml
+[07/04 04:11:01] pts.utils.env INFO: Using a generated random seed 2597946
+[07/04 04:11:03] pts.model.Uniformer INFO: Ignore: head.weight
+[07/04 04:11:03] pts.model.Uniformer INFO: Ignore: head.bias
+[07/04 04:11:07] pts.model.Uniformer INFO: Ignore: head.weight
+[07/04 04:11:07] pts.model.Uniformer INFO: Ignore: head.bias
+[07/04 04:11:07] pts.engine.defaults INFO: Model:
+Uniformer(
+  (patch_embed1): SpeicalPatchEmbed(
+    (norm): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+    (proj): Conv3d(3, 64, kernel_size=(3, 4, 4), stride=(2, 4, 4), padding=(1, 0, 0))
+  )
+  (patch_embed2): PatchEmbed(
+    (norm): LayerNorm((128,), eps=1e-05, elementwise_affine=True)
+    (proj): Conv3d(64, 128, kernel_size=(1, 2, 2), stride=(1, 2, 2))
+  )
+  (patch_embed3): PatchEmbed(
+    (norm): LayerNorm((320,), eps=1e-05, elementwise_affine=True)
+    (proj): Conv3d(128, 320, kernel_size=(1, 2, 2), stride=(1, 2, 2))
+  )
+  (patch_embed4): PatchEmbed(
+    (norm): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+    (proj): Conv3d(320, 512, kernel_size=(1, 2, 2), stride=(1, 2, 2))
+  )
+  (pos_drop): Dropout(p=0.0, inplace=False)
+  (blocks1): ModuleList(
+    (0): CBlock(
+      (pos_embed): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), groups=64)
+      (norm1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv1): Conv3d(64, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+      (conv2): Conv3d(64, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+      (attn): Conv3d(64, 64, kernel_size=(5, 5, 5), stride=(1, 1, 1), padding=(2, 2, 2), groups=64)
+      (drop_path): Identity()
+      (norm2): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (mlp): CMlp(
+        (fc1): Conv3d(64, 256, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (act): GELU(approximate='none')
+        (fc2): Conv3d(256, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (1): CBlock(
+      (pos_embed): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), groups=64)
+      (norm1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv1): Conv3d(64, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+      (conv2): Conv3d(64, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+      (attn): Conv3d(64, 64, kernel_size=(5, 5, 5), stride=(1, 1, 1), padding=(2, 2, 2), groups=64)
+      (drop_path): DropPath(drop_prob=0.012)
+      (norm2): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (mlp): CMlp(
+        (fc1): Conv3d(64, 256, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (act): GELU(approximate='none')
+        (fc2): Conv3d(256, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (2): CBlock(
+      (pos_embed): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), groups=64)
+      (norm1): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv1): Conv3d(64, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+      (conv2): Conv3d(64, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+      (attn): Conv3d(64, 64, kernel_size=(5, 5, 5), stride=(1, 1, 1), padding=(2, 2, 2), groups=64)
+      (drop_path): DropPath(drop_prob=0.024)
+      (norm2): BatchNorm3d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (mlp): CMlp(
+        (fc1): Conv3d(64, 256, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (act): GELU(approximate='none')
+        (fc2): Conv3d(256, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+  )
+  (blocks2): ModuleList(
+    (0): CBlock(
+      (pos_embed): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), groups=128)
+      (norm1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv1): Conv3d(128, 128, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+      (conv2): Conv3d(128, 128, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+      (attn): Conv3d(128, 128, kernel_size=(5, 5, 5), stride=(1, 1, 1), padding=(2, 2, 2), groups=128)
+      (drop_path): DropPath(drop_prob=0.035)
+      (norm2): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (mlp): CMlp(
+        (fc1): Conv3d(128, 512, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (act): GELU(approximate='none')
+        (fc2): Conv3d(512, 128, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (1): CBlock(
+      (pos_embed): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), groups=128)
+      (norm1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv1): Conv3d(128, 128, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+      (conv2): Conv3d(128, 128, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+      (attn): Conv3d(128, 128, kernel_size=(5, 5, 5), stride=(1, 1, 1), padding=(2, 2, 2), groups=128)
+      (drop_path): DropPath(drop_prob=0.047)
+      (norm2): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (mlp): CMlp(
+        (fc1): Conv3d(128, 512, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (act): GELU(approximate='none')
+        (fc2): Conv3d(512, 128, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (2): CBlock(
+      (pos_embed): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), groups=128)
+      (norm1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv1): Conv3d(128, 128, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+      (conv2): Conv3d(128, 128, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+      (attn): Conv3d(128, 128, kernel_size=(5, 5, 5), stride=(1, 1, 1), padding=(2, 2, 2), groups=128)
+      (drop_path): DropPath(drop_prob=0.059)
+      (norm2): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (mlp): CMlp(
+        (fc1): Conv3d(128, 512, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (act): GELU(approximate='none')
+        (fc2): Conv3d(512, 128, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (3): CBlock(
+      (pos_embed): Conv3d(128, 128, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), groups=128)
+      (norm1): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv1): Conv3d(128, 128, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+      (conv2): Conv3d(128, 128, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+      (attn): Conv3d(128, 128, kernel_size=(5, 5, 5), stride=(1, 1, 1), padding=(2, 2, 2), groups=128)
+      (drop_path): DropPath(drop_prob=0.071)
+      (norm2): BatchNorm3d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (mlp): CMlp(
+        (fc1): Conv3d(128, 512, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (act): GELU(approximate='none')
+        (fc2): Conv3d(512, 128, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+  )
+  (blocks3): ModuleList(
+    (0): SABlock(
+      (pos_embed): Conv3d(320, 320, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), groups=320)
+      (norm1): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=320, out_features=960, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=320, out_features=320, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.082)
+      (norm2): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=320, out_features=1280, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=1280, out_features=320, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (1): SABlock(
+      (pos_embed): Conv3d(320, 320, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), groups=320)
+      (norm1): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=320, out_features=960, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=320, out_features=320, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.094)
+      (norm2): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=320, out_features=1280, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=1280, out_features=320, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (2): SABlock(
+      (pos_embed): Conv3d(320, 320, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), groups=320)
+      (norm1): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=320, out_features=960, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=320, out_features=320, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.106)
+      (norm2): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=320, out_features=1280, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=1280, out_features=320, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (3): SABlock(
+      (pos_embed): Conv3d(320, 320, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), groups=320)
+      (norm1): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=320, out_features=960, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=320, out_features=320, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.118)
+      (norm2): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=320, out_features=1280, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=1280, out_features=320, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (4): SABlock(
+      (pos_embed): Conv3d(320, 320, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), groups=320)
+      (norm1): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=320, out_features=960, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=320, out_features=320, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.129)
+      (norm2): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=320, out_features=1280, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=1280, out_features=320, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (5): SABlock(
+      (pos_embed): Conv3d(320, 320, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), groups=320)
+      (norm1): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=320, out_features=960, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=320, out_features=320, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.141)
+      (norm2): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=320, out_features=1280, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=1280, out_features=320, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (6): SABlock(
+      (pos_embed): Conv3d(320, 320, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), groups=320)
+      (norm1): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=320, out_features=960, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=320, out_features=320, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.153)
+      (norm2): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=320, out_features=1280, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=1280, out_features=320, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (7): SABlock(
+      (pos_embed): Conv3d(320, 320, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), groups=320)
+      (norm1): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=320, out_features=960, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=320, out_features=320, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.165)
+      (norm2): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=320, out_features=1280, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=1280, out_features=320, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+  )
+  (blocks4): ModuleList(
+    (0): SABlock(
+      (pos_embed): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), groups=512)
+      (norm1): LayerNorm((512,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=512, out_features=1536, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=512, out_features=512, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.176)
+      (norm2): LayerNorm((512,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=512, out_features=2048, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=2048, out_features=512, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (1): SABlock(
+      (pos_embed): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), groups=512)
+      (norm1): LayerNorm((512,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=512, out_features=1536, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=512, out_features=512, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.188)
+      (norm2): LayerNorm((512,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=512, out_features=2048, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=2048, out_features=512, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+    (2): SABlock(
+      (pos_embed): Conv3d(512, 512, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1), groups=512)
+      (norm1): LayerNorm((512,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=512, out_features=1536, bias=True)
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=512, out_features=512, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (drop_path): DropPath(drop_prob=0.200)
+      (norm2): LayerNorm((512,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=512, out_features=2048, bias=True)
+        (act): GELU(approximate='none')
+        (fc2): Linear(in_features=2048, out_features=512, bias=True)
+        (drop): Dropout(p=0.0, inplace=False)
+      )
+    )
+  )
+  (norm): BatchNorm3d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (pre_logits): Identity()
+  (head): Linear(in_features=512, out_features=106, bias=True)
+)
+[07/04 04:11:15] fvcore.common.checkpoint INFO: No checkpoint found. Initializing model from scratch
+[07/04 04:11:15] pts.engine.train_loop INFO: Starting training from iteration 0
+[07/04 04:12:37] pts.utils.events INFO:  eta: 1:57:37  iter: 49 -- [49/259]  total_loss: 9.416  soft_target_cross_entropy_loss: 4.656  loss_ofl: 4.767  mask_loss: 0.0002853  time: 0.8315  data_time: 0.2187  lr: 9.4919e-06  max_mem: 17107M
+[07/04 04:13:15] pts.utils.events INFO:  eta: 1:58:18  iter: 99 -- [99/259]  total_loss: 9.18  soft_target_cross_entropy_loss: 4.446  loss_ofl: 4.747  mask_loss: 0.001314  time: 0.7877  data_time: 0.2849  lr: 1.7137e-05  max_mem: 17107M
+[07/04 04:13:51] pts.utils.events INFO:  eta: 1:58:01  iter: 149 -- [149/259]  total_loss: 8.875  soft_target_cross_entropy_loss: 4.169  loss_ofl: 4.752  mask_loss: 0.001968  time: 0.7606  data_time: 0.1424  lr: 2.4781e-05  max_mem: 17108M
+[07/04 04:14:26] pts.utils.events INFO:  eta: 1:57:49  iter: 199 -- [199/259]  total_loss: 8.781  soft_target_cross_entropy_loss: 4.07  loss_ofl: 4.717  mask_loss: 0.001421  time: 0.7434  data_time: 0.0653  lr: 3.2426e-05  max_mem: 17108M
+[07/04 04:15:02] pts.utils.events INFO:  eta: 1:57:40  iter: 249 -- [249/259]  total_loss: 8.559  soft_target_cross_entropy_loss: 3.879  loss_ofl: 4.682  mask_loss: 0.003779  time: 0.7374  data_time: 0.1930  lr: 4.0071e-05  max_mem: 17108M
+[07/04 04:15:11] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 04:15:54] pts.utils.events INFO:  eta: 1:57:12  iter: 299 -- [40/259]  total_loss: 8.249  soft_target_cross_entropy_loss: 3.624  loss_ofl: 4.64  mask_loss: 0.0005948  time: 0.7852  data_time: 0.1609  lr: 4.7716e-05  max_mem: 17108M
+[07/04 04:16:30] pts.utils.events INFO:  eta: 1:56:45  iter: 349 -- [90/259]  total_loss: 8.304  soft_target_cross_entropy_loss: 3.593  loss_ofl: 4.656  mask_loss: 0.0008378  time: 0.7729  data_time: 0.1023  lr: 5.5361e-05  max_mem: 17108M
+[07/04 04:17:12] pts.utils.events INFO:  eta: 1:56:16  iter: 399 -- [140/259]  total_loss: 8.078  soft_target_cross_entropy_loss: 3.48  loss_ofl: 4.602  mask_loss: 0.001037  time: 0.7817  data_time: 0.3163  lr: 6.3005e-05  max_mem: 17108M
+[07/04 04:17:49] pts.utils.events INFO:  eta: 1:55:50  iter: 449 -- [190/259]  total_loss: 7.895  soft_target_cross_entropy_loss: 3.311  loss_ofl: 4.57  mask_loss: 0.0005638  time: 0.7758  data_time: 0.0775  lr: 7.065e-05  max_mem: 17108M
+[07/04 04:18:26] pts.utils.events INFO:  eta: 1:55:22  iter: 499 -- [240/259]  total_loss: 7.776  soft_target_cross_entropy_loss: 3.255  loss_ofl: 4.522  mask_loss: 0.002627  time: 0.7697  data_time: 0.1408  lr: 7.8295e-05  max_mem: 17108M
+[07/04 04:18:37] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 04:19:15] pts.utils.events INFO:  eta: 1:54:53  iter: 549 -- [31/259]  total_loss: 7.686  soft_target_cross_entropy_loss: 3.232  loss_ofl: 4.436  mask_loss: 0.000515  time: 0.7875  data_time: 0.2055  lr: 8.594e-05  max_mem: 17108M
+[07/04 04:19:52] pts.utils.events INFO:  eta: 1:54:28  iter: 599 -- [81/259]  total_loss: 7.513  soft_target_cross_entropy_loss: 3.175  loss_ofl: 4.394  mask_loss: 0.001255  time: 0.7829  data_time: 0.1318  lr: 9.3585e-05  max_mem: 17108M
+[07/04 04:20:28] pts.utils.events INFO:  eta: 1:54:02  iter: 649 -- [131/259]  total_loss: 7.475  soft_target_cross_entropy_loss: 3.17  loss_ofl: 4.31  mask_loss: 0.0006832  time: 0.7775  data_time: 0.1539  lr: 0.00010123  max_mem: 17108M
+[07/04 04:21:02] pts.utils.events INFO:  eta: 1:53:37  iter: 699 -- [181/259]  total_loss: 7.245  soft_target_cross_entropy_loss: 3.073  loss_ofl: 4.222  mask_loss: 0.001178  time: 0.7691  data_time: 0.1174  lr: 0.00010887  max_mem: 17108M
+[07/04 04:21:37] pts.utils.events INFO:  eta: 1:53:08  iter: 749 -- [231/259]  total_loss: 7.409  soft_target_cross_entropy_loss: 3.13  loss_ofl: 4.153  mask_loss: 0.0007104  time: 0.7640  data_time: 0.1170  lr: 0.00011652  max_mem: 17108M
+[07/04 04:21:56] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 04:22:27] pts.utils.events INFO:  eta: 1:52:38  iter: 799 -- [22/259]  total_loss: 7.132  soft_target_cross_entropy_loss: 3.032  loss_ofl: 4.064  mask_loss: 0.0004266  time: 0.7770  data_time: 0.0802  lr: 0.00012416  max_mem: 17109M
+[07/04 04:23:02] pts.utils.events INFO:  eta: 1:52:12  iter: 849 -- [72/259]  total_loss: 7.141  soft_target_cross_entropy_loss: 3.154  loss_ofl: 4.062  mask_loss: 0.0016  time: 0.7729  data_time: 0.2560  lr: 0.00013181  max_mem: 17109M
+[07/04 04:23:40] pts.utils.events INFO:  eta: 1:51:44  iter: 899 -- [122/259]  total_loss: 6.876  soft_target_cross_entropy_loss: 2.964  loss_ofl: 3.898  mask_loss: 0.0004765  time: 0.7708  data_time: 0.1487  lr: 0.00013945  max_mem: 17109M
+[07/04 04:24:16] pts.utils.events INFO:  eta: 1:51:16  iter: 949 -- [172/259]  total_loss: 6.793  soft_target_cross_entropy_loss: 3.039  loss_ofl: 3.796  mask_loss: 0.0004044  time: 0.7676  data_time: 0.1013  lr: 0.0001471  max_mem: 17109M
+[07/04 04:24:50] pts.utils.events INFO:  eta: 1:50:48  iter: 999 -- [222/259]  total_loss: 6.781  soft_target_cross_entropy_loss: 3.029  loss_ofl: 3.713  mask_loss: 0.0001797  time: 0.7627  data_time: 0.0517  lr: 0.00015474  max_mem: 17109M
+[07/04 04:25:16] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 04:25:41] pts.utils.events INFO:  eta: 1:50:21  iter: 1049 -- [13/259]  total_loss: 6.609  soft_target_cross_entropy_loss: 2.923  loss_ofl: 3.67  mask_loss: 0.000705  time: 0.7736  data_time: 0.9367  lr: 0.00016239  max_mem: 17109M
+[07/04 04:26:16] pts.utils.events INFO:  eta: 1:49:54  iter: 1099 -- [63/259]  total_loss: 6.438  soft_target_cross_entropy_loss: 3.042  loss_ofl: 3.48  mask_loss: 0.000535  time: 0.7694  data_time: 0.1557  lr: 0.00017003  max_mem: 17109M
+[07/04 04:26:54] pts.utils.events INFO:  eta: 1:49:27  iter: 1149 -- [113/259]  total_loss: 6.315  soft_target_cross_entropy_loss: 2.848  loss_ofl: 3.448  mask_loss: 7.051e-06  time: 0.7690  data_time: 0.1602  lr: 0.00017768  max_mem: 17109M
+[07/04 04:27:28] pts.utils.events INFO:  eta: 1:49:01  iter: 1199 -- [163/259]  total_loss: 6.461  soft_target_cross_entropy_loss: 3.061  loss_ofl: 3.478  mask_loss: 0  time: 0.7647  data_time: 0.0585  lr: 0.00018532  max_mem: 17109M
+[07/04 04:28:00] pts.utils.events INFO:  eta: 1:48:31  iter: 1249 -- [213/259]  total_loss: 6.43  soft_target_cross_entropy_loss: 3.01  loss_ofl: 3.43  mask_loss: 0  time: 0.7592  data_time: 0.0843  lr: 0.00019297  max_mem: 17109M
+[07/04 04:30:59] pts.engine.hooks INFO: ############################## Test: 5 ##############################
+[07/04 04:30:59] pts.engine.hooks INFO: ACC-1crop@1: 0.5840751528739929
+[07/04 04:30:59] pts.engine.hooks INFO: ACC-1crop@5: 0.8882294297218323
+[07/04 04:30:59] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 04:31:00] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/best.pth
+[07/04 04:31:17] pts.utils.events INFO:  eta: 1:48:03  iter: 1299 -- [4/259]  total_loss: 6.396  soft_target_cross_entropy_loss: 3.067  loss_ofl: 3.268  mask_loss: 0  time: 0.7696  data_time: 0.7639  lr: 0.0002  max_mem: 17112M
+[07/04 04:31:48] pts.utils.events INFO:  eta: 1:47:34  iter: 1349 -- [54/259]  total_loss: 6.075  soft_target_cross_entropy_loss: 2.837  loss_ofl: 3.211  mask_loss: 0.0002325  time: 0.7642  data_time: 0.0379  lr: 0.00019999  max_mem: 17112M
+[07/04 04:32:29] pts.utils.events INFO:  eta: 1:47:07  iter: 1399 -- [104/259]  total_loss: 6.012  soft_target_cross_entropy_loss: 2.923  loss_ofl: 3.065  mask_loss: 0  time: 0.7653  data_time: 0.2010  lr: 0.00019996  max_mem: 17112M
+[07/04 04:33:05] pts.utils.events INFO:  eta: 1:46:39  iter: 1449 -- [154/259]  total_loss: 5.838  soft_target_cross_entropy_loss: 2.894  loss_ofl: 3.054  mask_loss: 0.0001593  time: 0.7634  data_time: 0.1171  lr: 0.00019992  max_mem: 17112M
+[07/04 04:33:40] pts.utils.events INFO:  eta: 1:46:11  iter: 1499 -- [204/259]  total_loss: 5.952  soft_target_cross_entropy_loss: 2.99  loss_ofl: 2.969  mask_loss: 0  time: 0.7608  data_time: 0.0788  lr: 0.00019985  max_mem: 17112M
+[07/04 04:34:16] pts.utils.events INFO:  eta: 1:45:44  iter: 1549 -- [254/259]  total_loss: 5.941  soft_target_cross_entropy_loss: 2.95  loss_ofl: 2.923  mask_loss: 0  time: 0.7592  data_time: 0.1181  lr: 0.00019977  max_mem: 17112M
+[07/04 04:34:18] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 04:35:04] pts.utils.events INFO:  eta: 1:45:14  iter: 1599 -- [45/259]  total_loss: 5.706  soft_target_cross_entropy_loss: 2.753  loss_ofl: 2.931  mask_loss: 0  time: 0.7651  data_time: 0.1490  lr: 0.00019967  max_mem: 17112M
+[07/04 04:35:43] pts.utils.events INFO:  eta: 1:44:47  iter: 1649 -- [95/259]  total_loss: 5.633  soft_target_cross_entropy_loss: 2.899  loss_ofl: 2.756  mask_loss: 0.0001515  time: 0.7652  data_time: 0.2676  lr: 0.00019955  max_mem: 17114M
+[07/04 04:36:19] pts.utils.events INFO:  eta: 1:44:20  iter: 1699 -- [145/259]  total_loss: 5.556  soft_target_cross_entropy_loss: 2.815  loss_ofl: 2.834  mask_loss: 0  time: 0.7632  data_time: 0.2041  lr: 0.00019941  max_mem: 17114M
+[07/04 04:36:55] pts.utils.events INFO:  eta: 1:43:52  iter: 1749 -- [195/259]  total_loss: 5.678  soft_target_cross_entropy_loss: 2.912  loss_ofl: 2.762  mask_loss: 0  time: 0.7618  data_time: 0.2480  lr: 0.00019926  max_mem: 17114M
+[07/04 04:37:27] pts.utils.events INFO:  eta: 1:43:25  iter: 1799 -- [245/259]  total_loss: 5.415  soft_target_cross_entropy_loss: 2.876  loss_ofl: 2.582  mask_loss: 0.0001858  time: 0.7580  data_time: 0.0668  lr: 0.00019909  max_mem: 17114M
+[07/04 04:37:36] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 04:38:18] pts.utils.events INFO:  eta: 1:42:56  iter: 1849 -- [36/259]  total_loss: 5.432  soft_target_cross_entropy_loss: 2.647  loss_ofl: 2.736  mask_loss: 0  time: 0.7647  data_time: 0.1661  lr: 0.0001989  max_mem: 17114M
+[07/04 04:38:56] pts.utils.events INFO:  eta: 1:42:29  iter: 1899 -- [86/259]  total_loss: 5.381  soft_target_cross_entropy_loss: 2.804  loss_ofl: 2.614  mask_loss: 0  time: 0.7644  data_time: 0.1383  lr: 0.00019869  max_mem: 17114M
+[07/04 04:39:31] pts.utils.events INFO:  eta: 1:42:03  iter: 1949 -- [136/259]  total_loss: 5.358  soft_target_cross_entropy_loss: 2.742  loss_ofl: 2.618  mask_loss: 0  time: 0.7625  data_time: 0.0852  lr: 0.00019846  max_mem: 17114M
+[07/04 04:40:14] pts.utils.events INFO:  eta: 1:41:35  iter: 1999 -- [186/259]  total_loss: 5.38  soft_target_cross_entropy_loss: 2.821  loss_ofl: 2.558  mask_loss: 0.0001361  time: 0.7643  data_time: 0.1561  lr: 0.00019822  max_mem: 17114M
+[07/04 04:40:51] pts.utils.events INFO:  eta: 1:41:07  iter: 2049 -- [236/259]  total_loss: 5.261  soft_target_cross_entropy_loss: 2.806  loss_ofl: 2.548  mask_loss: 0  time: 0.7639  data_time: 0.2002  lr: 0.00019796  max_mem: 17114M
+[07/04 04:41:07] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 04:41:41] pts.utils.events INFO:  eta: 1:40:39  iter: 2099 -- [27/259]  total_loss: 5.266  soft_target_cross_entropy_loss: 2.732  loss_ofl: 2.579  mask_loss: 0  time: 0.7688  data_time: 0.1223  lr: 0.00019768  max_mem: 17114M
+[07/04 04:42:17] pts.utils.events INFO:  eta: 1:40:13  iter: 2149 -- [77/259]  total_loss: 5.149  soft_target_cross_entropy_loss: 2.68  loss_ofl: 2.495  mask_loss: 0  time: 0.7675  data_time: 0.0799  lr: 0.00019738  max_mem: 17114M
+[07/04 04:42:52] pts.utils.events INFO:  eta: 1:39:44  iter: 2199 -- [127/259]  total_loss: 5.357  soft_target_cross_entropy_loss: 2.905  loss_ofl: 2.507  mask_loss: 0  time: 0.7657  data_time: 0.0777  lr: 0.00019707  max_mem: 17114M
+[07/04 04:43:30] pts.utils.events INFO:  eta: 1:39:17  iter: 2249 -- [177/259]  total_loss: 5.205  soft_target_cross_entropy_loss: 2.786  loss_ofl: 2.496  mask_loss: 0  time: 0.7651  data_time: 0.1985  lr: 0.00019674  max_mem: 17114M
+[07/04 04:44:03] pts.utils.events INFO:  eta: 1:38:49  iter: 2299 -- [227/259]  total_loss: 5.245  soft_target_cross_entropy_loss: 2.704  loss_ofl: 2.577  mask_loss: 0  time: 0.7627  data_time: 0.1179  lr: 0.00019639  max_mem: 17114M
+[07/04 04:44:24] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 04:44:55] pts.utils.events INFO:  eta: 1:38:22  iter: 2349 -- [18/259]  total_loss: 5.165  soft_target_cross_entropy_loss: 2.796  loss_ofl: 2.417  mask_loss: 0  time: 0.7680  data_time: 0.7222  lr: 0.00019602  max_mem: 17114M
+[07/04 04:45:31] pts.utils.events INFO:  eta: 1:37:56  iter: 2399 -- [68/259]  total_loss: 5.073  soft_target_cross_entropy_loss: 2.627  loss_ofl: 2.427  mask_loss: 0  time: 0.7669  data_time: 0.0919  lr: 0.00019563  max_mem: 17114M
+[07/04 04:46:08] pts.utils.events INFO:  eta: 1:37:28  iter: 2449 -- [118/259]  total_loss: 4.811  soft_target_cross_entropy_loss: 2.578  loss_ofl: 2.268  mask_loss: 0  time: 0.7661  data_time: 0.1977  lr: 0.00019523  max_mem: 17114M
+[07/04 04:46:42] pts.utils.events INFO:  eta: 1:37:02  iter: 2499 -- [168/259]  total_loss: 4.814  soft_target_cross_entropy_loss: 2.621  loss_ofl: 2.321  mask_loss: 0  time: 0.7641  data_time: 0.0628  lr: 0.00019481  max_mem: 17114M
+[07/04 04:47:20] pts.utils.events INFO:  eta: 1:36:33  iter: 2549 -- [218/259]  total_loss: 5.034  soft_target_cross_entropy_loss: 2.676  loss_ofl: 2.37  mask_loss: 2.341e-05  time: 0.7640  data_time: 0.0808  lr: 0.00019438  max_mem: 17114M
+[07/04 04:48:52] pts.engine.hooks INFO: ############################## Test: 10 ##############################
+[07/04 04:48:52] pts.engine.hooks INFO: ACC-1crop@1: 0.6745796203613281
+[07/04 04:48:52] pts.engine.hooks INFO: ACC-1crop@5: 0.9376854300498962
+[07/04 04:48:52] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 04:48:52] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/best.pth
+[07/04 04:49:13] pts.utils.events INFO:  eta: 1:36:05  iter: 2599 -- [9/259]  total_loss: 5.043  soft_target_cross_entropy_loss: 2.688  loss_ofl: 2.438  mask_loss: 0  time: 0.7676  data_time: 0.7935  lr: 0.00019393  max_mem: 17114M
+[07/04 04:49:48] pts.utils.events INFO:  eta: 1:35:35  iter: 2649 -- [59/259]  total_loss: 4.73  soft_target_cross_entropy_loss: 2.504  loss_ofl: 2.232  mask_loss: 0  time: 0.7660  data_time: 0.0542  lr: 0.00019346  max_mem: 17114M
+[07/04 04:50:24] pts.utils.events INFO:  eta: 1:35:06  iter: 2699 -- [109/259]  total_loss: 5.094  soft_target_cross_entropy_loss: 2.694  loss_ofl: 2.364  mask_loss: 0  time: 0.7652  data_time: 0.2284  lr: 0.00019297  max_mem: 17114M
+[07/04 04:51:00] pts.utils.events INFO:  eta: 1:34:40  iter: 2749 -- [159/259]  total_loss: 4.851  soft_target_cross_entropy_loss: 2.59  loss_ofl: 2.345  mask_loss: 0.0001117  time: 0.7641  data_time: 0.1833  lr: 0.00019247  max_mem: 17114M
+[07/04 04:51:39] pts.utils.events INFO:  eta: 1:34:10  iter: 2799 -- [209/259]  total_loss: 5.048  soft_target_cross_entropy_loss: 2.556  loss_ofl: 2.4  mask_loss: 0  time: 0.7641  data_time: 0.3136  lr: 0.00019195  max_mem: 17114M
+[07/04 04:52:16] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 04:52:30] pts.utils.events INFO:  eta: 1:33:43  iter: 2849 -- [0/259]  total_loss: 4.925  soft_target_cross_entropy_loss: 2.625  loss_ofl: 2.319  mask_loss: 0  time: 0.7682  data_time: 0.7933  lr: 0.00019141  max_mem: 17114M
+[07/04 04:53:07] pts.utils.events INFO:  eta: 1:33:13  iter: 2899 -- [50/259]  total_loss: 4.755  soft_target_cross_entropy_loss: 2.532  loss_ofl: 2.258  mask_loss: 0  time: 0.7674  data_time: 0.1712  lr: 0.00019086  max_mem: 17114M
+[07/04 04:53:42] pts.utils.events INFO:  eta: 1:32:45  iter: 2949 -- [100/259]  total_loss: 4.667  soft_target_cross_entropy_loss: 2.489  loss_ofl: 2.224  mask_loss: 0  time: 0.7663  data_time: 0.1542  lr: 0.00019029  max_mem: 17114M
+[07/04 04:54:19] pts.utils.events INFO:  eta: 1:32:16  iter: 2999 -- [150/259]  total_loss: 4.98  soft_target_cross_entropy_loss: 2.661  loss_ofl: 2.38  mask_loss: 0  time: 0.7655  data_time: 0.1045  lr: 0.0001897  max_mem: 17114M
+[07/04 04:54:53] pts.utils.events INFO:  eta: 1:31:47  iter: 3049 -- [200/259]  total_loss: 5.12  soft_target_cross_entropy_loss: 2.778  loss_ofl: 2.33  mask_loss: 0  time: 0.7639  data_time: 0.1037  lr: 0.0001891  max_mem: 17114M
+[07/04 04:55:29] pts.utils.events INFO:  eta: 1:31:19  iter: 3099 -- [250/259]  total_loss: 4.71  soft_target_cross_entropy_loss: 2.552  loss_ofl: 2.076  mask_loss: 0  time: 0.7629  data_time: 0.1725  lr: 0.00018848  max_mem: 17114M
+[07/04 04:55:34] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 04:56:15] pts.utils.events INFO:  eta: 1:30:50  iter: 3149 -- [41/259]  total_loss: 4.692  soft_target_cross_entropy_loss: 2.53  loss_ofl: 2.238  mask_loss: 0  time: 0.7652  data_time: 0.0783  lr: 0.00018784  max_mem: 17114M
+[07/04 04:56:48] pts.utils.events INFO:  eta: 1:30:22  iter: 3199 -- [91/259]  total_loss: 4.773  soft_target_cross_entropy_loss: 2.53  loss_ofl: 2.222  mask_loss: 0  time: 0.7634  data_time: 0.1528  lr: 0.00018719  max_mem: 17114M
+[07/04 04:57:21] pts.utils.events INFO:  eta: 1:29:52  iter: 3249 -- [141/259]  total_loss: 4.567  soft_target_cross_entropy_loss: 2.462  loss_ofl: 2.225  mask_loss: 0  time: 0.7618  data_time: 0.1091  lr: 0.00018653  max_mem: 17114M
+[07/04 04:57:58] pts.utils.events INFO:  eta: 1:29:23  iter: 3299 -- [191/259]  total_loss: 4.8  soft_target_cross_entropy_loss: 2.537  loss_ofl: 2.316  mask_loss: 0  time: 0.7612  data_time: 0.0702  lr: 0.00018585  max_mem: 17114M
+[07/04 04:58:33] pts.utils.events INFO:  eta: 1:28:54  iter: 3349 -- [241/259]  total_loss: 4.983  soft_target_cross_entropy_loss: 2.647  loss_ofl: 2.31  mask_loss: 6.981e-06  time: 0.7601  data_time: 0.0687  lr: 0.00018515  max_mem: 17114M
+[07/04 04:58:45] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 04:59:24] pts.utils.events INFO:  eta: 1:28:24  iter: 3399 -- [32/259]  total_loss: 4.55  soft_target_cross_entropy_loss: 2.413  loss_ofl: 2.023  mask_loss: 0  time: 0.7637  data_time: 0.1729  lr: 0.00018444  max_mem: 17114M
+[07/04 04:59:59] pts.utils.events INFO:  eta: 1:27:55  iter: 3449 -- [82/259]  total_loss: 4.685  soft_target_cross_entropy_loss: 2.461  loss_ofl: 2.157  mask_loss: 7.167e-05  time: 0.7626  data_time: 0.1033  lr: 0.00018371  max_mem: 17114M
+[07/04 05:00:32] pts.utils.events INFO:  eta: 1:27:23  iter: 3499 -- [132/259]  total_loss: 4.966  soft_target_cross_entropy_loss: 2.592  loss_ofl: 2.345  mask_loss: 0  time: 0.7608  data_time: 0.0339  lr: 0.00018297  max_mem: 17114M
+[07/04 05:01:09] pts.utils.events INFO:  eta: 1:26:54  iter: 3549 -- [182/259]  total_loss: 4.518  soft_target_cross_entropy_loss: 2.484  loss_ofl: 2.081  mask_loss: 0.0003562  time: 0.7603  data_time: 0.2360  lr: 0.00018221  max_mem: 17114M
+[07/04 05:01:45] pts.utils.events INFO:  eta: 1:26:26  iter: 3599 -- [232/259]  total_loss: 4.693  soft_target_cross_entropy_loss: 2.581  loss_ofl: 2.142  mask_loss: 0  time: 0.7597  data_time: 0.1242  lr: 0.00018144  max_mem: 17114M
+[07/04 05:02:02] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 05:02:34] pts.utils.events INFO:  eta: 1:25:59  iter: 3649 -- [23/259]  total_loss: 4.534  soft_target_cross_entropy_loss: 2.453  loss_ofl: 2.102  mask_loss: 0  time: 0.7626  data_time: 0.2012  lr: 0.00018065  max_mem: 17114M
+[07/04 05:03:09] pts.utils.events INFO:  eta: 1:25:30  iter: 3699 -- [73/259]  total_loss: 4.644  soft_target_cross_entropy_loss: 2.496  loss_ofl: 2.192  mask_loss: 0  time: 0.7616  data_time: 0.1063  lr: 0.00017985  max_mem: 17114M
+[07/04 05:03:46] pts.utils.events INFO:  eta: 1:25:02  iter: 3749 -- [123/259]  total_loss: 4.646  soft_target_cross_entropy_loss: 2.465  loss_ofl: 2.152  mask_loss: 0  time: 0.7611  data_time: 0.1603  lr: 0.00017903  max_mem: 17114M
+[07/04 05:04:20] pts.utils.events INFO:  eta: 1:24:36  iter: 3799 -- [173/259]  total_loss: 4.51  soft_target_cross_entropy_loss: 2.365  loss_ofl: 2.124  mask_loss: 0  time: 0.7600  data_time: 0.0987  lr: 0.0001782  max_mem: 17114M
+[07/04 05:04:59] pts.utils.events INFO:  eta: 1:24:08  iter: 3849 -- [223/259]  total_loss: 4.571  soft_target_cross_entropy_loss: 2.49  loss_ofl: 2.151  mask_loss: 0.0002094  time: 0.7599  data_time: 0.1522  lr: 0.00017736  max_mem: 17114M
+[07/04 05:06:28] pts.engine.hooks INFO: ############################## Test: 15 ##############################
+[07/04 05:06:28] pts.engine.hooks INFO: ACC-1crop@1: 0.6879327297210693
+[07/04 05:06:28] pts.engine.hooks INFO: ACC-1crop@5: 0.9495548605918884
+[07/04 05:06:28] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 05:06:29] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/best.pth
+[07/04 05:06:54] pts.utils.events INFO:  eta: 1:23:41  iter: 3899 -- [14/259]  total_loss: 4.667  soft_target_cross_entropy_loss: 2.404  loss_ofl: 2.255  mask_loss: 0  time: 0.7629  data_time: 0.9123  lr: 0.0001765  max_mem: 17114M
+[07/04 05:07:29] pts.utils.events INFO:  eta: 1:23:12  iter: 3949 -- [64/259]  total_loss: 4.309  soft_target_cross_entropy_loss: 2.278  loss_ofl: 2.088  mask_loss: 0  time: 0.7618  data_time: 0.1621  lr: 0.00017562  max_mem: 17114M
+[07/04 05:08:05] pts.utils.events INFO:  eta: 1:22:45  iter: 3999 -- [114/259]  total_loss: 4.57  soft_target_cross_entropy_loss: 2.53  loss_ofl: 2.119  mask_loss: 0  time: 0.7612  data_time: 0.1374  lr: 0.00017474  max_mem: 17114M
+[07/04 05:08:39] pts.utils.events INFO:  eta: 1:22:18  iter: 4049 -- [164/259]  total_loss: 4.418  soft_target_cross_entropy_loss: 2.374  loss_ofl: 2.026  mask_loss: 1.356e-05  time: 0.7601  data_time: 0.0662  lr: 0.00017384  max_mem: 17114M
+[07/04 05:09:16] pts.utils.events INFO:  eta: 1:21:53  iter: 4099 -- [214/259]  total_loss: 4.499  soft_target_cross_entropy_loss: 2.353  loss_ofl: 2.105  mask_loss: 0  time: 0.7598  data_time: 0.1604  lr: 0.00017293  max_mem: 17114M
+[07/04 05:09:48] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 05:10:08] pts.utils.events INFO:  eta: 1:21:26  iter: 4149 -- [5/259]  total_loss: 4.455  soft_target_cross_entropy_loss: 2.398  loss_ofl: 2.053  mask_loss: 0  time: 0.7629  data_time: 0.9172  lr: 0.000172  max_mem: 17114M
+[07/04 05:10:43] pts.utils.events INFO:  eta: 1:20:58  iter: 4199 -- [55/259]  total_loss: 4.446  soft_target_cross_entropy_loss: 2.293  loss_ofl: 2.127  mask_loss: 0  time: 0.7620  data_time: 0.1778  lr: 0.00017106  max_mem: 17114M
+[07/04 05:11:21] pts.utils.events INFO:  eta: 1:20:30  iter: 4249 -- [105/259]  total_loss: 4.251  soft_target_cross_entropy_loss: 2.257  loss_ofl: 1.988  mask_loss: 0.0002089  time: 0.7617  data_time: 0.1820  lr: 0.00017011  max_mem: 17114M
+[07/04 05:11:58] pts.utils.events INFO:  eta: 1:20:04  iter: 4299 -- [155/259]  total_loss: 4.301  soft_target_cross_entropy_loss: 2.312  loss_ofl: 2.103  mask_loss: 0  time: 0.7614  data_time: 0.2513  lr: 0.00016914  max_mem: 17114M
+[07/04 05:12:39] pts.utils.events INFO:  eta: 1:19:36  iter: 4349 -- [205/259]  total_loss: 4.408  soft_target_cross_entropy_loss: 2.374  loss_ofl: 2.078  mask_loss: 0  time: 0.7619  data_time: 0.3011  lr: 0.00016817  max_mem: 17114M
+[07/04 05:13:18] pts.utils.events INFO:  eta: 1:19:09  iter: 4399 -- [255/259]  total_loss: 4.4  soft_target_cross_entropy_loss: 2.42  loss_ofl: 1.989  mask_loss: 0  time: 0.7620  data_time: 0.3329  lr: 0.00016718  max_mem: 17114M
+[07/04 05:13:20] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 05:14:09] pts.utils.events INFO:  eta: 1:18:41  iter: 4449 -- [46/259]  total_loss: 4.48  soft_target_cross_entropy_loss: 2.448  loss_ofl: 2.084  mask_loss: 0  time: 0.7647  data_time: 0.0781  lr: 0.00016618  max_mem: 17114M
+[07/04 05:14:44] pts.utils.events INFO:  eta: 1:18:15  iter: 4499 -- [96/259]  total_loss: 4.257  soft_target_cross_entropy_loss: 2.263  loss_ofl: 1.982  mask_loss: 0  time: 0.7639  data_time: 0.1405  lr: 0.00016516  max_mem: 17114M
+[07/04 05:15:24] pts.utils.events INFO:  eta: 1:17:50  iter: 4549 -- [146/259]  total_loss: 4.292  soft_target_cross_entropy_loss: 2.348  loss_ofl: 1.975  mask_loss: 1.771e-05  time: 0.7641  data_time: 0.2292  lr: 0.00016414  max_mem: 17114M
+[07/04 05:16:04] pts.utils.events INFO:  eta: 1:17:23  iter: 4599 -- [196/259]  total_loss: 4.161  soft_target_cross_entropy_loss: 2.205  loss_ofl: 1.932  mask_loss: 0.0005065  time: 0.7644  data_time: 0.1746  lr: 0.0001631  max_mem: 17114M
+[07/04 05:16:40] pts.utils.events INFO:  eta: 1:16:57  iter: 4649 -- [246/259]  total_loss: 4.268  soft_target_cross_entropy_loss: 2.385  loss_ofl: 2.001  mask_loss: 0.0001689  time: 0.7639  data_time: 0.1535  lr: 0.00016205  max_mem: 17114M
+[07/04 05:16:48] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 05:17:38] pts.utils.events INFO:  eta: 1:16:30  iter: 4699 -- [37/259]  total_loss: 4.289  soft_target_cross_entropy_loss: 2.276  loss_ofl: 2.033  mask_loss: 4.875e-05  time: 0.7678  data_time: 0.1361  lr: 0.00016099  max_mem: 17114M
+[07/04 05:18:16] pts.utils.events INFO:  eta: 1:16:03  iter: 4749 -- [87/259]  total_loss: 4.307  soft_target_cross_entropy_loss: 2.24  loss_ofl: 2.071  mask_loss: 0  time: 0.7676  data_time: 0.1622  lr: 0.00015992  max_mem: 17114M
+[07/04 05:18:54] pts.utils.events INFO:  eta: 1:15:34  iter: 4799 -- [137/259]  total_loss: 4.272  soft_target_cross_entropy_loss: 2.234  loss_ofl: 1.966  mask_loss: 0  time: 0.7673  data_time: 0.1572  lr: 0.00015884  max_mem: 17114M
+[07/04 05:19:32] pts.utils.events INFO:  eta: 1:15:08  iter: 4849 -- [187/259]  total_loss: 4.261  soft_target_cross_entropy_loss: 2.268  loss_ofl: 2.006  mask_loss: 0  time: 0.7672  data_time: 0.2197  lr: 0.00015775  max_mem: 17114M
+[07/04 05:20:07] pts.utils.events INFO:  eta: 1:14:41  iter: 4899 -- [237/259]  total_loss: 4.375  soft_target_cross_entropy_loss: 2.294  loss_ofl: 2.065  mask_loss: 7.043e-05  time: 0.7664  data_time: 0.1968  lr: 0.00015665  max_mem: 17114M
+[07/04 05:20:24] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 05:20:58] pts.utils.events INFO:  eta: 1:14:14  iter: 4949 -- [28/259]  total_loss: 4.212  soft_target_cross_entropy_loss: 2.172  loss_ofl: 2.007  mask_loss: 0  time: 0.7687  data_time: 0.0913  lr: 0.00015554  max_mem: 17114M
+[07/04 05:21:35] pts.utils.events INFO:  eta: 1:13:46  iter: 4999 -- [78/259]  total_loss: 4.163  soft_target_cross_entropy_loss: 2.243  loss_ofl: 1.997  mask_loss: 0  time: 0.7683  data_time: 0.2217  lr: 0.00015442  max_mem: 17114M
+[07/04 05:22:15] pts.utils.events INFO:  eta: 1:13:18  iter: 5049 -- [128/259]  total_loss: 4.221  soft_target_cross_entropy_loss: 2.215  loss_ofl: 1.939  mask_loss: 2.97e-05  time: 0.7685  data_time: 0.2144  lr: 0.00015328  max_mem: 17114M
+[07/04 05:22:52] pts.utils.events INFO:  eta: 1:12:48  iter: 5099 -- [178/259]  total_loss: 4.203  soft_target_cross_entropy_loss: 2.31  loss_ofl: 1.972  mask_loss: 0.0001432  time: 0.7682  data_time: 0.1178  lr: 0.00015214  max_mem: 17114M
+[07/04 05:23:28] pts.utils.events INFO:  eta: 1:12:21  iter: 5149 -- [228/259]  total_loss: 4.155  soft_target_cross_entropy_loss: 2.28  loss_ofl: 1.899  mask_loss: 0  time: 0.7676  data_time: 0.2157  lr: 0.00015099  max_mem: 17114M
+[07/04 05:24:53] pts.engine.hooks INFO: ############################## Test: 20 ##############################
+[07/04 05:24:53] pts.engine.hooks INFO: ACC-1crop@1: 0.6993075609207153
+[07/04 05:24:53] pts.engine.hooks INFO: ACC-1crop@5: 0.9500494003295898
+[07/04 05:24:54] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 05:24:54] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/best.pth
+[07/04 05:25:23] pts.utils.events INFO:  eta: 1:11:53  iter: 5199 -- [19/259]  total_loss: 4.131  soft_target_cross_entropy_loss: 2.226  loss_ofl: 1.918  mask_loss: 0  time: 0.7697  data_time: 0.8940  lr: 0.00014983  max_mem: 17114M
+[07/04 05:25:59] pts.utils.events INFO:  eta: 1:11:26  iter: 5249 -- [69/259]  total_loss: 4.051  soft_target_cross_entropy_loss: 2.148  loss_ofl: 1.925  mask_loss: 0  time: 0.7692  data_time: 0.0564  lr: 0.00014866  max_mem: 17114M
+[07/04 05:26:34] pts.utils.events INFO:  eta: 1:10:57  iter: 5299 -- [119/259]  total_loss: 4.217  soft_target_cross_entropy_loss: 2.196  loss_ofl: 1.957  mask_loss: 0  time: 0.7684  data_time: 0.1580  lr: 0.00014748  max_mem: 17114M
+[07/04 05:27:11] pts.utils.events INFO:  eta: 1:10:29  iter: 5349 -- [169/259]  total_loss: 4.112  soft_target_cross_entropy_loss: 2.215  loss_ofl: 1.943  mask_loss: 2.186e-06  time: 0.7680  data_time: 0.2401  lr: 0.0001463  max_mem: 17114M
+[07/04 05:27:47] pts.utils.events INFO:  eta: 1:10:01  iter: 5399 -- [219/259]  total_loss: 4.367  soft_target_cross_entropy_loss: 2.295  loss_ofl: 1.939  mask_loss: 0.0005094  time: 0.7675  data_time: 0.0849  lr: 0.0001451  max_mem: 17114M
+[07/04 05:28:16] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 05:28:40] pts.utils.events INFO:  eta: 1:09:35  iter: 5449 -- [10/259]  total_loss: 4.056  soft_target_cross_entropy_loss: 2.13  loss_ofl: 1.966  mask_loss: 0  time: 0.7700  data_time: 0.9677  lr: 0.0001439  max_mem: 17114M
+[07/04 05:29:16] pts.utils.events INFO:  eta: 1:09:07  iter: 5499 -- [60/259]  total_loss: 4.112  soft_target_cross_entropy_loss: 2.228  loss_ofl: 1.861  mask_loss: 0  time: 0.7695  data_time: 0.1063  lr: 0.00014269  max_mem: 17114M
+[07/04 05:29:53] pts.utils.events INFO:  eta: 1:08:39  iter: 5549 -- [110/259]  total_loss: 4.256  soft_target_cross_entropy_loss: 2.226  loss_ofl: 2.008  mask_loss: 0  time: 0.7691  data_time: 0.1245  lr: 0.00014147  max_mem: 17114M
+[07/04 05:30:31] pts.utils.events INFO:  eta: 1:08:12  iter: 5599 -- [160/259]  total_loss: 4.025  soft_target_cross_entropy_loss: 2.226  loss_ofl: 1.883  mask_loss: 0.0007063  time: 0.7689  data_time: 0.1829  lr: 0.00014025  max_mem: 17114M
+[07/04 05:31:06] pts.utils.events INFO:  eta: 1:07:44  iter: 5649 -- [210/259]  total_loss: 4.236  soft_target_cross_entropy_loss: 2.331  loss_ofl: 1.912  mask_loss: 0  time: 0.7681  data_time: 0.1299  lr: 0.00013901  max_mem: 17114M
+[07/04 05:31:38] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 05:31:53] pts.utils.events INFO:  eta: 1:07:15  iter: 5699 -- [1/259]  total_loss: 4.063  soft_target_cross_entropy_loss: 2.207  loss_ofl: 1.868  mask_loss: 0.0002129  time: 0.7695  data_time: 0.7718  lr: 0.00013777  max_mem: 17114M
+[07/04 05:32:27] pts.utils.events INFO:  eta: 1:06:47  iter: 5749 -- [51/259]  total_loss: 4.028  soft_target_cross_entropy_loss: 2.108  loss_ofl: 1.967  mask_loss: 1.304e-05  time: 0.7687  data_time: 0.0609  lr: 0.00013653  max_mem: 17114M
+[07/04 05:33:03] pts.utils.events INFO:  eta: 1:06:20  iter: 5799 -- [101/259]  total_loss: 4.042  soft_target_cross_entropy_loss: 2.189  loss_ofl: 1.816  mask_loss: 0.0001308  time: 0.7681  data_time: 0.1357  lr: 0.00013527  max_mem: 17114M
+[07/04 05:33:41] pts.utils.events INFO:  eta: 1:05:51  iter: 5849 -- [151/259]  total_loss: 4.026  soft_target_cross_entropy_loss: 2.21  loss_ofl: 1.79  mask_loss: 0.0004559  time: 0.7679  data_time: 0.2333  lr: 0.00013401  max_mem: 17114M
+[07/04 05:34:15] pts.utils.events INFO:  eta: 1:05:23  iter: 5899 -- [201/259]  total_loss: 3.993  soft_target_cross_entropy_loss: 2.093  loss_ofl: 1.971  mask_loss: 9.407e-06  time: 0.7672  data_time: 0.1100  lr: 0.00013275  max_mem: 17114M
+[07/04 05:34:53] pts.utils.events INFO:  eta: 1:04:57  iter: 5949 -- [251/259]  total_loss: 4.001  soft_target_cross_entropy_loss: 2.225  loss_ofl: 1.871  mask_loss: 0  time: 0.7669  data_time: 0.1213  lr: 0.00013148  max_mem: 17114M
+[07/04 05:34:58] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 05:35:43] pts.utils.events INFO:  eta: 1:04:29  iter: 5999 -- [42/259]  total_loss: 4.053  soft_target_cross_entropy_loss: 2.118  loss_ofl: 1.883  mask_loss: 0  time: 0.7686  data_time: 0.1558  lr: 0.0001302  max_mem: 17114M
+[07/04 05:36:20] pts.utils.events INFO:  eta: 1:04:01  iter: 6049 -- [92/259]  total_loss: 4.053  soft_target_cross_entropy_loss: 2.098  loss_ofl: 1.913  mask_loss: 0  time: 0.7683  data_time: 0.1816  lr: 0.00012892  max_mem: 17114M
+[07/04 05:36:55] pts.utils.events INFO:  eta: 1:03:35  iter: 6099 -- [142/259]  total_loss: 3.914  soft_target_cross_entropy_loss: 2.136  loss_ofl: 1.81  mask_loss: 0.0005812  time: 0.7677  data_time: 0.2265  lr: 0.00012763  max_mem: 17114M
+[07/04 05:37:28] pts.utils.events INFO:  eta: 1:03:07  iter: 6149 -- [192/259]  total_loss: 4.088  soft_target_cross_entropy_loss: 2.215  loss_ofl: 1.86  mask_loss: 0  time: 0.7667  data_time: 0.1127  lr: 0.00012634  max_mem: 17114M
+[07/04 05:38:03] pts.utils.events INFO:  eta: 1:02:40  iter: 6199 -- [242/259]  total_loss: 4.05  soft_target_cross_entropy_loss: 2.137  loss_ofl: 1.834  mask_loss: 0.0001143  time: 0.7661  data_time: 0.1366  lr: 0.00012504  max_mem: 17114M
+[07/04 05:38:16] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 05:38:53] pts.utils.events INFO:  eta: 1:02:12  iter: 6249 -- [33/259]  total_loss: 3.94  soft_target_cross_entropy_loss: 2.06  loss_ofl: 1.847  mask_loss: 0  time: 0.7678  data_time: 0.1548  lr: 0.00012374  max_mem: 17114M
+[07/04 05:39:26] pts.utils.events INFO:  eta: 1:01:44  iter: 6299 -- [83/259]  total_loss: 4.004  soft_target_cross_entropy_loss: 2.068  loss_ofl: 1.918  mask_loss: 0.0009167  time: 0.7669  data_time: 0.0719  lr: 0.00012243  max_mem: 17114M
+[07/04 05:40:03] pts.utils.events INFO:  eta: 1:01:16  iter: 6349 -- [133/259]  total_loss: 4.023  soft_target_cross_entropy_loss: 2.127  loss_ofl: 1.829  mask_loss: 0  time: 0.7666  data_time: 0.1634  lr: 0.00012112  max_mem: 17114M
+[07/04 05:40:38] pts.utils.events INFO:  eta: 1:00:48  iter: 6399 -- [183/259]  total_loss: 3.917  soft_target_cross_entropy_loss: 2.048  loss_ofl: 1.828  mask_loss: 0  time: 0.7660  data_time: 0.1330  lr: 0.00011981  max_mem: 17114M
+[07/04 05:41:22] pts.utils.events INFO:  eta: 1:00:19  iter: 6449 -- [233/259]  total_loss: 3.841  soft_target_cross_entropy_loss: 2.145  loss_ofl: 1.817  mask_loss: 0.0001761  time: 0.7668  data_time: 0.3112  lr: 0.00011849  max_mem: 17114M
+[07/04 05:42:42] pts.engine.hooks INFO: ############################## Test: 25 ##############################
+[07/04 05:42:42] pts.engine.hooks INFO: ACC-1crop@1: 0.7161226272583008
+[07/04 05:42:42] pts.engine.hooks INFO: ACC-1crop@5: 0.947576642036438
+[07/04 05:42:42] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 05:42:42] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/best.pth
+[07/04 05:43:12] pts.utils.events INFO:  eta: 0:59:52  iter: 6499 -- [24/259]  total_loss: 3.811  soft_target_cross_entropy_loss: 1.998  loss_ofl: 1.798  mask_loss: 1.629e-05  time: 0.7678  data_time: 0.1076  lr: 0.00011717  max_mem: 17114M
+[07/04 05:43:50] pts.utils.events INFO:  eta: 0:59:23  iter: 6549 -- [74/259]  total_loss: 3.936  soft_target_cross_entropy_loss: 2.189  loss_ofl: 1.766  mask_loss: 0.001709  time: 0.7676  data_time: 0.1745  lr: 0.00011585  max_mem: 17114M
+[07/04 05:44:26] pts.utils.events INFO:  eta: 0:58:56  iter: 6599 -- [124/259]  total_loss: 3.938  soft_target_cross_entropy_loss: 2.096  loss_ofl: 1.876  mask_loss: 0  time: 0.7671  data_time: 0.1899  lr: 0.00011452  max_mem: 17114M
+[07/04 05:45:03] pts.utils.events INFO:  eta: 0:58:27  iter: 6649 -- [174/259]  total_loss: 3.842  soft_target_cross_entropy_loss: 1.978  loss_ofl: 1.784  mask_loss: 0.0002111  time: 0.7669  data_time: 0.2024  lr: 0.00011319  max_mem: 17114M
+[07/04 05:45:39] pts.utils.events INFO:  eta: 0:58:00  iter: 6699 -- [224/259]  total_loss: 3.935  soft_target_cross_entropy_loss: 2.12  loss_ofl: 1.771  mask_loss: 0.0001098  time: 0.7665  data_time: 0.1808  lr: 0.00011186  max_mem: 17114M
+[07/04 05:46:06] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 05:46:33] pts.utils.events INFO:  eta: 0:57:32  iter: 6749 -- [15/259]  total_loss: 3.8  soft_target_cross_entropy_loss: 2.035  loss_ofl: 1.799  mask_loss: 0.0003278  time: 0.7686  data_time: 0.9883  lr: 0.00011053  max_mem: 17114M
+[07/04 05:47:11] pts.utils.events INFO:  eta: 0:57:04  iter: 6799 -- [65/259]  total_loss: 3.959  soft_target_cross_entropy_loss: 2.128  loss_ofl: 1.799  mask_loss: 0.00106  time: 0.7685  data_time: 0.1011  lr: 0.00010919  max_mem: 17114M
+[07/04 05:47:50] pts.utils.events INFO:  eta: 0:56:35  iter: 6849 -- [115/259]  total_loss: 3.812  soft_target_cross_entropy_loss: 2.021  loss_ofl: 1.806  mask_loss: 0  time: 0.7684  data_time: 0.2427  lr: 0.00010786  max_mem: 17114M
+[07/04 05:48:24] pts.utils.events INFO:  eta: 0:56:09  iter: 6899 -- [165/259]  total_loss: 4.001  soft_target_cross_entropy_loss: 2.045  loss_ofl: 1.883  mask_loss: 0  time: 0.7678  data_time: 0.1364  lr: 0.00010652  max_mem: 17114M
+[07/04 05:48:59] pts.utils.events INFO:  eta: 0:55:40  iter: 6949 -- [215/259]  total_loss: 3.905  soft_target_cross_entropy_loss: 2.104  loss_ofl: 1.796  mask_loss: 0.0005499  time: 0.7672  data_time: 0.1000  lr: 0.00010518  max_mem: 17114M
+[07/04 05:49:27] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 05:49:50] pts.utils.events INFO:  eta: 0:55:13  iter: 6999 -- [6/259]  total_loss: 3.826  soft_target_cross_entropy_loss: 2.08  loss_ofl: 1.774  mask_loss: 0.0002151  time: 0.7688  data_time: 0.9745  lr: 0.00010384  max_mem: 17114M
+[07/04 05:50:27] pts.utils.events INFO:  eta: 0:54:44  iter: 7049 -- [56/259]  total_loss: 3.727  soft_target_cross_entropy_loss: 1.908  loss_ofl: 1.759  mask_loss: 0.0007817  time: 0.7686  data_time: 0.1063  lr: 0.0001025  max_mem: 17114M
+[07/04 05:51:02] pts.utils.events INFO:  eta: 0:54:15  iter: 7099 -- [106/259]  total_loss: 3.872  soft_target_cross_entropy_loss: 1.944  loss_ofl: 1.882  mask_loss: 0.0001661  time: 0.7681  data_time: 0.1763  lr: 0.00010116  max_mem: 17114M
+[07/04 05:51:38] pts.utils.events INFO:  eta: 0:53:47  iter: 7149 -- [156/259]  total_loss: 3.857  soft_target_cross_entropy_loss: 2.037  loss_ofl: 1.773  mask_loss: 0.0003577  time: 0.7676  data_time: 0.1783  lr: 9.9816e-05  max_mem: 17114M
+[07/04 05:52:19] pts.utils.events INFO:  eta: 0:53:18  iter: 7199 -- [206/259]  total_loss: 3.691  soft_target_cross_entropy_loss: 1.974  loss_ofl: 1.732  mask_loss: 0  time: 0.7678  data_time: 0.3473  lr: 9.8475e-05  max_mem: 17114M
+[07/04 05:52:58] pts.utils.events INFO:  eta: 0:52:49  iter: 7249 -- [256/259]  total_loss: 3.803  soft_target_cross_entropy_loss: 2.067  loss_ofl: 1.757  mask_loss: 0.000343  time: 0.7678  data_time: 0.3786  lr: 9.7135e-05  max_mem: 17114M
+[07/04 05:52:59] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 05:53:52] pts.utils.events INFO:  eta: 0:52:21  iter: 7299 -- [47/259]  total_loss: 3.712  soft_target_cross_entropy_loss: 1.964  loss_ofl: 1.734  mask_loss: 0  time: 0.7699  data_time: 0.4165  lr: 9.5795e-05  max_mem: 17114M
+[07/04 05:54:28] pts.utils.events INFO:  eta: 0:51:54  iter: 7349 -- [97/259]  total_loss: 3.701  soft_target_cross_entropy_loss: 1.937  loss_ofl: 1.743  mask_loss: 0  time: 0.7694  data_time: 0.1411  lr: 9.4456e-05  max_mem: 17114M
+[07/04 05:55:01] pts.utils.events INFO:  eta: 0:51:26  iter: 7399 -- [147/259]  total_loss: 3.724  soft_target_cross_entropy_loss: 2.005  loss_ofl: 1.784  mask_loss: 0  time: 0.7687  data_time: 0.1320  lr: 9.3118e-05  max_mem: 17114M
+[07/04 05:55:38] pts.utils.events INFO:  eta: 0:50:58  iter: 7449 -- [197/259]  total_loss: 3.607  soft_target_cross_entropy_loss: 1.9  loss_ofl: 1.747  mask_loss: 0.0004613  time: 0.7683  data_time: 0.0930  lr: 9.1781e-05  max_mem: 17114M
+[07/04 05:56:15] pts.utils.events INFO:  eta: 0:50:30  iter: 7499 -- [247/259]  total_loss: 3.565  soft_target_cross_entropy_loss: 1.95  loss_ofl: 1.665  mask_loss: 0.001573  time: 0.7682  data_time: 0.2360  lr: 9.0446e-05  max_mem: 17114M
+[07/04 05:56:22] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 05:57:05] pts.utils.events INFO:  eta: 0:50:02  iter: 7549 -- [38/259]  total_loss: 3.647  soft_target_cross_entropy_loss: 1.955  loss_ofl: 1.698  mask_loss: 1.137e-05  time: 0.7696  data_time: 0.1842  lr: 8.9113e-05  max_mem: 17114M
+[07/04 05:57:39] pts.utils.events INFO:  eta: 0:49:34  iter: 7599 -- [88/259]  total_loss: 3.458  soft_target_cross_entropy_loss: 1.828  loss_ofl: 1.646  mask_loss: 0.0003033  time: 0.7688  data_time: 0.1322  lr: 8.7782e-05  max_mem: 17114M
+[07/04 05:58:15] pts.utils.events INFO:  eta: 0:49:07  iter: 7649 -- [138/259]  total_loss: 3.728  soft_target_cross_entropy_loss: 1.988  loss_ofl: 1.735  mask_loss: 0.000209  time: 0.7684  data_time: 0.1698  lr: 8.6453e-05  max_mem: 17114M
+[07/04 05:58:50] pts.utils.events INFO:  eta: 0:48:39  iter: 7699 -- [188/259]  total_loss: 3.558  soft_target_cross_entropy_loss: 1.907  loss_ofl: 1.669  mask_loss: 6.923e-05  time: 0.7680  data_time: 0.1744  lr: 8.5127e-05  max_mem: 17114M
+[07/04 05:59:27] pts.utils.events INFO:  eta: 0:48:12  iter: 7749 -- [238/259]  total_loss: 3.743  soft_target_cross_entropy_loss: 1.989  loss_ofl: 1.653  mask_loss: 0.0003898  time: 0.7677  data_time: 0.2229  lr: 8.3803e-05  max_mem: 17114M
+[07/04 06:00:48] pts.engine.hooks INFO: ############################## Test: 30 ##############################
+[07/04 06:00:48] pts.engine.hooks INFO: ACC-1crop@1: 0.7185954451560974
+[07/04 06:00:48] pts.engine.hooks INFO: ACC-1crop@5: 0.950543999671936
+[07/04 06:00:48] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 06:00:49] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/best.pth
+[07/04 06:01:24] pts.utils.events INFO:  eta: 0:47:43  iter: 7799 -- [29/259]  total_loss: 3.563  soft_target_cross_entropy_loss: 1.828  loss_ofl: 1.71  mask_loss: 0.0002817  time: 0.7692  data_time: 0.1818  lr: 8.2483e-05  max_mem: 17114M
+[07/04 06:01:58] pts.utils.events INFO:  eta: 0:47:14  iter: 7849 -- [79/259]  total_loss: 3.652  soft_target_cross_entropy_loss: 1.98  loss_ofl: 1.701  mask_loss: 3.627e-05  time: 0.7686  data_time: 0.1107  lr: 8.1166e-05  max_mem: 17114M
+[07/04 06:02:33] pts.utils.events INFO:  eta: 0:46:45  iter: 7899 -- [129/259]  total_loss: 3.739  soft_target_cross_entropy_loss: 1.952  loss_ofl: 1.788  mask_loss: 0  time: 0.7682  data_time: 0.1117  lr: 7.9852e-05  max_mem: 17114M
+[07/04 06:03:07] pts.utils.events INFO:  eta: 0:46:19  iter: 7949 -- [179/259]  total_loss: 3.563  soft_target_cross_entropy_loss: 1.92  loss_ofl: 1.691  mask_loss: 0.0001236  time: 0.7675  data_time: 0.1976  lr: 7.8542e-05  max_mem: 17114M
+[07/04 06:03:43] pts.utils.events INFO:  eta: 0:45:50  iter: 7999 -- [229/259]  total_loss: 3.613  soft_target_cross_entropy_loss: 1.941  loss_ofl: 1.66  mask_loss: 0.0005531  time: 0.7672  data_time: 0.1586  lr: 7.7236e-05  max_mem: 17114M
+[07/04 06:04:03] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 06:04:31] pts.utils.events INFO:  eta: 0:45:24  iter: 8049 -- [20/259]  total_loss: 3.61  soft_target_cross_entropy_loss: 1.9  loss_ofl: 1.716  mask_loss: 9.902e-05  time: 0.7682  data_time: 0.0638  lr: 7.5935e-05  max_mem: 17114M
+[07/04 06:05:06] pts.utils.events INFO:  eta: 0:44:55  iter: 8099 -- [70/259]  total_loss: 3.583  soft_target_cross_entropy_loss: 1.952  loss_ofl: 1.608  mask_loss: 0.0004634  time: 0.7677  data_time: 0.1793  lr: 7.4637e-05  max_mem: 17114M
+[07/04 06:05:42] pts.utils.events INFO:  eta: 0:44:27  iter: 8149 -- [120/259]  total_loss: 3.636  soft_target_cross_entropy_loss: 1.877  loss_ofl: 1.689  mask_loss: 0.0007899  time: 0.7674  data_time: 0.1084  lr: 7.3345e-05  max_mem: 17114M
+[07/04 06:06:23] pts.utils.events INFO:  eta: 0:44:00  iter: 8199 -- [170/259]  total_loss: 3.503  soft_target_cross_entropy_loss: 1.827  loss_ofl: 1.664  mask_loss: 1.362e-05  time: 0.7676  data_time: 0.2445  lr: 7.2057e-05  max_mem: 17114M
+[07/04 06:06:59] pts.utils.events INFO:  eta: 0:43:33  iter: 8249 -- [220/259]  total_loss: 3.601  soft_target_cross_entropy_loss: 1.956  loss_ofl: 1.678  mask_loss: 0.0005014  time: 0.7673  data_time: 0.0988  lr: 7.0775e-05  max_mem: 17114M
+[07/04 06:07:27] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 06:07:49] pts.utils.events INFO:  eta: 0:43:05  iter: 8299 -- [11/259]  total_loss: 3.497  soft_target_cross_entropy_loss: 1.83  loss_ofl: 1.664  mask_loss: 0.001056  time: 0.7685  data_time: 0.7687  lr: 6.9498e-05  max_mem: 17114M
+[07/04 06:08:25] pts.utils.events INFO:  eta: 0:42:38  iter: 8349 -- [61/259]  total_loss: 3.574  soft_target_cross_entropy_loss: 1.849  loss_ofl: 1.728  mask_loss: 0.001034  time: 0.7681  data_time: 0.1144  lr: 6.8226e-05  max_mem: 17114M
+[07/04 06:09:02] pts.utils.events INFO:  eta: 0:42:11  iter: 8399 -- [111/259]  total_loss: 3.505  soft_target_cross_entropy_loss: 1.869  loss_ofl: 1.664  mask_loss: 0.0001503  time: 0.7679  data_time: 0.2079  lr: 6.6961e-05  max_mem: 17114M
+[07/04 06:09:36] pts.utils.events INFO:  eta: 0:41:44  iter: 8449 -- [161/259]  total_loss: 3.542  soft_target_cross_entropy_loss: 1.866  loss_ofl: 1.639  mask_loss: 0.000623  time: 0.7674  data_time: 0.0782  lr: 6.5701e-05  max_mem: 17114M
+[07/04 06:10:10] pts.utils.events INFO:  eta: 0:41:17  iter: 8499 -- [211/259]  total_loss: 3.566  soft_target_cross_entropy_loss: 1.872  loss_ofl: 1.661  mask_loss: 0.0002515  time: 0.7668  data_time: 0.0462  lr: 6.4448e-05  max_mem: 17114M
+[07/04 06:10:49] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 06:11:06] pts.utils.events INFO:  eta: 0:40:50  iter: 8549 -- [2/259]  total_loss: 3.614  soft_target_cross_entropy_loss: 1.919  loss_ofl: 1.623  mask_loss: 0.0003739  time: 0.7686  data_time: 0.8619  lr: 6.3202e-05  max_mem: 17114M
+[07/04 06:11:41] pts.utils.events INFO:  eta: 0:40:21  iter: 8599 -- [52/259]  total_loss: 3.501  soft_target_cross_entropy_loss: 1.864  loss_ofl: 1.641  mask_loss: 0.0008272  time: 0.7683  data_time: 0.1157  lr: 6.1962e-05  max_mem: 17114M
+[07/04 06:12:20] pts.utils.events INFO:  eta: 0:39:52  iter: 8649 -- [102/259]  total_loss: 3.416  soft_target_cross_entropy_loss: 1.797  loss_ofl: 1.565  mask_loss: 0.0004793  time: 0.7682  data_time: 0.2452  lr: 6.0729e-05  max_mem: 17114M
+[07/04 06:13:00] pts.utils.events INFO:  eta: 0:39:24  iter: 8699 -- [152/259]  total_loss: 3.623  soft_target_cross_entropy_loss: 1.938  loss_ofl: 1.744  mask_loss: 0.001156  time: 0.7684  data_time: 0.1713  lr: 5.9504e-05  max_mem: 17114M
+[07/04 06:13:39] pts.utils.events INFO:  eta: 0:38:56  iter: 8749 -- [202/259]  total_loss: 3.519  soft_target_cross_entropy_loss: 1.871  loss_ofl: 1.666  mask_loss: 5.135e-05  time: 0.7683  data_time: 0.0606  lr: 5.8285e-05  max_mem: 17114M
+[07/04 06:14:14] pts.utils.events INFO:  eta: 0:38:29  iter: 8799 -- [252/259]  total_loss: 3.496  soft_target_cross_entropy_loss: 1.868  loss_ofl: 1.632  mask_loss: 0.0004943  time: 0.7679  data_time: 0.2379  lr: 5.7075e-05  max_mem: 17114M
+[07/04 06:14:17] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 06:15:03] pts.utils.events INFO:  eta: 0:38:01  iter: 8849 -- [43/259]  total_loss: 3.649  soft_target_cross_entropy_loss: 1.825  loss_ofl: 1.686  mask_loss: 0  time: 0.7689  data_time: 0.1909  lr: 5.5872e-05  max_mem: 17114M
+[07/04 06:15:38] pts.utils.events INFO:  eta: 0:37:34  iter: 8899 -- [93/259]  total_loss: 3.385  soft_target_cross_entropy_loss: 1.751  loss_ofl: 1.615  mask_loss: 0  time: 0.7686  data_time: 0.1027  lr: 5.4678e-05  max_mem: 17114M
+[07/04 06:16:14] pts.utils.events INFO:  eta: 0:37:04  iter: 8949 -- [143/259]  total_loss: 3.472  soft_target_cross_entropy_loss: 1.831  loss_ofl: 1.653  mask_loss: 0.001223  time: 0.7682  data_time: 0.1118  lr: 5.3492e-05  max_mem: 17114M
+[07/04 06:16:50] pts.utils.events INFO:  eta: 0:36:36  iter: 8999 -- [193/259]  total_loss: 3.501  soft_target_cross_entropy_loss: 1.814  loss_ofl: 1.641  mask_loss: 0.0007095  time: 0.7679  data_time: 0.1026  lr: 5.2314e-05  max_mem: 17114M
+[07/04 06:17:25] pts.utils.events INFO:  eta: 0:36:08  iter: 9049 -- [243/259]  total_loss: 3.409  soft_target_cross_entropy_loss: 1.834  loss_ofl: 1.62  mask_loss: 0.001987  time: 0.7675  data_time: 0.1075  lr: 5.1145e-05  max_mem: 17114M
+[07/04 06:18:40] pts.engine.hooks INFO: ############################## Test: 35 ##############################
+[07/04 06:18:40] pts.engine.hooks INFO: ACC-1crop@1: 0.7136498093605042
+[07/04 06:18:40] pts.engine.hooks INFO: ACC-1crop@5: 0.9401581883430481
+[07/04 06:18:40] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 06:19:17] pts.utils.events INFO:  eta: 0:35:40  iter: 9099 -- [34/259]  total_loss: 3.351  soft_target_cross_entropy_loss: 1.812  loss_ofl: 1.593  mask_loss: 0.0006071  time: 0.7686  data_time: 0.0980  lr: 4.9985e-05  max_mem: 17114M
+[07/04 06:19:51] pts.utils.events INFO:  eta: 0:35:12  iter: 9149 -- [84/259]  total_loss: 3.398  soft_target_cross_entropy_loss: 1.723  loss_ofl: 1.62  mask_loss: 6.123e-05  time: 0.7680  data_time: 0.1387  lr: 4.8835e-05  max_mem: 17114M
+[07/04 06:20:28] pts.utils.events INFO:  eta: 0:34:43  iter: 9199 -- [134/259]  total_loss: 3.376  soft_target_cross_entropy_loss: 1.739  loss_ofl: 1.688  mask_loss: 0.0002582  time: 0.7679  data_time: 0.0902  lr: 4.7693e-05  max_mem: 17114M
+[07/04 06:21:05] pts.utils.events INFO:  eta: 0:34:16  iter: 9249 -- [184/259]  total_loss: 3.369  soft_target_cross_entropy_loss: 1.725  loss_ofl: 1.611  mask_loss: 0.0004207  time: 0.7676  data_time: 0.0446  lr: 4.6562e-05  max_mem: 17114M
+[07/04 06:21:41] pts.utils.events INFO:  eta: 0:33:48  iter: 9299 -- [234/259]  total_loss: 3.34  soft_target_cross_entropy_loss: 1.778  loss_ofl: 1.553  mask_loss: 0.000211  time: 0.7673  data_time: 0.1017  lr: 4.544e-05  max_mem: 17114M
+[07/04 06:21:59] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 06:22:31] pts.utils.events INFO:  eta: 0:33:19  iter: 9349 -- [25/259]  total_loss: 3.295  soft_target_cross_entropy_loss: 1.681  loss_ofl: 1.615  mask_loss: 0  time: 0.7684  data_time: 0.1093  lr: 4.4328e-05  max_mem: 17114M
+[07/04 06:23:08] pts.utils.events INFO:  eta: 0:32:51  iter: 9399 -- [75/259]  total_loss: 3.396  soft_target_cross_entropy_loss: 1.738  loss_ofl: 1.684  mask_loss: 0.0005521  time: 0.7682  data_time: 0.0807  lr: 4.3226e-05  max_mem: 17114M
+[07/04 06:23:42] pts.utils.events INFO:  eta: 0:32:22  iter: 9449 -- [125/259]  total_loss: 3.386  soft_target_cross_entropy_loss: 1.746  loss_ofl: 1.591  mask_loss: 0.001419  time: 0.7677  data_time: 0.0737  lr: 4.2135e-05  max_mem: 17114M
+[07/04 06:24:18] pts.utils.events INFO:  eta: 0:31:54  iter: 9499 -- [175/259]  total_loss: 3.463  soft_target_cross_entropy_loss: 1.909  loss_ofl: 1.569  mask_loss: 0.001853  time: 0.7674  data_time: 0.0966  lr: 4.1054e-05  max_mem: 17114M
+[07/04 06:24:55] pts.utils.events INFO:  eta: 0:31:26  iter: 9549 -- [225/259]  total_loss: 3.376  soft_target_cross_entropy_loss: 1.723  loss_ofl: 1.646  mask_loss: 0  time: 0.7672  data_time: 0.0481  lr: 3.9984e-05  max_mem: 17114M
+[07/04 06:25:23] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 06:25:50] pts.utils.events INFO:  eta: 0:30:58  iter: 9599 -- [16/259]  total_loss: 3.284  soft_target_cross_entropy_loss: 1.691  loss_ofl: 1.576  mask_loss: 0.0003889  time: 0.7688  data_time: 0.8943  lr: 3.8925e-05  max_mem: 17114M
+[07/04 06:26:26] pts.utils.events INFO:  eta: 0:30:30  iter: 9649 -- [66/259]  total_loss: 3.396  soft_target_cross_entropy_loss: 1.866  loss_ofl: 1.615  mask_loss: 0.002181  time: 0.7684  data_time: 0.1855  lr: 3.7877e-05  max_mem: 17114M
+[07/04 06:26:59] pts.utils.events INFO:  eta: 0:30:03  iter: 9699 -- [116/259]  total_loss: 3.297  soft_target_cross_entropy_loss: 1.807  loss_ofl: 1.537  mask_loss: 0.0009945  time: 0.7678  data_time: 0.0690  lr: 3.6841e-05  max_mem: 17114M
+[07/04 06:27:36] pts.utils.events INFO:  eta: 0:29:35  iter: 9749 -- [166/259]  total_loss: 3.379  soft_target_cross_entropy_loss: 1.804  loss_ofl: 1.558  mask_loss: 0.0001225  time: 0.7677  data_time: 0.1637  lr: 3.5816e-05  max_mem: 17114M
+[07/04 06:28:14] pts.utils.events INFO:  eta: 0:29:07  iter: 9799 -- [216/259]  total_loss: 3.405  soft_target_cross_entropy_loss: 1.807  loss_ofl: 1.662  mask_loss: 5.842e-05  time: 0.7676  data_time: 0.1726  lr: 3.4803e-05  max_mem: 17114M
+[07/04 06:28:45] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 06:29:03] pts.utils.events INFO:  eta: 0:28:39  iter: 9849 -- [7/259]  total_loss: 3.342  soft_target_cross_entropy_loss: 1.761  loss_ofl: 1.528  mask_loss: 0.001425  time: 0.7686  data_time: 0.8567  lr: 3.3802e-05  max_mem: 17114M
+[07/04 06:29:37] pts.utils.events INFO:  eta: 0:28:11  iter: 9899 -- [57/259]  total_loss: 3.339  soft_target_cross_entropy_loss: 1.709  loss_ofl: 1.667  mask_loss: 6.503e-05  time: 0.7680  data_time: 0.0421  lr: 3.2813e-05  max_mem: 17114M
+[07/04 06:30:10] pts.utils.events INFO:  eta: 0:27:43  iter: 9949 -- [107/259]  total_loss: 3.362  soft_target_cross_entropy_loss: 1.739  loss_ofl: 1.637  mask_loss: 0.001874  time: 0.7675  data_time: 0.0544  lr: 3.1836e-05  max_mem: 17114M
+[07/04 06:30:46] pts.utils.events INFO:  eta: 0:27:16  iter: 9999 -- [157/259]  total_loss: 3.302  soft_target_cross_entropy_loss: 1.752  loss_ofl: 1.542  mask_loss: 0.00115  time: 0.7672  data_time: 0.2252  lr: 3.0872e-05  max_mem: 17114M
+[07/04 06:31:22] pts.utils.events INFO:  eta: 0:26:49  iter: 10049 -- [207/259]  total_loss: 3.346  soft_target_cross_entropy_loss: 1.668  loss_ofl: 1.581  mask_loss: 0.0003881  time: 0.7669  data_time: 0.1197  lr: 2.992e-05  max_mem: 17114M
+[07/04 06:32:03] pts.utils.events INFO:  eta: 0:26:22  iter: 10099 -- [257/259]  total_loss: 3.367  soft_target_cross_entropy_loss: 1.671  loss_ofl: 1.588  mask_loss: 0  time: 0.7670  data_time: 0.3071  lr: 2.8982e-05  max_mem: 17114M
+[07/04 06:32:03] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 06:32:54] pts.utils.events INFO:  eta: 0:25:54  iter: 10149 -- [48/259]  total_loss: 3.248  soft_target_cross_entropy_loss: 1.724  loss_ofl: 1.534  mask_loss: 0.0007137  time: 0.7682  data_time: 0.1154  lr: 2.8056e-05  max_mem: 17114M
+[07/04 06:33:31] pts.utils.events INFO:  eta: 0:25:26  iter: 10199 -- [98/259]  total_loss: 3.19  soft_target_cross_entropy_loss: 1.7  loss_ofl: 1.512  mask_loss: 0.00093  time: 0.7680  data_time: 0.0507  lr: 2.7143e-05  max_mem: 17114M
+[07/04 06:34:09] pts.utils.events INFO:  eta: 0:24:58  iter: 10249 -- [148/259]  total_loss: 3.263  soft_target_cross_entropy_loss: 1.754  loss_ofl: 1.574  mask_loss: 0.001455  time: 0.7679  data_time: 0.1493  lr: 2.6244e-05  max_mem: 17114M
+[07/04 06:34:44] pts.utils.events INFO:  eta: 0:24:30  iter: 10299 -- [198/259]  total_loss: 3.288  soft_target_cross_entropy_loss: 1.783  loss_ofl: 1.57  mask_loss: 0.000639  time: 0.7676  data_time: 0.0913  lr: 2.5358e-05  max_mem: 17114M
+[07/04 06:35:18] pts.utils.events INFO:  eta: 0:24:03  iter: 10349 -- [248/259]  total_loss: 3.31  soft_target_cross_entropy_loss: 1.753  loss_ofl: 1.545  mask_loss: 0.0002192  time: 0.7671  data_time: 0.0473  lr: 2.4486e-05  max_mem: 17114M
+[07/04 06:36:28] pts.engine.hooks INFO: ############################## Test: 40 ##############################
+[07/04 06:36:28] pts.engine.hooks INFO: ACC-1crop@1: 0.7141444087028503
+[07/04 06:36:28] pts.engine.hooks INFO: ACC-1crop@5: 0.9431255459785461
+[07/04 06:36:28] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 06:37:08] pts.utils.events INFO:  eta: 0:23:35  iter: 10399 -- [39/259]  total_loss: 3.32  soft_target_cross_entropy_loss: 1.704  loss_ofl: 1.597  mask_loss: 0.0003918  time: 0.7677  data_time: 0.0523  lr: 2.3627e-05  max_mem: 17114M
+[07/04 06:37:44] pts.utils.events INFO:  eta: 0:23:08  iter: 10449 -- [89/259]  total_loss: 3.257  soft_target_cross_entropy_loss: 1.749  loss_ofl: 1.504  mask_loss: 0.001707  time: 0.7674  data_time: 0.1001  lr: 2.2783e-05  max_mem: 17114M
+[07/04 06:38:23] pts.utils.events INFO:  eta: 0:22:40  iter: 10499 -- [139/259]  total_loss: 3.322  soft_target_cross_entropy_loss: 1.754  loss_ofl: 1.603  mask_loss: 0.0005577  time: 0.7675  data_time: 0.3204  lr: 2.1953e-05  max_mem: 17114M
+[07/04 06:39:01] pts.utils.events INFO:  eta: 0:22:12  iter: 10549 -- [189/259]  total_loss: 3.242  soft_target_cross_entropy_loss: 1.82  loss_ofl: 1.539  mask_loss: 0.0005101  time: 0.7674  data_time: 0.2316  lr: 2.1137e-05  max_mem: 17114M
+[07/04 06:39:35] pts.utils.events INFO:  eta: 0:21:45  iter: 10599 -- [239/259]  total_loss: 3.233  soft_target_cross_entropy_loss: 1.661  loss_ofl: 1.558  mask_loss: 0.001011  time: 0.7669  data_time: 0.1198  lr: 2.0335e-05  max_mem: 17114M
+[07/04 06:40:51] pts.engine.hooks INFO: ############################## Test: 41 ##############################
+[07/04 06:40:51] pts.engine.hooks INFO: ACC-1crop@1: 0.7101879119873047
+[07/04 06:40:51] pts.engine.hooks INFO: ACC-1crop@5: 0.9352126121520996
+[07/04 06:40:51] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 06:41:29] pts.utils.events INFO:  eta: 0:21:17  iter: 10649 -- [30/259]  total_loss: 3.322  soft_target_cross_entropy_loss: 1.744  loss_ofl: 1.526  mask_loss: 0.0011  time: 0.7680  data_time: 0.1290  lr: 1.9548e-05  max_mem: 17114M
+[07/04 06:42:06] pts.utils.events INFO:  eta: 0:20:49  iter: 10699 -- [80/259]  total_loss: 3.355  soft_target_cross_entropy_loss: 1.826  loss_ofl: 1.539  mask_loss: 0.0003795  time: 0.7678  data_time: 0.1354  lr: 1.8776e-05  max_mem: 17114M
+[07/04 06:42:46] pts.utils.events INFO:  eta: 0:20:21  iter: 10749 -- [130/259]  total_loss: 3.324  soft_target_cross_entropy_loss: 1.702  loss_ofl: 1.526  mask_loss: 0.001822  time: 0.7679  data_time: 0.2152  lr: 1.8018e-05  max_mem: 17114M
+[07/04 06:43:22] pts.utils.events INFO:  eta: 0:19:53  iter: 10799 -- [180/259]  total_loss: 3.205  soft_target_cross_entropy_loss: 1.666  loss_ofl: 1.526  mask_loss: 0.001078  time: 0.7677  data_time: 0.0689  lr: 1.7276e-05  max_mem: 17114M
+[07/04 06:43:56] pts.utils.events INFO:  eta: 0:19:26  iter: 10849 -- [230/259]  total_loss: 3.237  soft_target_cross_entropy_loss: 1.679  loss_ofl: 1.553  mask_loss: 6.215e-05  time: 0.7672  data_time: 0.0839  lr: 1.6548e-05  max_mem: 17114M
+[07/04 06:45:22] pts.engine.hooks INFO: ############################## Test: 42 ##############################
+[07/04 06:45:22] pts.engine.hooks INFO: ACC-1crop@1: 0.7136498093605042
+[07/04 06:45:22] pts.engine.hooks INFO: ACC-1crop@5: 0.9386745095252991
+[07/04 06:45:22] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 06:45:50] pts.utils.events INFO:  eta: 0:18:58  iter: 10899 -- [21/259]  total_loss: 3.359  soft_target_cross_entropy_loss: 1.729  loss_ofl: 1.563  mask_loss: 0.0003805  time: 0.7681  data_time: 0.1026  lr: 1.5836e-05  max_mem: 17114M
+[07/04 06:46:27] pts.utils.events INFO:  eta: 0:18:31  iter: 10949 -- [71/259]  total_loss: 3.232  soft_target_cross_entropy_loss: 1.676  loss_ofl: 1.544  mask_loss: 0.001122  time: 0.7679  data_time: 0.1366  lr: 1.5139e-05  max_mem: 17114M
+[07/04 06:47:06] pts.utils.events INFO:  eta: 0:18:02  iter: 10999 -- [121/259]  total_loss: 3.205  soft_target_cross_entropy_loss: 1.61  loss_ofl: 1.559  mask_loss: 0.001605  time: 0.7679  data_time: 0.2320  lr: 1.4458e-05  max_mem: 17114M
+[07/04 06:47:41] pts.utils.events INFO:  eta: 0:17:34  iter: 11049 -- [171/259]  total_loss: 3.201  soft_target_cross_entropy_loss: 1.669  loss_ofl: 1.58  mask_loss: 0.0006865  time: 0.7676  data_time: 0.1346  lr: 1.3793e-05  max_mem: 17114M
+[07/04 06:48:17] pts.utils.events INFO:  eta: 0:17:06  iter: 11099 -- [221/259]  total_loss: 3.213  soft_target_cross_entropy_loss: 1.706  loss_ofl: 1.577  mask_loss: 0.00109  time: 0.7673  data_time: 0.1828  lr: 1.3143e-05  max_mem: 17114M
+[07/04 06:49:46] pts.engine.hooks INFO: ############################## Test: 43 ##############################
+[07/04 06:49:46] pts.engine.hooks INFO: ACC-1crop@1: 0.7096933126449585
+[07/04 06:49:46] pts.engine.hooks INFO: ACC-1crop@5: 0.9337289333343506
+[07/04 06:49:47] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 06:50:11] pts.utils.events INFO:  eta: 0:16:39  iter: 11149 -- [12/259]  total_loss: 3.298  soft_target_cross_entropy_loss: 1.645  loss_ofl: 1.591  mask_loss: 0.0009981  time: 0.7682  data_time: 0.9407  lr: 1.2509e-05  max_mem: 17114M
+[07/04 06:50:49] pts.utils.events INFO:  eta: 0:16:11  iter: 11199 -- [62/259]  total_loss: 3.281  soft_target_cross_entropy_loss: 1.673  loss_ofl: 1.632  mask_loss: 0.001029  time: 0.7681  data_time: 0.2325  lr: 1.1891e-05  max_mem: 17114M
+[07/04 06:51:25] pts.utils.events INFO:  eta: 0:15:44  iter: 11249 -- [112/259]  total_loss: 3.283  soft_target_cross_entropy_loss: 1.679  loss_ofl: 1.583  mask_loss: 0.0002034  time: 0.7679  data_time: 0.2300  lr: 1.1289e-05  max_mem: 17114M
+[07/04 06:52:02] pts.utils.events INFO:  eta: 0:15:16  iter: 11299 -- [162/259]  total_loss: 3.218  soft_target_cross_entropy_loss: 1.695  loss_ofl: 1.491  mask_loss: 0.0009765  time: 0.7677  data_time: 0.1839  lr: 1.0703e-05  max_mem: 17114M
+[07/04 06:52:42] pts.utils.events INFO:  eta: 0:14:48  iter: 11349 -- [212/259]  total_loss: 3.204  soft_target_cross_entropy_loss: 1.645  loss_ofl: 1.533  mask_loss: 0.0002849  time: 0.7678  data_time: 0.2535  lr: 1.0133e-05  max_mem: 17114M
+[07/04 06:54:17] pts.engine.hooks INFO: ############################## Test: 44 ##############################
+[07/04 06:54:17] pts.engine.hooks INFO: ACC-1crop@1: 0.7052422761917114
+[07/04 06:54:17] pts.engine.hooks INFO: ACC-1crop@5: 0.935707151889801
+[07/04 06:54:17] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 06:54:35] pts.utils.events INFO:  eta: 0:14:20  iter: 11399 -- [3/259]  total_loss: 3.218  soft_target_cross_entropy_loss: 1.657  loss_ofl: 1.5  mask_loss: 0.0004821  time: 0.7687  data_time: 0.9334  lr: 9.5804e-06  max_mem: 17114M
+[07/04 06:55:13] pts.utils.events INFO:  eta: 0:13:52  iter: 11449 -- [53/259]  total_loss: 3.266  soft_target_cross_entropy_loss: 1.685  loss_ofl: 1.548  mask_loss: 0.0006242  time: 0.7686  data_time: 0.1722  lr: 9.0439e-06  max_mem: 17114M
+[07/04 06:55:51] pts.utils.events INFO:  eta: 0:13:25  iter: 11499 -- [103/259]  total_loss: 3.268  soft_target_cross_entropy_loss: 1.691  loss_ofl: 1.572  mask_loss: 0  time: 0.7685  data_time: 0.3232  lr: 8.524e-06  max_mem: 17114M
+[07/04 06:56:26] pts.utils.events INFO:  eta: 0:12:57  iter: 11549 -- [153/259]  total_loss: 3.356  soft_target_cross_entropy_loss: 1.797  loss_ofl: 1.591  mask_loss: 3.617e-05  time: 0.7682  data_time: 0.0845  lr: 8.0208e-06  max_mem: 17114M
+[07/04 06:57:03] pts.utils.events INFO:  eta: 0:12:29  iter: 11599 -- [203/259]  total_loss: 3.196  soft_target_cross_entropy_loss: 1.625  loss_ofl: 1.564  mask_loss: 0.001171  time: 0.7680  data_time: 0.2778  lr: 7.5345e-06  max_mem: 17114M
+[07/04 06:57:36] pts.utils.events INFO:  eta: 0:12:02  iter: 11649 -- [253/259]  total_loss: 3.174  soft_target_cross_entropy_loss: 1.684  loss_ofl: 1.518  mask_loss: 0.001698  time: 0.7675  data_time: 0.0955  lr: 7.065e-06  max_mem: 17114M
+[07/04 06:58:43] pts.engine.hooks INFO: ############################## Test: 45 ##############################
+[07/04 06:58:43] pts.engine.hooks INFO: ACC-1crop@1: 0.7101879119873047
+[07/04 06:58:43] pts.engine.hooks INFO: ACC-1crop@5: 0.931256115436554
+[07/04 06:58:43] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 06:59:28] pts.utils.events INFO:  eta: 0:11:34  iter: 11699 -- [44/259]  total_loss: 3.164  soft_target_cross_entropy_loss: 1.656  loss_ofl: 1.53  mask_loss: 0.003568  time: 0.7683  data_time: 0.1093  lr: 6.6124e-06  max_mem: 17114M
+[07/04 07:00:07] pts.utils.events INFO:  eta: 0:11:06  iter: 11749 -- [94/259]  total_loss: 3.332  soft_target_cross_entropy_loss: 1.748  loss_ofl: 1.639  mask_loss: 0.0007869  time: 0.7683  data_time: 0.1915  lr: 6.177e-06  max_mem: 17114M
+[07/04 07:00:40] pts.utils.events INFO:  eta: 0:10:38  iter: 11799 -- [144/259]  total_loss: 3.184  soft_target_cross_entropy_loss: 1.681  loss_ofl: 1.547  mask_loss: 0.002413  time: 0.7678  data_time: 0.0805  lr: 5.7586e-06  max_mem: 17114M
+[07/04 07:01:17] pts.utils.events INFO:  eta: 0:10:10  iter: 11849 -- [194/259]  total_loss: 3.181  soft_target_cross_entropy_loss: 1.678  loss_ofl: 1.526  mask_loss: 0.0006837  time: 0.7676  data_time: 0.0918  lr: 5.3575e-06  max_mem: 17114M
+[07/04 07:01:52] pts.utils.events INFO:  eta: 0:09:43  iter: 11899 -- [244/259]  total_loss: 3.103  soft_target_cross_entropy_loss: 1.628  loss_ofl: 1.512  mask_loss: 0.000807  time: 0.7673  data_time: 0.1157  lr: 4.9736e-06  max_mem: 17114M
+[07/04 07:03:07] pts.engine.hooks INFO: ############################## Test: 46 ##############################
+[07/04 07:03:07] pts.engine.hooks INFO: ACC-1crop@1: 0.70474773645401
+[07/04 07:03:07] pts.engine.hooks INFO: ACC-1crop@5: 0.9317507147789001
+[07/04 07:03:07] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 07:03:46] pts.utils.events INFO:  eta: 0:09:15  iter: 11949 -- [35/259]  total_loss: 3.384  soft_target_cross_entropy_loss: 1.716  loss_ofl: 1.608  mask_loss: 0.003049  time: 0.7682  data_time: 0.0646  lr: 4.6071e-06  max_mem: 17114M
+[07/04 07:04:23] pts.utils.events INFO:  eta: 0:08:47  iter: 11999 -- [85/259]  total_loss: 3.178  soft_target_cross_entropy_loss: 1.706  loss_ofl: 1.477  mask_loss: 0.0009983  time: 0.7680  data_time: 0.0633  lr: 4.258e-06  max_mem: 17114M
+[07/04 07:05:01] pts.utils.events INFO:  eta: 0:08:19  iter: 12049 -- [135/259]  total_loss: 3.132  soft_target_cross_entropy_loss: 1.707  loss_ofl: 1.521  mask_loss: 0.002011  time: 0.7679  data_time: 0.1498  lr: 3.9264e-06  max_mem: 17114M
+[07/04 07:05:35] pts.utils.events INFO:  eta: 0:07:52  iter: 12099 -- [185/259]  total_loss: 3.12  soft_target_cross_entropy_loss: 1.587  loss_ofl: 1.56  mask_loss: 0.0005611  time: 0.7676  data_time: 0.0877  lr: 3.6124e-06  max_mem: 17114M
+[07/04 07:06:12] pts.utils.events INFO:  eta: 0:07:24  iter: 12149 -- [235/259]  total_loss: 3.146  soft_target_cross_entropy_loss: 1.569  loss_ofl: 1.492  mask_loss: 0.0009624  time: 0.7674  data_time: 0.1110  lr: 3.3159e-06  max_mem: 17114M
+[07/04 07:07:30] pts.engine.hooks INFO: ############################## Test: 47 ##############################
+[07/04 07:07:30] pts.engine.hooks INFO: ACC-1crop@1: 0.7082096338272095
+[07/04 07:07:30] pts.engine.hooks INFO: ACC-1crop@5: 0.932739794254303
+[07/04 07:07:30] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 07:08:04] pts.utils.events INFO:  eta: 0:06:56  iter: 12199 -- [26/259]  total_loss: 3.161  soft_target_cross_entropy_loss: 1.567  loss_ofl: 1.574  mask_loss: 0.001115  time: 0.7681  data_time: 0.1418  lr: 3.0371e-06  max_mem: 17114M
+[07/04 07:08:40] pts.utils.events INFO:  eta: 0:06:28  iter: 12249 -- [76/259]  total_loss: 3.079  soft_target_cross_entropy_loss: 1.604  loss_ofl: 1.515  mask_loss: 0.002315  time: 0.7679  data_time: 0.1285  lr: 2.776e-06  max_mem: 17114M
+[07/04 07:09:14] pts.utils.events INFO:  eta: 0:06:01  iter: 12299 -- [126/259]  total_loss: 3.16  soft_target_cross_entropy_loss: 1.6  loss_ofl: 1.557  mask_loss: 0.0002308  time: 0.7674  data_time: 0.1131  lr: 2.5327e-06  max_mem: 17114M
+[07/04 07:09:51] pts.utils.events INFO:  eta: 0:05:33  iter: 12349 -- [176/259]  total_loss: 3.141  soft_target_cross_entropy_loss: 1.642  loss_ofl: 1.47  mask_loss: 0.003641  time: 0.7673  data_time: 0.2184  lr: 2.3071e-06  max_mem: 17114M
+[07/04 07:10:28] pts.utils.events INFO:  eta: 0:05:05  iter: 12399 -- [226/259]  total_loss: 3.167  soft_target_cross_entropy_loss: 1.693  loss_ofl: 1.538  mask_loss: 0.001983  time: 0.7671  data_time: 0.1182  lr: 2.0994e-06  max_mem: 17114M
+[07/04 07:11:53] pts.engine.hooks INFO: ############################## Test: 48 ##############################
+[07/04 07:11:53] pts.engine.hooks INFO: ACC-1crop@1: 0.7057368755340576
+[07/04 07:11:53] pts.engine.hooks INFO: ACC-1crop@5: 0.9268050789833069
+[07/04 07:11:53] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 07:12:20] pts.utils.events INFO:  eta: 0:04:37  iter: 12449 -- [17/259]  total_loss: 3.111  soft_target_cross_entropy_loss: 1.551  loss_ofl: 1.564  mask_loss: 0.001676  time: 0.7680  data_time: 0.8528  lr: 1.9095e-06  max_mem: 17114M
+[07/04 07:12:56] pts.utils.events INFO:  eta: 0:04:10  iter: 12499 -- [67/259]  total_loss: 3.236  soft_target_cross_entropy_loss: 1.689  loss_ofl: 1.568  mask_loss: 0.0005294  time: 0.7677  data_time: 0.1213  lr: 1.7376e-06  max_mem: 17114M
+[07/04 07:13:32] pts.utils.events INFO:  eta: 0:03:42  iter: 12549 -- [117/259]  total_loss: 3.229  soft_target_cross_entropy_loss: 1.649  loss_ofl: 1.581  mask_loss: 0.001692  time: 0.7674  data_time: 0.2437  lr: 1.5836e-06  max_mem: 17114M
+[07/04 07:14:09] pts.utils.events INFO:  eta: 0:03:14  iter: 12599 -- [167/259]  total_loss: 3.124  soft_target_cross_entropy_loss: 1.639  loss_ofl: 1.495  mask_loss: 0.003968  time: 0.7673  data_time: 0.1870  lr: 1.4475e-06  max_mem: 17114M
+[07/04 07:14:46] pts.utils.events INFO:  eta: 0:02:46  iter: 12649 -- [217/259]  total_loss: 3.222  soft_target_cross_entropy_loss: 1.669  loss_ofl: 1.552  mask_loss: 0.001934  time: 0.7671  data_time: 0.1362  lr: 1.3295e-06  max_mem: 17114M
+[07/04 07:16:16] pts.engine.hooks INFO: ############################## Test: 49 ##############################
+[07/04 07:16:16] pts.engine.hooks INFO: ACC-1crop@1: 0.7057368755340576
+[07/04 07:16:16] pts.engine.hooks INFO: ACC-1crop@5: 0.9282887578010559
+[07/04 07:16:16] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 07:16:36] pts.utils.events INFO:  eta: 0:02:18  iter: 12699 -- [8/259]  total_loss: 3.132  soft_target_cross_entropy_loss: 1.619  loss_ofl: 1.566  mask_loss: 0.001189  time: 0.7676  data_time: 0.8284  lr: 1.2295e-06  max_mem: 17114M
+[07/04 07:17:14] pts.utils.events INFO:  eta: 0:01:51  iter: 12749 -- [58/259]  total_loss: 3.323  soft_target_cross_entropy_loss: 1.669  loss_ofl: 1.583  mask_loss: 0.001769  time: 0.7675  data_time: 0.1643  lr: 1.1475e-06  max_mem: 17114M
+[07/04 07:17:50] pts.utils.events INFO:  eta: 0:01:23  iter: 12799 -- [108/259]  total_loss: 3.175  soft_target_cross_entropy_loss: 1.646  loss_ofl: 1.539  mask_loss: 0.0005598  time: 0.7673  data_time: 0.1292  lr: 1.0835e-06  max_mem: 17114M
+[07/04 07:18:23] pts.utils.events INFO:  eta: 0:00:55  iter: 12849 -- [158/259]  total_loss: 3.166  soft_target_cross_entropy_loss: 1.61  loss_ofl: 1.573  mask_loss: 0.0001743  time: 0.7669  data_time: 0.1068  lr: 1.0376e-06  max_mem: 17114M
+[07/04 07:18:58] pts.utils.events INFO:  eta: 0:00:27  iter: 12899 -- [208/259]  total_loss: 3.146  soft_target_cross_entropy_loss: 1.737  loss_ofl: 1.451  mask_loss: 0.0003315  time: 0.7665  data_time: 0.1251  lr: 1.0098e-06  max_mem: 17114M
+[07/04 07:20:38] pts.engine.hooks INFO: ############################## Test: 50 ##############################
+[07/04 07:20:38] pts.engine.hooks INFO: ACC-1crop@1: 0.7052422761917114
+[07/04 07:20:38] pts.engine.hooks INFO: ACC-1crop@5: 0.9322452545166016
+[07/04 07:20:38] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/current.pth
+[07/04 07:20:39] fvcore.common.checkpoint INFO: Saving checkpoint to experiments/log_eg_uniformer_s2s+t2t_8gpu_mixlr002/model_final.pth
+[07/04 07:20:39] pts.utils.events INFO:  eta: 0:00:00  iter: 12949 -- [258/259]  total_loss: 3.305  soft_target_cross_entropy_loss: 1.635  loss_ofl: 1.568  mask_loss: 0.0004421  time: 0.7663  data_time: 0.1799  lr: 1e-06  max_mem: 17114M
+[07/04 07:20:39] pts.engine.hooks INFO: Overall training speed: 12948 iterations in 2:45:22 (0.7663 s / it)
+[07/04 07:20:39] pts.engine.hooks INFO: Total training time: 3:08:42 (0:23:20 on hooks)
+[07/04 07:21:42] pts.engine.hooks INFO: ############################## Test: 50 ##############################
+[07/04 07:21:42] pts.engine.hooks INFO: ACC-1crop@1: 0.7052422761917114
+[07/04 07:21:42] pts.engine.hooks INFO: ACC-1crop@5: 0.9322452545166016
+[07/04 07:21:42] pts.engine.hooks INFO: Best accuracy 71.860%

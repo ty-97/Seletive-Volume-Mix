@@ -1,0 +1,72 @@
+DATASET:
+  NAME: 'VideoClsDataset'
+
+DATALOADER:
+  TRAIN_BATCH_SIZE: 8
+  TEST_BATCH_SIZE: 24
+  TOTAL_BATCH_SIZE: 64
+  NUM_WORKERS: 8
+  ROOT_PATH: '/data/yanbin/diving48'
+  TRAIN_LIST_FILE: 'trainValTest/train.txt'
+  TEST_LIST_FILE: 'trainValTest/val.txt'
+  FORMAT: 'DECORD_.mp4'
+  NUM_CLIPS: 1
+  NUM_CROPS: 1
+  NUM_SEGMENTS: 8
+  CLIP_LENGTH: 1
+  NUM_STEPS: 1
+
+
+ENGINE:
+  NAME: 'DefaultTrainer'
+  BEST_METRICS: ['ACC-1crop@1']
+  FP16: False
+
+TRANSFORM:
+  NAME: 'SIFARTransform'
+  CROP_SIZE: 224
+  TEST_CROP_SIZE: 224
+  NO_HORIZONTAL_FLIP: False
+  TIME_DIM: 'C'
+  MIXUP_PROB: 1.
+  SWITCH_PROB: .5
+  MASK_MOTION_CUT: 1.
+  MIXUP_LABELSMOOTHING: .1
+
+
+MODEL:
+  NAME: 'TSM_ResNet'
+  ARCH: 'tsm_resnet50'
+  ARCH_CFGS: [avg, 8, blockres]
+  NUM_CLASSES: 48
+  DROPOUT_RATIO: 0.5
+  WEIGHTS: '/home/yanbin/.cache/torch/hub/checkpoints/resnet50-19c8e357.pth'
+  REMOVE_FC: True
+  FROZEN_BN: False
+  TRANSFER_WEIGHTS: True
+
+SOLVER:
+  NAME: 'SGD'
+  NAME_MIXBLOCK: 'SGD'
+  PARAMS: 'tsm'
+  EPOCH: 50
+  CHECKPOINT_PERIOD: 5
+  EVAL_PERIOD: 10
+  DENSE_EVAL_EPOCH: 40
+  BASE_LR: 0.01
+  BASE_LR_MIXBLOCK: 0.04
+  WEIGHT_DECAY: 0.0001
+  WRITE_PERIOD: 100
+  AUTO_LR: False
+  FC_LR5: True
+  GRAD_CLIP: 20.
+
+LR_SCHEDULER:
+  NAME: 'MultiStepLR'
+  MILESTONES: [20, 40]
+
+LOSSES:
+  NAMES: ['SoftTargetCrossEntropy']
+
+INFERENCE:
+  NAME: 'ClsEvaluator'
