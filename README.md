@@ -15,8 +15,7 @@ This is an official implementaion of paper "Selective Volume Mixup for Video Act
 - [Data Preparation](#data-preparation)
 - [Code](#code)
 - [Performance](#performance)
-- [Train](#Train)
-- [Test](#Test)
+- [Running](#Running)
 - [Contibutors](#Contributors)
 - [Citing](#Citing)
 - [Acknowledgement](#Acknowledgement)
@@ -80,7 +79,7 @@ Our implements are partitially based on [SlowFast](https://github.com/facebookre
 
 
 
-## Runing 
+## Running 
 Our implementation includes 3 project: _SV-Mix_, _SlowFast_SV-Mix_Mvit_ and _UniFormer_SV-Mix_. For runing CNN models and Transfomer models (only on small scale datasets), we use _SV-Mix_ by command:
 ```
 cd SV-Mix
