@@ -78,65 +78,43 @@ Our implements are partitially based on [SlowFast](https://github.com/facebookre
 | Uniformer+SV-Mix | **97.1(+3.9)** | **85.0(+1.9)** | **71.9(+2.2)** |
 
 
-### Diving48
-| Model             | Frame * view   | Top-1 Acc.  | Checkpoint |
-| ----------------- | ----------- | ----------  | ---------------- |
-| H2CN   | 16 * 1  | 87.0%      |  |
 
 
+## Runing 
+Our implementation includes 3 project: _SV-Mix_, _SlowFast_SV-Mix_Mvit_ and _UniFormer_SV-Mix_. For runing CNN models and Transfomer models (only on small scale datasets), we use _SV-Mix_ by command:
+```
+cd SV-Mix
+python3 train_net.py --num-gpus 4 --config-file experiments/ssv1_tsm.yaml
+```
+Config files for other datasets and models can be found in experiments folder.
 
-### EGTEA Gaze
-| Model             | Frame * view * clip    | Split1 |  Split2 | Split3 |
-| ----------------- | ----------- | ---------- | ----------- | ----------- |
-| H2CN  | 8 * 1 * 1  | 66.2%     | 63.9%    | 60.5%  |
-
-
-## Train 
+For runing MvitV2 on large scale datasets, we use _SlowFast_SV-Mix_Mvit_ project. The running command is as:
 
 ```
-python train.py
+cd SlowFast_SV-Mix_Mvit
+python tools/run_net.py --cfg configs/SSv1/MVITv2_S_16x4.yaml --init_method tcp://localhost:9997
 ```
+Config files for other datasets and models can be found in configs folder.
+
+For runing Uniformer on large scale datasets, we use _UniFormer_SV-Mix_ project. The running command is as:
+
+```
+cd UniFormer_SV-Mix/video_classification
+bash exp/uniformer_s16_sthv1_prek400/run.sh
+```
+Config files for other datasets and models can be found in exp folder.
 
 
-## Test 
-We use the test code and protocal of repo [TDN](https://github.com/MCG-NJU/TDN)
 
-- For center crop single clip, the processing of testing can be summarized into 2 steps:
-    1. Run the following testing scripts:
-        ```
-        CUDA_VISIBLE_DEVICES=0 python3 test_models_center_crop.py something \
-        --archs='resnet50' --weights <your_checkpoint_path>  --test_segments=8  \
-        --test_crops=1 --batch_size=16  --gpus 0 --output_dir <your_pkl_path> -j 4 --clip_index=0
-        ```
-    2. Run the following scripts to get result from the raw score:
-        ```
-        python3 pkl_to_results.py --num_clips 1 --test_crops 1 --output_dir <your_pkl_path>  
-        ```
-- For 3 crops, 10 clips, the processing of testing can be summarized into 2 steps: 
-    1. Run the following testing scripts for 10 times(clip_index from 0 to 9):
-        ``` 
-        CUDA_VISIBLE_DEVICES=0 python3 test_models_three_crops.py  kinetics \
-        --archs='resnet50' --weights <your_checkpoint_path>  --test_segments=8 \
-        --test_crops=3 --batch_size=16 --full_res --gpus 0 --output_dir <your_pkl_path>  \
-        -j 4 --clip_index <your_clip_index>
-        ```
-    2. Run the following scripts to ensemble the raw score of the 30 views:
-        ```
-        python pkl_to_results.py --num_clips 10 --test_crops 3 --output_dir <your_pkl_path> 
-        ```
 
 
 ## Citing
 ```bash
-@article{H2CN2022,
-  title={Hierarchical Hourglass Convolutional Network for Efficient Video Classification},
-  author={Yi Tan, Yanbin Hao, Hao Zhang, Shuo Wang, Xiangnan He},
-  journal={MM 2022},
+@article{tan2023selective,
+  title={Selective Volume Mixup for Video Action Recognition},
+  author={Tan, Yi and Qiu, Zhaofan and Hao, Yanbin and Yao, Ting and He, Xiangnan and Mei, Tao},
+  journal={arXiv preprint arXiv:2309.09534},
+  year={2023}
 }
 ```
 
-## Acknowledgement
-Thanks for the following Github projects:
-- https://github.com/yjxiong/temporal-segment-networks
-- https://github.com/mit-han-lab/temporal-shift-module
-- https://github.com/MCG-NJU/TDN
