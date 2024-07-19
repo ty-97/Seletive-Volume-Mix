@@ -1,4 +1,4 @@
-# Hierarchical Hourglass Convolutional Network for Efficient Video Classification (MM 2022)
+# Selective Volume Mixup for Video Action Recognition
 This is an official implementaion of paper "Selective Volume Mixup for Video Action Recognition". [`Paper link`](https://arxiv.org/pdf/2309.09534)
 <div align="center">
   <img src="model.png" width="700px"/>
@@ -23,32 +23,43 @@ This is an official implementaion of paper "Selective Volume Mixup for Video Act
 
 ## Prerequisites
 
-The code is built with following libraries:
-* PyTorch >= 1.7, torchvision
-* tensorboardx
+The conda environment can be built by ```conda env create -f environment.yaml```
 
 For video data pre-processing, you may need [ffmpeg](https://www.ffmpeg.org/).
 
 ## Data Preparation
 
- We need to first extract videos into frames for all datasets ([Kinetics-400](https://deepmind.com/research/open-source/open-source-datasets/kinetics/), [Something-Something V1](https://20bn.com/datasets/something-something/v1) and [V2](https://20bn.com/datasets/something-something/v2), [Diving48](http://www.svcl.ucsd.edu/projects/resound/dataset.html) and [EGTEA Gaze+](http://cbi.gatech.edu/fpv)), following the [TSN](https://github.com/yjxiong/temporal-segment-networks) repo.
+ Please download the datasets and origenize the anotation files as the following form:
+ ```
+...
+[path to video file or frame folder] [num of frames] [category index]
+...
+```
 
 
 ## Code
 
 
-The implement of H2CN refers to [TSN](https://github.com/yjxiong/temporal-segment-networks), [TSM](https://github.com/mit-han-lab/temporal-shift-module),[TDN](https://github.com/MCG-NJU/TDN) codebases
+Our implements are partitially based on [SlowFast](https://github.com/facebookresearch/SlowFast/), [Uniformer](https://github.com/Sense-X/UniFormer) codebases
 
 
-## Pretrained Models
+## Performance
 
-Here we provide some of the pretrained models. 
+| Method | Sth-Sth V1 |  | Sth-Sth V2 |  | Mini-Kinetics |  |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+|  | Acc 1.(%) | $\Delta \operatorname{Acc} 1 .(\%)$ | Acc 1.(%) | $\Delta$ Acc 1.(%) | Acc 1.(%) | $\Delta$ Acc 1.(%) |
+| TSM <br> TSM+SV-Mix | 45.5 <br> 47.2 | +1.7 | 59.3 <br> 60.3 | +1.0 | 75.9 <br> 76.6 | +0.7 |
+| $\mathrm{R}(2+1) \mathrm{D}$ <br> $\mathrm{R}(2+1) \mathrm{D}+\mathrm{SV}-$ Mix | 45.9 <br> 46.7 | +0.8 | 58.9 <br> 60.3 | +1.4 | 75.5 <br> 76.1 | +0.6 |
+| MViTv2 <br> MViTv2+SV-Mix | 57.0 <br> 57.9 | +0.9 | 67.4 <br> 68.6 | +1.2 | 79.3 <br> 79.5 | +0.2 |
+| Uniformer <br> Uniformer+SV-Mix | 56.7 <br> $\mathbf{5 7 . 2}$ | +0.5 | 67.7 <br> 68.2 | +0.5 | 79.1 | + |
 
+### Large scale datasets
 
-### Something-Something
-
-Something-Something [V1](https://20bn.com/datasets/something-something/v1)&[V2](https://20bn.com/datasets/something-something) datasets are highly temporal-related. Here, we 
-use the 224×224 resolution for performance report.
+| Model             | Frame * view   | Top-1 Acc. | Top-5 Acc. | Checkpoint |
+| ----------------- | ----------- | ---------- | ----------- | ---------------- |
+| H2CN   | 8 * 1  | 53.6%      | 81.4%     |  |
+| H2CN   | 16 * 1  | 55.0%      | 82.4%     |  |
+| H2CN   | (8+16) * 1  | 56.7%      | 83.2%     |  |
 
 #### Something-Something-V1
 
