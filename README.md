@@ -6,8 +6,8 @@ This is an official implementaion of paper "Selective Volume Mixup for Video Act
 
 
 ## Updates
-### Oct 11, 2022
-* Release this V1 version (the version used in paper) to public. Complete codes and models will be released soon.
+### Jul 19, 2024
+* Release this V1 version (the version used in paper) to public. Complete logs and models will be released soon.
 
 ## Content
 
