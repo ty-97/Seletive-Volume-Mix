@@ -45,47 +45,37 @@ Our implements are partitially based on [SlowFast](https://github.com/facebookre
 
 ## Performance
 
-| Method | Sth-Sth V1 |  | Sth-Sth V2 |  | Mini-Kinetics |  |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-|  | Acc 1.(%) | $\Delta \operatorname{Acc} 1 .(\%)$ | Acc 1.(%) | $\Delta$ Acc 1.(%) | Acc 1.(%) | $\Delta$ Acc 1.(%) |
-| TSM <br> TSM+SV-Mix | 45.5 <br> 47.2 | +1.7 | 59.3 <br> 60.3 | +1.0 | 75.9 <br> 76.6 | +0.7 |
-| $\mathrm{R}(2+1) \mathrm{D}$ <br> $\mathrm{R}(2+1) \mathrm{D}+\mathrm{SV}-$ Mix | 45.9 <br> 46.7 | +0.8 | 58.9 <br> 60.3 | +1.4 | 75.5 <br> 76.1 | +0.6 |
-| MViTv2 <br> MViTv2+SV-Mix | 57.0 <br> 57.9 | +0.9 | 67.4 <br> 68.6 | +1.2 | 79.3 <br> 79.5 | +0.2 |
-| Uniformer <br> Uniformer+SV-Mix | 56.7 <br> $\mathbf{5 7 . 2}$ | +0.5 | 67.7 <br> 68.2 | +0.5 | 79.1 | + |
+
 
 ### Large scale datasets
 
-| Model             | Frame * view   | Top-1 Acc. | Top-5 Acc. | Checkpoint |
-| ----------------- | ----------- | ---------- | ----------- | ---------------- |
-| H2CN   | 8 * 1  | 53.6%      | 81.4%     |  |
-| H2CN   | 16 * 1  | 55.0%      | 82.4%     |  |
-| H2CN   | (8+16) * 1  | 56.7%      | 83.2%     |  |
-
-#### Something-Something-V1
-
-| Model             | Frame * view   | Top-1 Acc. | Top-5 Acc. | Checkpoint |
-| ----------------- | ----------- | ---------- | ----------- | ---------------- |
-| H2CN   | 8 * 1  | 53.6%      | 81.4%     |  |
-| H2CN   | 16 * 1  | 55.0%      | 82.4%     |  |
-| H2CN   | (8+16) * 1  | 56.7%      | 83.2%     |  |
+| Method           | Sth-Sth V1     | Sth-Sth V2     | Mini-Kinetics  |
+|------------------|----------------|----------------|----------------|
+| TSM              | 45.5           | 59.3           | 75.9           |
+| TSM+SV-Mix       | **47.2(+1.7)** | **60.3(+1.0)** | **76.6(+0.7)** |
+| R(2+1)D          | 45.9           | 58.9           | 75.5           |
+| R(2+1)D+SV-Mix   | **46.7(+0.8)** | **60.3(+1.4)** | **76.1(+0.6)** |
+| MViTv2           | 57.0           | 67.4           | 79.3           |
+| MViTv2+SV-Mix    | **57.9(+0.9)** | **68.6(+1.2)** | **79.5(+0.2)** |
+| Uniformer        | 56.7           | 67.7           | 79.1           |
+| Uniformer+SV-Mix | **57.2(+0.5)** | **68.2(+0.5)** |                |
 
 
-#### Something-Something-V2
-| Model             | Frame * view   | Top-1 Acc. | Top-5 Acc. | Checkpoint |
-| ----------------- | ----------- | ---------- | ----------- | ---------------- |
-| H2CN   | 8 * 1  | 65.2%      | 89.7%     | |
-| H2CN   | 16 * 1  | 66.4%      | 90.1%     | |
-| H2CN   | (8+16) * 1  | 67.9%      | 91.2%     |  |
 
+### Small scale datasets
 
-### Kinetics-400
-
-| Model             | Frame * view   | Top-1 Acc. | Top-5 Acc. | Checkpoint |
-| ----------------- | ----------- | ---------- | ----------- | ---------------- |
-| H2CN   | 8 * 30  | 76.9%      | 93.0%     | [link](https://pan.baidu.com/s/16nf9kad6RClaW3NbInsPBA)(password:defq) |
-| H2CN   | 16 * 30  | 77.9%      | 93.3%     | [link](https://pan.baidu.com/s/1SsBSWqJYpM4bnh1ACNqtzg)(password:vert) |
-| H2CN   | (8+16) * 30  | 78.7%      | 93.6%     |  |
-
+| Method           | UCF101         | Diving48       | EGTEA GAZE+    |
+|------------------|----------------|----------------|----------------|
+| TSM              | 85.2           | 77.6           | 63.5           |
+| TSM+SV-Mix       | **88.4(+3.2)** | **80.2(+2.6)** | **65.5(+2.0)** |
+| ViViT            | 87.3           | 70.0           | 57.3           |
+| ViViT+SV-Mix     | **88.3(+1.0)** | **76.2(+6.2)** | **62.1(+4.8)** |
+| MViTv2           | 90.0           | 80.7           | 66.5           |
+| MViTv2+SV-Mix    | **92.2(+2.2)** | **83.8(+3.1)** | **67.8(+1.3)** |
+| VideoSwin        | 93.6           | 78.7           | 67.0           |
+| VideoSwin+SV-Mix | **96.6(+3.0)** | **82.8(+4.1)** | **68.8(+1.8)** |
+| Uniformer        | 93.2           | 83.1           | 69.7           |
+| Uniformer+SV-Mix | **97.1(+3.9)** | **85.0(+1.9)** | **71.9(+2.2)** |
 
 
 ### Diving48
