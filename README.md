@@ -1,7 +1,7 @@
 # Selective Volume Mixup for Video Action Recognition
 This is an official implementaion of paper "Selective Volume Mixup for Video Action Recognition". [`Paper link`](https://arxiv.org/pdf/2309.09534)
 <div align="center">
-  <img src="model.png" width="700px"/>
+  <img src="framework.png" width="700px"/>
 </div>
 
 
