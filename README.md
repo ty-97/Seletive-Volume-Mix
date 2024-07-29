@@ -57,7 +57,7 @@ Our implements are partitially based on [SlowFast](https://github.com/facebookre
 | MViTv2           | 57.0           | 67.4           | 79.3           |
 | MViTv2+SV-Mix    | **57.9(+0.9)** | **68.6(+1.2)** | **79.5(+0.2)** |
 | Uniformer        | 56.7           | 67.7           | 79.1           |
-| Uniformer+SV-Mix | **57.2(+0.5)** | **68.2(+0.5)** |                |
+| Uniformer+SV-Mix | **57.4(+0.7)** | **68.8(+1.1)** | **79.4(+0.3)** |
 
 
 
